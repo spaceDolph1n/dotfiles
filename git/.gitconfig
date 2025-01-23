@@ -1,0 +1,15 @@
+[user]
+    name = spaceDolph1n
+    email = tiagojsr1@gmail.com
+
+[pull]
+    rebase = true
+
+[push]
+    default = upstream
+
+[init]
+    defaultBranch = main
+
+[rebase]
+	autoStash = true
