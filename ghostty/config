@@ -1,0 +1,9 @@
+theme = catppuccin-mocha
+font-size = "15"
+font-family="JetBrains Mono"
+background-opacity = 0.92
+background-blur-radius = 20
+mouse-hide-while-typing = true
+macos-titlebar-style = hidden
+window-padding-balance=true
+macos-option-as-alt = true
