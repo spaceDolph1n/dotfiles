@@ -65,9 +65,9 @@ keymap.set("v", "p", '"_dP')
 
 -- Octo and Prs
 keymap.set("n", "<leader>oo", ":Octo<CR>", { desc = "Open Octo" })
-keymap.set("n", "<leader>op", ":Octo pr list<CR>", { desc = "Octo PR list" })
-keymap.set("n", "<leader>oc", ":Octo pr create<CR>", { desc = "Octo PR create" })
-keymap.set("n", "<leader>or", ":Octo review start<CR>", { desc = "Start Review on PR" })
+keymap.set("n", "<leader>op", ":Octo pr list<CR>", { desc = "PR list" })
+keymap.set("n", "<leader>oc", ":Octo pr create<CR>", { desc = "Create PR" })
+keymap.set("n", "<leader>or", ":Octo review start<CR>", { desc = "Start PR Review" })
 
 -- Run custom search and replace command in a quick fix list
 keymap.set(
