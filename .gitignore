@@ -1,0 +1,35 @@
+# General OS and editor files
+.DS_Store       # macOS folder metadata
+Thumbs.db       # Windows thumbnail cache
+*.swp           # Vim swap files
+*~              # Backup files
+*.bak           # Backup files
+
+# Temporary files
+.cache/
+.tmp/
+temp/
+
+# Sensitive files
+.env
+.secret
+*.key
+*.pem
+id_rsa          # Private SSH key
+id_rsa.pub      # Public SSH key (optional to include)
+
+# Version control
+.git/
+
+# IDE-specific files
+.idea/
+.vscode/
+
+# Language-specific (optional)
+node_modules/
+__pycache__/
+*.pyc
+
+# Local overrides (optional)
+local/
+local.*
