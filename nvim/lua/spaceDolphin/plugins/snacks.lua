@@ -64,6 +64,7 @@ return {
 			enabled = true,
 			timeout = 5000,
 		},
+		picker = { enabled = true },
 		quickfile = { enabled = true },
 		rename = { enabled = true },
 		scroll = { enabled = true },
@@ -86,6 +87,13 @@ return {
 				Snacks.rename.rename_file()
 			end,
 			desc = "Rename File",
+		},
+		{
+			"<leader>fp",
+			function()
+				Snacks.picker()
+			end,
+			desc = "Snacks Picker",
 		},
 		{
 			"<leader>lb",
