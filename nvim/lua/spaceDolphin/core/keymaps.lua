@@ -81,7 +81,7 @@ keymap.set(
 keymap.set("n", "<CR>", "o<Esc>", { noremap = true, silent = true })
 
 -- Go to the beginning of the line
-keymap.set("n", "B", "0", { desc = "Go to beginning of the line" })
+keymap.set({ "n", "o" }, "B", "0", { desc = "Go to beginning of the line" })
 
 -- Go to the end of the line
-keymap.set("n", "E", "$", { desc = "Go to end of the line" })
+keymap.set({ "n", "o" }, "E", "$", { desc = "Go to end of the line" })
