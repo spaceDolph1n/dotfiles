@@ -1,5 +1,5 @@
 return {
-	display = 1,
+	display = "all",
 	paddings = 5,
 	group_paddings = 5,
 	corner_radius = 8,
