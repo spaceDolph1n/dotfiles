@@ -10,9 +10,8 @@ local profile = sbar.add("item", "widgets.profile", {
 	background = {
 		image = {
 			string = profile_pic,
-			corner_radius = 8,
-			scale = 0.03,
-			drawing = true,
+			corner_radius = 5,
+			scale = 0.035,
 			border_color = colors.transparent,
 			border_width = 0,
 		},

@@ -13,7 +13,7 @@ return {
 		spec = {
 			{ "<leader>a", group = "AI Avante" },
 			{ "<leader>c", group = "AI ChatGPT" },
-			{ "<leader>e", group = "File Explorer" },
+			-- { "<leader>e", group = "File Explorer" },
 			{ "<leader>f", group = "Find" },
 			{ "<leader>g", group = "Go", icon = { icon = "⏩" } },
 			{ "<leader>h", group = "GitSigns" },
