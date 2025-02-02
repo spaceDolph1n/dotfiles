@@ -56,6 +56,7 @@ return {
 			},
 		},
 		dim = { enabled = true },
+		explorer = { enabled = true },
 		git = { enabled = true },
 		indent = { enabled = true },
 		input = { enabled = true },
@@ -74,6 +75,7 @@ return {
 		zen = { enabled = true },
 	},
 	keys = {
+		-- UI
 		{
 			"<leader>un",
 			function()
@@ -82,19 +84,13 @@ return {
 			desc = "Notification History",
 		},
 		{
-			"<leader>cR",
+			"<leader>uN",
 			function()
-				Snacks.rename.rename_file()
+				Snacks.notifier.hide()
 			end,
-			desc = "Rename File",
+			desc = "Dismiss All Notifications",
 		},
-		{
-			"<leader>fp",
-			function()
-				Snacks.picker()
-			end,
-			desc = "Snacks Picker",
-		},
+		-- Git
 		{
 			"<leader>lb",
 			function()
@@ -123,12 +119,116 @@ return {
 			end,
 			desc = "Lazygit Log (cwd)",
 		},
+		-- Explorer
 		{
-			"<leader>uN",
+			"<leader>e",
 			function()
-				Snacks.notifier.hide()
+				Snacks.explorer.open()
 			end,
-			desc = "Dismiss All Notifications",
+			desc = "Open Explorer",
+		},
+		-- Picker
+		{
+			"<leader><space>",
+			function()
+				Snacks.picker.files()
+			end,
+			desc = "Find Files",
+		},
+		{
+			"<leader>ff",
+			function()
+				Snacks.picker.files()
+			end,
+			desc = "Files",
+		},
+		{
+			"<leader>fs",
+			function()
+				Snacks.picker.grep()
+			end,
+			desc = "Grep",
+		},
+		{
+			"<leader>fr",
+			function()
+				Snacks.picker.recent()
+			end,
+			desc = "Recent",
+		},
+		{
+			"<leader>fw",
+			function()
+				Snacks.picker.grep_word()
+			end,
+			desc = "Visual selection or word",
+			mode = { "n", "x" },
+		},
+		{
+			"<leader>fa",
+			function()
+				Snacks.picker()
+			end,
+			desc = "All",
+		},
+		{
+			"<leader>ft",
+			function()
+				Snacks.picker.todo_comments()
+			end,
+			desc = "Todos",
+		},
+		-- LSP
+		{
+			"<leader>gd",
+			function()
+				Snacks.picker.lsp_definitions()
+			end,
+			desc = "Definition",
+		},
+		{
+			"<leader>gr",
+			function()
+				Snacks.picker.lsp_references()
+			end,
+			nowait = true,
+			desc = "References",
+		},
+		{
+			"<leader>gi",
+			function()
+				Snacks.picker.lsp_implementations()
+			end,
+			desc = "Implementation",
+		},
+		{
+			"<leader>gt",
+			function()
+				Snacks.picker.lsp_type_definitions()
+			end,
+			desc = "Type Definition",
+		},
+		{
+			"<leader>gs",
+			function()
+				Snacks.picker.lsp_symbols()
+			end,
+			desc = "LSP Symbols",
+		},
+		{
+			"<leader>D",
+			function()
+				Snacks.picker.diagnostics()
+			end,
+			desc = "Diagnostics",
+		},
+		-- Other
+		{
+			"<leader>tR",
+			function()
+				Snacks.rename.rename_file()
+			end,
+			desc = "Rename File",
 		},
 		{
 			"<leader>/",

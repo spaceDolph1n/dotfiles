@@ -1,23 +1,34 @@
 local icons = require("icons")
 local colors = require("colors")
 
+-- Updated whitelist with Chrome instead of Brave
 local whitelist = {
-	["Spotify"] = true,
-	["Brave Browser"] = true,
+	["^Spotify$"] = true, -- Exact match for Spotify
+	["^Google Chrome$"] = true, -- Exact match for Chrome
+	["^Zen Browser$"] = true, -- Exact match for Chrome
 }
+
+local function is_whitelisted(app_name)
+	for pattern in pairs(whitelist) do
+		if string.match(app_name, pattern) then
+			return true
+		end
+	end
+	return false
+end
 
 local media_cover = sbar.add("item", "media.cover", {
 	position = "right",
 	background = {
 		image = {
 			string = "media.artwork",
-			scale = 0.75,
+			scale = 0.85, -- Default scale
 		},
 		color = colors.transparent,
 	},
 	label = { drawing = false },
 	icon = { drawing = false },
-	drawing = false,
+	drawing = true, -- Always show the media cover
 	updates = true,
 	name = "media.cover",
 })
@@ -52,92 +63,69 @@ local media_title = sbar.add("item", {
 	},
 })
 
-local interrupt = 0
-local function animate_detail(detail)
-	-- Don't show details if player is visible
-	if player_visible then
-		return
-	end
+local is_playing = false
 
-	if not detail then
-		interrupt = interrupt - 1
-	end
-	if interrupt > 0 and not detail then
-		return
-	end
-
+local function animate_labels(show)
 	sbar.animate("tanh", 30, function()
-		media_artist:set({ label = { width = detail and "dynamic" or 0 } })
-		media_title:set({ label = { width = detail and "dynamic" or 0 } })
+		media_artist:set({ label = { width = show and "dynamic" or 0 } })
+		media_title:set({ label = { width = show and "dynamic" or 0 } })
 	end)
 end
 
 media_cover:subscribe("media_change", function(env)
-	if whitelist[env.INFO.app] then
-		local drawing = (env.INFO.artist ~= "" or env.INFO.title ~= "")
-		media_artist:set({ drawing = drawing, label = env.INFO.artist })
-		media_title:set({ drawing = drawing, label = env.INFO.title })
+	if is_whitelisted(env.INFO.app) then
+		local has_artist = env.INFO.artist ~= ""
+		local has_title = env.INFO.title ~= ""
+		local drawing = has_artist or has_title
+		local was_playing = is_playing
+		is_playing = env.INFO.state == "playing"
+
+		-- Determine if it's a YouTube video playing in Chrome
+		local is_youtube = env.INFO.url and string.match(env.INFO.url, "youtube%.com")
+		local target_scale = 0.85 -- Default scale for most apps
+		if is_youtube then
+			target_scale = 1.0 -- Larger scale for YouTube
+		end
+
+		-- Always show the media cover
 		media_cover:set({
-			drawing = drawing,
+			drawing = true,
 			background = {
 				image = {
 					string = "media.artwork",
-					scale = 0.75,
 				},
 			},
 		})
 
-		-- Only show details if player isn't visible
-		if drawing and not player_visible then
-			animate_detail(true)
-			interrupt = interrupt + 1
-			sbar.delay(5, animate_detail)
+		-- For YouTube videos, use the video title as the "song name"
+		local title = env.INFO.title
+		if is_youtube then
+			title = env.INFO.title -- Use the video title directly
 		end
+
+		-- Only show artist and title if they exist
+		media_artist:set({ drawing = has_artist, label = env.INFO.artist })
+		media_title:set({ drawing = has_title, label = title })
+
+		-- Animate labels when play state changes
+		if is_playing ~= was_playing then
+			animate_labels(is_playing)
+		end
+	else
+		-- Hide artist and title if the app is not whitelisted
+		media_artist:set({ drawing = false })
+		media_title:set({ drawing = false })
 	end
 end)
 
-local player_visible = false
-
--- Add a function to handle player visibility
-local function show_player()
-	if not player_visible then
-		sbar.exec("~/.config/sketchybar/helpers/event_providers/media_player/bin/media_player")
-		player_visible = true
-	end
-end
-
-local function hide_player()
-	if player_visible then
-		sbar.exec("pkill -SIGUSR1 media_player")
-		player_visible = false
-	end
-end
-
 media_cover:subscribe("mouse.entered", function(env)
-	interrupt = interrupt + 1
-	animate_detail(true)
-	show_player()
+	if not is_playing then
+		animate_labels(true)
+	end
 end)
 
 media_cover:subscribe("mouse.exited", function(env)
-	animate_detail(false)
-end)
-
--- Keep click handler for closing
-media_cover:subscribe("mouse.clicked", function(env)
-	if player_visible then
-		hide_player()
-	else
-		show_player()
+	if not is_playing then
+		animate_labels(false)
 	end
-end)
-
--- Add this to prevent window from closing when clicking inside it
-media_cover:subscribe("mouse.clicked.inside", function(env)
-	return
-end)
-
--- Add this to track when the player closes itself
-media_cover:subscribe("mouse.exited.global", function(env)
-	player_visible = false
 end)

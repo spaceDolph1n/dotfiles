@@ -8,7 +8,7 @@ return {
 	},
 	y_offset = 8,
 
-	item_height = 26,
+	item_height = 27,
 	item_padding = 8,
 	item_corner_radius = 6,
 	item_spacing = 8,
