@@ -69,7 +69,11 @@ return {
 		quickfile = { enabled = true },
 		rename = { enabled = true },
 		scroll = { enabled = true },
-		terminal = { enabled = true },
+		terminal = { enabled = true, win = {
+			wo = {
+				winbar = "",
+			},
+		} },
 		toggle = { enabled = true },
 		words = { enabled = true }, -- what is this doing?
 		zen = { enabled = true },
