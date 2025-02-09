@@ -10,6 +10,7 @@ return {
 		})
 		require("mini.icons").setup()
 		require("mini.ai").setup()
+		require("mini.diff").setup()
 		require("mini.surround").setup()
 		require("mini.pairs").setup()
 		require("mini.comment").setup()
@@ -31,5 +32,9 @@ return {
 			window = { suffix = "", options = {} },
 			yank = { suffix = "y", options = {} },
 		})
+
+		vim.keymap.set("n", "<leader>ld", function()
+			MiniDiff.toggle_overlay()
+		end, { noremap = true, silent = true, desc = "Git diff toggle" })
 	end,
 }
