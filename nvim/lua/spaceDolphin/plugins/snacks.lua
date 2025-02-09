@@ -182,6 +182,13 @@ return {
 			end,
 			desc = "Todos",
 		},
+		{
+			"<leader>fd",
+			function()
+				Snacks.picker.diagnostics()
+			end,
+			desc = "Workspace Diagnostics",
+		},
 		-- LSP
 		{
 			"<leader>gd",
@@ -222,9 +229,9 @@ return {
 		{
 			"<leader>D",
 			function()
-				Snacks.picker.diagnostics()
+				Snacks.picker.diagnostics_buffer()
 			end,
-			desc = "Diagnostics",
+			desc = "Buffer Diagnostics",
 		},
 		-- Other
 		{
