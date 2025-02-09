@@ -24,7 +24,7 @@ return {
 			{ "<leader>u", group = "UI" },
 			{ "<leader>w", desc = "Save", icon = { icon = "⚡" } },
 			{ "<leader>W", desc = "Save all", icon = { icon = "💾" } },
-			{ "<leader>x", group = "Diagnostics" },
+			-- { "<leader>x", group = "Diagnostics Trouble" },
 			{ "<leader>/", desc = "Terminal", icon = { icon = "" } },
 			{ "<leader>+", desc = "Increment", icon = { icon = "➕" } },
 			{ "<leader>-", desc = "Decrement", icon = { icon = "➖" } },
