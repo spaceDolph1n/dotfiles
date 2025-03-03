@@ -59,6 +59,7 @@ return {
 		explorer = { enabled = true },
 		git = { enabled = true },
 		indent = { enabled = true },
+		image = { enabled = true },
 		input = { enabled = true },
 		lazygit = { enabled = true },
 		notifier = {
@@ -189,6 +190,13 @@ return {
 			end,
 			desc = "Workspace Diagnostics",
 		},
+		{
+			"<leader>fz",
+			function()
+				Snacks.picker.zoxide()
+			end,
+			desc = "Zoxide",
+		},
 		-- LSP
 		{
 			"<leader>gd",
@@ -219,13 +227,13 @@ return {
 			end,
 			desc = "Type Definition",
 		},
-		{
-			"<leader>gs",
-			function()
-				Snacks.picker.lsp_symbols()
-			end,
-			desc = "LSP Symbols",
-		},
+		-- {
+		-- 	"<leader>gs",
+		-- 	function()
+		-- 		Snacks.picker.lsp_symbols()
+		-- 	end,
+		-- 	desc = "LSP Symbols",
+		-- },
 		{
 			"<leader>D",
 			function()

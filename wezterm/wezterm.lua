@@ -2,10 +2,9 @@ local wezterm = require("wezterm")
 return {
 	color_scheme = "Catppuccin Mocha",
 	enable_tab_bar = false,
-	font_size = 15.0,
+	font_size = 13.0,
 	font = wezterm.font("JetBrains Mono"),
 	macos_window_background_blur = 30,
-	enable_mouse = true,
 	window_background_opacity = 0.92,
 	window_decorations = "RESIZE",
 
