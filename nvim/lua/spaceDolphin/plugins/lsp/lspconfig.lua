@@ -133,7 +133,6 @@ return {
 			end,
 			["volar"] = function()
 				lspconfig["volar"].setup({
-					-- filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact", "vue" },
 					filetypes = { "vue" },
 				})
 			end,

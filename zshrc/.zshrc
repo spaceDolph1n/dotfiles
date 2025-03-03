@@ -108,3 +108,4 @@ export GIT_CONFIG_GLOBAL=~/.config/git/.gitconfig
 
 # Ollama alias
 alias bot="ollama run qwen2.5-coder:14b"
+
