@@ -24,6 +24,13 @@ return {
 				path = "/Users/tiagorodrigues/Library/Mobile Documents/iCloud~md~obsidian/Documents/Second Brain",
 			},
 		},
+		ui = {
+			checkboxes = {
+				-- NOTE: the 'char' value has to be a single character, and the highlight groups are defined below.
+				[" "] = { char = "󰄱", hl_group = "ObsidianTodo" },
+				["x"] = { char = "", hl_group = "ObsidianDone" },
+			},
+		},
 		follow_url_func = function(url)
 			-- Open the URL in the default web browser.
 			vim.fn.jobstart({ "open", url }) -- Mac OS

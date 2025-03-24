@@ -197,6 +197,13 @@ return {
 			end,
 			desc = "Zoxide",
 		},
+		{
+			"<leader>fq",
+			function()
+				Snacks.picker.qflist()
+			end,
+			desc = "Quickfix List",
+		},
 		-- LSP
 		{
 			"<leader>gd",

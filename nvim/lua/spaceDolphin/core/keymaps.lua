@@ -46,6 +46,9 @@ keymap.set("i", ",,", "<Esc>A,<Esc>")
 -- Sending single char delete to black hole register
 keymap.set("n", "x", '"_x')
 
+-- Sending Visual mode deletions to black hole register
+keymap.set("v", "x", '"_d', { noremap = true, silent = true })
+
 -- Save file
 keymap.set("n", "<leader>w", ":update<CR>", { desc = "Save" })
 keymap.set("n", "<leader>W", ":wa<CR>", { desc = "Save all" })
@@ -81,7 +84,7 @@ keymap.set(
 keymap.set("n", "<CR>", "o<Esc>", { noremap = true, silent = true })
 
 -- Go to the beginning of the line
-keymap.set({ "n", "o" }, "B", "0", { desc = "Go to beginning of the line" })
+keymap.set({ "n", "o", "v" }, "B", "0", { desc = "Go to beginning of the line" })
 
 -- Go to the end of the line
-keymap.set({ "n", "o" }, "E", "$", { desc = "Go to end of the line" })
+keymap.set({ "n", "o", "v" }, "E", "$", { desc = "Go to end of the line" })

@@ -45,7 +45,7 @@ sbar.exec("aerospace list-workspaces --all --format '%{workspace}%{monitor-id}' 
 	local spaces = parse_workspace_json(spaces_json)
 
 	-- Get all visible workspaces
-	sbar.exec("aerospace list-workspaces --monitor all --visible", function(visible_workspaces)
+	sbar.exec("aerospace list-workspaces --monitor all ", function(visible_workspaces)
 		-- Create a set of visible workspaces for quick lookup
 		local visible_set = {}
 		for workspace in visible_workspaces:gmatch("[^\r\n]+") do
@@ -132,4 +132,3 @@ sbar.exec("aerospace list-workspaces --all --format '%{workspace}%{monitor-id}' 
 		sbar.exec("sketchybar --reorder " .. item_order .. " front_app menus")
 	end)
 end)
-
