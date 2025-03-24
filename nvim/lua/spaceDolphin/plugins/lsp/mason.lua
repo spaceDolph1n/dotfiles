@@ -3,6 +3,7 @@ return {
 	dependencies = {
 		"williamboman/mason-lspconfig.nvim",
 		"WhoIsSethDaniel/mason-tool-installer.nvim",
+		"jay-babu/mason-nvim-dap.nvim", -- Add this line
 	},
 	config = function()
 		-- import mason
@@ -10,8 +11,8 @@ return {
 
 		-- import mason-lspconfig
 		local mason_lspconfig = require("mason-lspconfig")
-
 		local mason_tool_installer = require("mason-tool-installer")
+		local mason_dap = require("mason-nvim-dap") -- Add this line
 
 		-- enable mason and configure icons
 		mason.setup({
@@ -42,6 +43,17 @@ return {
 				"volar",
 				"phpactor",
 			},
+			automatic_installation = true, -- Automatically install LSP servers
+		})
+
+		-- Add this block for DAP configuration
+		mason_dap.setup({
+			ensure_installed = {
+				"js-debug-adapter", -- For JavaScript/TypeScript
+				"php-debug-adapter", -- For PHP
+				"node-debug2-adapter", -- Alternative JS debugger
+			},
+			automatic_installation = true, -- Automatically install debug adapters
 		})
 
 		mason_tool_installer.setup({

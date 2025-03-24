@@ -2,6 +2,7 @@
 vim.g.mapleader = " "
 
 local keymap = vim.keymap -- for conciseness
+local fn = vim.fn -- for conciseness
 
 ---------------------
 -- General Keymaps -------------------
@@ -88,3 +89,9 @@ keymap.set({ "n", "o", "v" }, "B", "0", { desc = "Go to beginning of the line" }
 
 -- Go to the end of the line
 keymap.set({ "n", "o", "v" }, "E", "$", { desc = "Go to end of the line" })
+
+-- Macros
+--
+
+-- macro to add a console.log statement with visual selection
+vim.cmd([[ let @l = "viwyoconsole.log('\<Esc>pa:\<Esc>la, \<Esc>pl" ]])

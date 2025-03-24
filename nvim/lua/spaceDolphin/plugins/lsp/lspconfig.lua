@@ -28,7 +28,7 @@ return {
 				-- set keybinds
 
 				opts.desc = "Go to declaration"
-				keymap.set("n", "<leader>gD", vim.lsp.buf.declaration, opts) -- go to declaration
+				-- keymap.set("n", "<leader>gD", vim.lsp.buf.declaration, opts) -- go to declaration
 
 				opts.desc = "See available code actions"
 				keymap.set({ "n", "v" }, "<leader>ta", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
@@ -40,7 +40,7 @@ return {
 				-- keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts) -- show  diagnostics for file
 
 				opts.desc = "Show line diagnostics"
-				keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts) -- show diagnostics for line
+				keymap.set("n", "gl", vim.diagnostic.open_float, opts) -- show diagnostics for line
 
 				opts.desc = "Show documentation for what is under cursor"
 				keymap.set("n", "K", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
