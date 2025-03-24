@@ -213,6 +213,13 @@ return {
 			desc = "Definition",
 		},
 		{
+			"<leader>gD",
+			function()
+				Snacks.picker.lsp_declarations()
+			end,
+			desc = "Declaration",
+		},
+		{
 			"<leader>gr",
 			function()
 				Snacks.picker.lsp_references()
@@ -234,13 +241,13 @@ return {
 			end,
 			desc = "Type Definition",
 		},
-		-- {
-		-- 	"<leader>gs",
-		-- 	function()
-		-- 		Snacks.picker.lsp_symbols()
-		-- 	end,
-		-- 	desc = "LSP Symbols",
-		-- },
+		{
+			"<leader>fl",
+			function()
+				Snacks.picker.lsp_symbols()
+			end,
+			desc = "LSP Symbols",
+		},
 		{
 			"<leader>D",
 			function()
