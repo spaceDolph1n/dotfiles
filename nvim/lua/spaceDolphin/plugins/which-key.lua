@@ -11,8 +11,7 @@ return {
 			padding = { 2, 2 },
 		},
 		spec = {
-			-- { "<leader>a", group = "AI Avante" },
-			{ "<leader>c", desc = "AI Chat" },
+			{ "<leader>a", group = "AI" },
 			{ "<leader>d", group = "Debug" },
 			{ "<leader>f", group = "Find" },
 			{ "<leader>g", group = "Go", icon = { icon = "⏩" } },
