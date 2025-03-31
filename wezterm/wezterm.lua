@@ -19,6 +19,7 @@ return {
 			mods = "CTRL",
 			action = wezterm.action.ClearScrollback("ScrollbackAndViewport"),
 		},
+		{ key = "Enter", mods = "OPT", action = wezterm.action.DisableDefaultAssignment },
 	},
 	mouse_bindings = {
 		-- Ctrl-click will open the link under the mouse cursor

@@ -9,6 +9,7 @@ local fn = vim.fn -- for conciseness
 
 -- use jk to exit insert mode
 keymap.set("i", "jj", "<ESC>", { desc = "Exit insert mode with jj" })
+keymap.set("i", "jjw", "<ESC>:w!<cr>", { desc = "Exit insert mode and save" })
 
 -- clear search highlights
 keymap.set("n", "<leader>uh", ":nohl<CR>", { desc = "Clear search highlights" })
@@ -81,11 +82,14 @@ keymap.set(
 	{ desc = "Search and Replace", noremap = true, silent = true }
 )
 
+-- Replace all occurrences of the word under the cursor with a new word
+keymap.set("n", "<leader>tT", ":ReplaceAll<CR>", { desc = "Replace All", noremap = true, silent = true })
+
 -- Pressing enter in normal mode will insert a new line
 keymap.set("n", "<CR>", "o<Esc>", { noremap = true, silent = true })
 
 -- Go to the beginning of the line
-keymap.set({ "n", "o", "v" }, "B", "0", { desc = "Go to beginning of the line" })
+keymap.set({ "n", "o", "v" }, "B", "^", { desc = "Go to beginning of the line" })
 
 -- Go to the end of the line
 keymap.set({ "n", "o", "v" }, "E", "$", { desc = "Go to end of the line" })

@@ -74,3 +74,17 @@ vim.api.nvim_create_user_command("SearchReplaceInQuickfix", function()
 		print("Please provide both find and replace strings, separated by a comma.")
 	end
 end, { nargs = 0 })
+
+vim.api.nvim_create_user_command("ReplaceAll", function()
+	local find = vim.fn.expand("<cword>")
+	local replace = vim.fn.input('Replace "' .. find .. '" with: ')
+	if replace ~= "" then
+		local choice = vim.fn.input('Replace all "' .. find .. '" with "' .. replace .. '"? [y/n]: ')
+		if choice:lower() == "y" then
+			vim.cmd(":%s/" .. vim.fn.escape(find, "/\\") .. "/" .. vim.fn.escape(replace, "/\\") .. "/g")
+			print("Replaced all occurrences")
+		else
+			print("Cancelled")
+		end
+	end
+end, {})

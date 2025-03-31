@@ -10,6 +10,7 @@ return {
 			javascriptreact = { "eslint_d" },
 			typescriptreact = { "eslint_d" },
 			svelte = { "eslint_d" },
+			vue = { "eslint_d" },
 			php = { "phpcs" },
 			blade = { "phpcs" },
 		}
