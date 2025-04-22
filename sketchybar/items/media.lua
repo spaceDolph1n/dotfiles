@@ -4,6 +4,7 @@ local colors = require("colors")
 -- Updated whitelist with Chrome instead of Brave
 local whitelist = {
 	["^Spotify$"] = true, -- Exact match for Spotify
+	["Spotify"] = true, -- Exact match for Spotify
 	["^Google Chrome$"] = true, -- Exact match for Chrome
 	["^Zen Browser$"] = true, -- Exact match for Chrome
 }
