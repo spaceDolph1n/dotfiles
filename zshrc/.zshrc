@@ -2,6 +2,10 @@
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
 export PATH=/opt/homebrew/bin:$PATH
+export PATH=$PATH:$HOME/.local/bin
+
+# add path for keg-only formulae
+export PATH="/opt/homebrew/opt/mysql-client/bin:/opt/homebrew/bin:$PATH"
 
 export SCRIPTS="$HOME/.config/scripts"
 export SECOND_BRAIN=$HOME/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Second\ Brain
@@ -21,7 +25,7 @@ export EDITOR=/opt/homebrew/bin/nvim
 # ZSH_CUSTOM=/path/to/new-custom-folder
 
 # Zsh plugins
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting wp-cli)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -106,6 +110,24 @@ alias gcoall='git checkout -- .'
 # Git config default location
 export GIT_CONFIG_GLOBAL=~/.config/git/.gitconfig
 
-# Ollama alias
-alias bot="ollama run qwen2.5-coder:14b"
 
+# Herd injected PHP 8.4 configuration.
+export HERD_PHP_84_INI_SCAN_DIR="/Users/tiagorodrigues/Library/Application Support/Herd/config/php/84/"
+
+
+# Herd injected NVM configuration
+export NVM_DIR="/Users/tiagorodrigues/Library/Application Support/Herd/config/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+
+[[ -f "/Applications/Herd.app/Contents/Resources/config/shell/zshrc.zsh" ]] && builtin source "/Applications/Herd.app/Contents/Resources/config/shell/zshrc.zsh"
+
+# Herd injected PHP binary.
+export PATH="/Users/tiagorodrigues/Library/Application Support/Herd/bin/":$PATH
+
+
+# Herd injected PHP 8.3 configuration.
+export HERD_PHP_83_INI_SCAN_DIR="/Users/tiagorodrigues/Library/Application Support/Herd/config/php/83/"
+
+
+# Herd injected PHP 8.2 configuration.
+export HERD_PHP_82_INI_SCAN_DIR="/Users/tiagorodrigues/Library/Application Support/Herd/config/php/82/"

@@ -2,30 +2,36 @@ return {
 	"hrsh7th/nvim-cmp",
 	event = "InsertEnter",
 	dependencies = {
-		"hrsh7th/cmp-nvim-lsp",
-		"hrsh7th/cmp-nvim-lsp-signature-help",
-		"hrsh7th/cmp-buffer",
-		"hrsh7th/cmp-path",
-		"hrsh7th/cmp-cmdline", -- Added explicitly for command line completion
+		"hrsh7th/cmp-nvim-lsp", -- from lsp
+		"hrsh7th/cmp-nvim-lsp-signature-help", -- from lsp and add references
+		"hrsh7th/cmp-buffer", -- source for text in buffer
+		"hrsh7th/cmp-path", -- source for file system paths
 		{
 			"L3MON4D3/LuaSnip",
-			version = "v2.*",
+			-- follow latest release.
+			version = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+			-- install jsregexp (optional!).
 			build = "make install_jsregexp",
 		},
-		"saadparwaiz1/cmp_luasnip",
-		"rafamadriz/friendly-snippets",
-		"onsails/lspkind.nvim",
+		"saadparwaiz1/cmp_luasnip", -- for autocompletion
+		"rafamadriz/friendly-snippets", -- useful snippets
+		"onsails/lspkind.nvim", -- vs-code like pictograms
 	},
 	config = function()
 		local cmp = require("cmp")
+
 		local luasnip = require("luasnip")
 
-		-- Load snippets
+		local lspkind = require("lspkind")
+
+		-- loads vscode style snippets from installed plugins (e.g. friendly-snippets)
 		require("luasnip.loaders.from_vscode").lazy_load()
 
-		-- Main completion setup
 		cmp.setup({
-			snippet = {
+			completion = {
+				completeopt = "menu,menuone,preview,noselect",
+			},
+			snippet = { -- configure how nvim-cmp interacts with snippet engine
 				expand = function(args)
 					luasnip.lsp_expand(args.body)
 				end,
@@ -48,35 +54,22 @@ return {
 				end, { "i", "s" }),
 				["<CR>"] = cmp.mapping.confirm({ select = true }),
 			}),
+			-- sources for autocompletion
 			sources = cmp.config.sources({
 				{ name = "copilot", group_index = 2 },
 				{ name = "nvim_lsp", group_index = 1 },
-				{ name = "luasnip" },
-				{ name = "buffer" },
-				{ name = "path" },
+				{ name = "luasnip" }, -- snippets
+				{ name = "buffer" }, -- text within current buffer
+				{ name = "path" }, -- file system paths
+				{ name = "tailwindcss" },
 			}),
+
+			-- configure lspkind for vs-code like pictograms in completion menu
 			formatting = {
-				format = require("lspkind").cmp_format({
+				format = lspkind.cmp_format({
 					maxwidth = 50,
 					ellipsis_char = "...",
 				}),
-			},
-		})
-
-		-- Command line completion setup
-		cmp.setup.cmdline(":", {
-			mapping = cmp.mapping.preset.cmdline(),
-			sources = cmp.config.sources({
-				{ name = "path" },
-				{ name = "cmdline" },
-			}),
-		})
-
-		-- Search completion setup (/ and ?)
-		cmp.setup.cmdline({ "/", "?" }, {
-			mapping = cmp.mapping.preset.cmdline(),
-			sources = {
-				{ name = "buffer" },
 			},
 		})
 	end,
