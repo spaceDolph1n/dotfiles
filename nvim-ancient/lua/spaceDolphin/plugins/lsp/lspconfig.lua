@@ -1,4 +1,5 @@
 return {
+	enabled = true,
 	"neovim/nvim-lspconfig",
 	event = { "BufReadPre", "BufNewFile" },
 	dependencies = {
@@ -145,7 +146,6 @@ return {
 			["intelephense"] = function()
 				lspconfig["intelephense"].setup({
 					capabilities = capabilities,
-					on_attach = on_attach,
 					settings = {
 						intelephense = {
 							stubs = {
@@ -180,7 +180,6 @@ return {
 			["phpactor"] = function()
 				lspconfig["phpactor"].setup({
 					capabilities = capabilities,
-					on_attach = on_attach,
 					settings = {
 						phpactor = {
 							stubs = {

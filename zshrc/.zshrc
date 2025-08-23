@@ -83,6 +83,12 @@ alias sftp-prod="lftp -u scanbotsdk1-tiago -p 2222 sftp://scanbotsdk1.sftp.wpeng
 alias sftp-staging="lftp -u stagingscanbot-tiago -p 2222 sftp://stagingscanbot.sftp.wpengine.com"
 alias sftp-dev="lftp -u scanbotdev-tiago -p 2222 sftp://scanbotdev.sftp.wpengine.com"
 
+# SFTP connections
+alias ssh-test="ssh scanbotsdk2@scanbotsdk2.ssh.wpengine.net"
+alias ssh-prod="ssh scanbotsdk1@scanbotsdk1.ssh.wpengine.net"
+alias ssh-staging="ssh stagingscanbot@stagingscanbot.ssh.wpengine.net"
+alias ssh-dev="ssh scanbotdev@scanbotdev.ssh.wpengine.net"
+
 # change LazyGit config location
 export XDG_CONFIG_HOME="$HOME/.config"
 
@@ -110,10 +116,8 @@ alias gcoall='git checkout -- .'
 # Git config default location
 export GIT_CONFIG_GLOBAL=~/.config/git/.gitconfig
 
-
 # Herd injected PHP 8.4 configuration.
 export HERD_PHP_84_INI_SCAN_DIR="/Users/tiagorodrigues/Library/Application Support/Herd/config/php/84/"
-
 
 # Herd injected NVM configuration
 export NVM_DIR="/Users/tiagorodrigues/Library/Application Support/Herd/config/nvm"
@@ -124,10 +128,8 @@ export NVM_DIR="/Users/tiagorodrigues/Library/Application Support/Herd/config/nv
 # Herd injected PHP binary.
 export PATH="/Users/tiagorodrigues/Library/Application Support/Herd/bin/":$PATH
 
-
 # Herd injected PHP 8.3 configuration.
 export HERD_PHP_83_INI_SCAN_DIR="/Users/tiagorodrigues/Library/Application Support/Herd/config/php/83/"
-
 
 # Herd injected PHP 8.2 configuration.
 export HERD_PHP_82_INI_SCAN_DIR="/Users/tiagorodrigues/Library/Application Support/Herd/config/php/82/"
