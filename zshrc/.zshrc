@@ -78,6 +78,7 @@ alias source-zsh="source ~/.zshrc"
 alias edit-zsh="nvim ~/.zshrc"
 
 
+
 # change LazyGit config location
 export XDG_CONFIG_HOME="$HOME/.config"
 
@@ -105,10 +106,8 @@ alias gcoall='git checkout -- .'
 # Git config default location
 export GIT_CONFIG_GLOBAL=~/.config/git/.gitconfig
 
-
 # Herd injected PHP 8.4 configuration.
 export HERD_PHP_84_INI_SCAN_DIR="/Users/tiagorodrigues/Library/Application Support/Herd/config/php/84/"
-
 
 # Herd injected NVM configuration
 export NVM_DIR="/Users/tiagorodrigues/Library/Application Support/Herd/config/nvm"
@@ -119,10 +118,8 @@ export NVM_DIR="/Users/tiagorodrigues/Library/Application Support/Herd/config/nv
 # Herd injected PHP binary.
 export PATH="/Users/tiagorodrigues/Library/Application Support/Herd/bin/":$PATH
 
-
 # Herd injected PHP 8.3 configuration.
 export HERD_PHP_83_INI_SCAN_DIR="/Users/tiagorodrigues/Library/Application Support/Herd/config/php/83/"
-
 
 # Herd injected PHP 8.2 configuration.
 export HERD_PHP_82_INI_SCAN_DIR="/Users/tiagorodrigues/Library/Application Support/Herd/config/php/82/"
