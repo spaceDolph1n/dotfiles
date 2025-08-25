@@ -48,10 +48,10 @@ keymap.set("n", "x", '"_x')
 keymap.set("v", "x", '"_d', { noremap = true, silent = true })
 
 -- Save file
-keymap.set("n", "<leader>w", ":update<CR>", { desc = "Save" })
-keymap.set("n", "<leader>W", ":wa<CR>", { desc = "Save all" })
-keymap.set("n", "<leader>q", ":quit<CR>", { desc = "Quit" })
-keymap.set("n", "<leader>Q", ":qa<Return>", { desc = "Quit all" })
+keymap.set("n", "<leader>w", ":update<CR>")
+keymap.set("n", "<leader>W", ":wa<CR>")
+keymap.set("n", "<leader>q", ":quit<CR>")
+keymap.set("n", "<leader>Q", ":qa<Return>")
 
 -- Find and center
 keymap.set("n", "n", "nzzzv")
@@ -69,23 +69,6 @@ keymap.set("v", "p", '"_dP')
 -- keymap.set("n", "<leader>op", ":Octo pr list<CR>", { desc = "PR list" })
 -- keymap.set("n", "<leader>oc", ":Octo pr create<CR>", { desc = "Create PR" })
 -- keymap.set("n", "<leader>or", ":Octo review start<CR>", { desc = "Start PR Review" })
-
--- Spectre
-keymap.set("n", "<leader>ts", '<cmd>lua require("spectre").toggle()<CR>', {
-	desc = "Spectre",
-})
-keymap.set("n", "<leader>tS", '<cmd>lua require("spectre").toggle()<CR>', {
-	desc = "Toggle Spectre",
-})
-keymap.set("n", "<leader>tsw", '<cmd>lua require("spectre").open_visual({select_word=true})<CR>', {
-	desc = "Search current word",
-})
-keymap.set("n", "<leader>tsc", '<cmd>lua require("spectre").open_file_search({select_word=true})<CR>', {
-	desc = "Search on current file",
-})
-
--- Pressing enter in normal mode will insert a new line
--- keymap.set("n", "<CR>", "o<Esc>", { noremap = true, silent = true })
 
 -- Go to the beginning and end of the line
 keymap.set({ "n", "o", "v" }, "H", "^", { desc = "Go to beginning of the line" })

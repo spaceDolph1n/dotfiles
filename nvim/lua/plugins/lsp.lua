@@ -37,6 +37,7 @@ return {
 				tailwindcss = {},
 				html = {},
 				phpactor = {},
+				eslint = { version = "13.1.2" },
 			},
 		},
 		config = function(_, opts)

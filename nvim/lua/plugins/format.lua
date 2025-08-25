@@ -5,7 +5,7 @@ return {
 		formatters_by_ft = {
 			lua = { "stylua" },
 			python = { "isort", "black" },
-			php = { "php_cs_fixer" },
+			php = { "phpcbf" },
 			blade = { "prettierd", "prettier" },
 			javascript = { "prettierd", "prettier" },
 			typescript = { "prettierd", "prettier" },

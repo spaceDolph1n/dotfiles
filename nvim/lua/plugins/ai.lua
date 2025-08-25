@@ -11,25 +11,6 @@ return {
 		end,
 	},
 	{
-		enabled = false,
-		"CopilotC-Nvim/CopilotChat.nvim",
-		dependencies = {
-			{ "nvim-lua/plenary.nvim", branch = "master" },
-		},
-		build = "make tiktoken",
-		opts = {
-			{
-				model = "sonnet-4", -- AI model to use
-				temperature = 0.1, -- Lower = focused, higher = creative
-				window = {
-					layout = "vertical", -- 'vertical', 'horizontal', 'float'
-					width = 0.3, -- 50% of screen width
-				},
-				auto_insert_mode = true, -- Enter insert mode when opening
-			},
-		},
-	},
-	{
 		"olimorris/codecompanion.nvim",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
