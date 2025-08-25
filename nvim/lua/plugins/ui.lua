@@ -25,7 +25,7 @@ return {
 				{ "<leader>g", group = "Go", icon = { icon = "⏩" } },
 				{ "<leader>l", group = "Git" },
 				{ "<leader>o", group = "Git PRs" },
-				{ "<leader>s", group = "Window management" },
+				{ "<leader>s", group = "Window" },
 				{ "<leader>t", group = "Tools", icon = { icon = "🔧" } },
 				{ "<leader>ts", group = "Spectre", icon = { icon = "🔍" } },
 				{ "<leader>u", group = "UI" },

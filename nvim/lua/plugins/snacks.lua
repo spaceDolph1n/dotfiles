@@ -188,16 +188,9 @@ return {
 		{
 			"<leader>fd",
 			function()
-				Snacks.picker.diagnostics()
+				Snacks.picker.diagnostics_buffer()
 			end,
-			desc = "Workspace Diagnostics",
-		},
-		{
-			"<leader>fz",
-			function()
-				Snacks.picker.zoxide()
-			end,
-			desc = "Zoxide",
+			desc = "Buffer Diagnostics",
 		},
 		{
 			"<leader>fq",
@@ -250,13 +243,6 @@ return {
 			end,
 			desc = "LSP Symbols",
 		},
-		{
-			"<leader>D",
-			function()
-				Snacks.picker.diagnostics_buffer()
-			end,
-			desc = "Buffer Diagnostics",
-		},
 		-- Other
 		{
 			"<leader>/",
@@ -290,8 +276,7 @@ return {
 				Snacks.toggle.option("spell", { name = "Spelling" }):map("<leader>us")
 				Snacks.toggle.option("wrap", { name = "Wrap" }):map("<leader>uw")
 				Snacks.toggle.diagnostics():map("<leader>ud")
-				Snacks.toggle.zoom():map("<leader>uZ")
-				Snacks.toggle.inlay_hints():map("<leader>uH")
+				Snacks.toggle.zoom():map("<leader>uz")
 				Snacks.toggle.indent():map("<leader>ug")
 				Snacks.toggle.dim():map("<leader>uD")
 			end,

@@ -108,7 +108,34 @@ return {
 		"nvim-pack/nvim-spectre",
 		lazy = true,
 		keys = {
-			{ "<leader>sS", "<cmd>Spectre<CR>", desc = "Search with [S]pectre" },
+			{
+				"<leader>ts",
+				function()
+					require("spectre").toggle()
+				end,
+				desc = "Spectre",
+			},
+			{
+				"<leader>tS",
+				function()
+					require("spectre").toggle()
+				end,
+				desc = "Toggle Spectre",
+			},
+			{
+				"<leader>tsw",
+				function()
+					require("spectre").open_visual({ select_word = true })
+				end,
+				desc = "Search current word",
+			},
+			{
+				"<leader>tsc",
+				function()
+					require("spectre").open_file_search({ select_word = true })
+				end,
+				desc = "Search on current file",
+			},
 		},
 		cmd = {
 			"Spectre",
