@@ -32,6 +32,12 @@ source $ZSH/oh-my-zsh.sh
 # Set language environment
 export LANG=en_US.UTF-8
 
+# solution for functest error 
+# xref: https://github.com/starship/starship/issues/3418
+if [[ "${widgets[zle-keymap-select]#user:}" == "starship_zle-keymap-select" || \
+      "${widgets[zle-keymap-select]#user:}" == "starship_zle-keymap-select-wrapped" ]]; then
+    zle -N zle-keymap-select "";
+fi
 eval "$(starship init zsh)"
 export STARSHIP_CONFIG=~/.config/starship/starship.toml
 
@@ -133,3 +139,6 @@ export HERD_PHP_83_INI_SCAN_DIR="/Users/tiagorodrigues/Library/Application Suppo
 
 # Herd injected PHP 8.2 configuration.
 export HERD_PHP_82_INI_SCAN_DIR="/Users/tiagorodrigues/Library/Application Support/Herd/config/php/82/"
+
+# VI Mode
+bindkey -v
