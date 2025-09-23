@@ -51,7 +51,10 @@ return {
 			},
 			strategies = {
 				chat = {
-					adapter = "copilot",
+					adapter = {
+						name = "copilot",
+						model = "claude-sonnet-4",
+					},
 					roles = {
 						llm = function(adapter)
 							return "" .. adapter.formatted_name .. "(" .. adapter.model.name .. ")"
@@ -64,19 +67,6 @@ return {
 				},
 			},
 			show_defaults = false,
-			adapters = {
-				copilot = function()
-					-- lua print(vim.inspect(require("codecompanion.adapters").extend("copilot").schema.model.choices()))
-					local adapters = require("codecompanion.adapters")
-					return adapters.extend("copilot", {
-						schema = {
-							model = {
-								default = "claude-3.7-sonnet",
-							},
-						},
-					})
-				end,
-			},
 			prompt_library = {
 				-- Custom the default prompt
 				["Generate a Commit Message"] = {

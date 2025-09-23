@@ -28,7 +28,7 @@ return {
 							},
 						},
 					},
-					filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
+					filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue", "mdx" },
 					on_attach = function(client)
 						client.server_capabilities.documentFormattingProvider = false
 						client.server_capabilities.documentRangeFormattingProvider = false
@@ -38,6 +38,7 @@ return {
 				html = {},
 				phpactor = {},
 				eslint = { version = "13.1.2" },
+				marksman = {},
 			},
 		},
 		config = function(_, opts)
