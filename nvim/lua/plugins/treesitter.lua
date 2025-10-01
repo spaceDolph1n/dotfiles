@@ -5,6 +5,38 @@ return {
 	build = ":TSUpdate",
 	config = function()
 		require("nvim-treesitter.configs").setup({
+			ensure_installed = {
+				-- Basics
+				"lua",
+				"vim",
+				"bash",
+				"sql",
+
+				-- Web Fundamentals
+				"html",
+				"css",
+				"javascript",
+				"typescript",
+
+				-- Frameworks & Templating
+				"vue",
+				"blade",
+				"graphql",
+
+				-- Data Formats
+				"json",
+				"yaml",
+
+				-- Documentation
+				"markdown",
+				"markdown_inline",
+				"jsdoc",
+				"phpdoc",
+
+				-- Backend
+				"php",
+				"prisma",
+			},
 			-- do I still need this for mini.ai?
 			textobjects = {
 				select = {
