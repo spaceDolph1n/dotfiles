@@ -1,0 +1,14 @@
+# NOTE: you can use vars with $<var> and ${<var>} as long as the str is double quoted: ""
+# WARNING: hex colors can't contain capital letters
+
+# --> Kanso-Zen (Official Palette)
+thm_bg="#090E13"          # zenBg0 (deep navy base)
+thm_fg="#C5C9C7"          # Default text (soft white)
+thm_cyan="#8ea4a2"        # aqua
+thm_gray="#22262D"        # zenBg3 (medium slate)
+thm_pink="#8ea4a2"        # current folder?
+thm_red="#E46876"         # tmux icon when leader is clicked - means ready for command
+thm_green="#C5C9C7"       # tmux icon
+thm_blue="#8ea4a2"        # unfocused windows and clock
+thm_orange="#DCA561"      # current window
+
