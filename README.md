@@ -33,7 +33,6 @@ brew install bash bat eza fd fzf gh lazygit neovim nvm pnpm ripgrep starship sto
 
 ```bash
 brew install felixkratz/formulae/borders
-brew install felixkratz/formulae/sketchybar
 ```
 
 ### GUI Apps
