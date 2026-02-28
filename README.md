@@ -26,7 +26,7 @@ xcode-select --install
 ### CLI Tools
 
 ```bash
-brew install bash bat eza fd fzf gh lazygit neovim nvm pnpm ripgrep starship stow tmux zoxide btop yazi
+brew install bash bat eza fd fzf gh lazygit neovim nvm pnpm ripgrep starship stow tmux zoxide btop yazi 1password-cli
 ```
 
 ### Custom Formulae

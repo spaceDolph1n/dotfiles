@@ -8,6 +8,9 @@ export SCRIPTS="$HOME/.config/scripts"
 export SECOND_BRAIN=$HOME/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Second\ Brain
 export PATH="$PATH:$SCRIPTS"
 
+export ESLINT_USE_FLAT_CONFIG=true
+export ESLINT_CONFIG="$HOME/.config/eslint/eslint.config.js"
+
 alias dotfiles="cd ~/.config/dotfiles/"
 alias scripts='cd ~/.config/scripts'
 alias sb='cd $SECOND_BRAIN'
@@ -80,10 +83,13 @@ alias edit-zsh="nvim ~/.zshrc"
 export XDG_CONFIG_HOME="$HOME/.config"
 
 # navigation
-cx() { cd "$@" && ll; } # cd and list
+cl() { cd "$@" && ll; } # cd and list
+cv() { cd "$@" && ll; } # cd and open in nvim
 fcd() { cd "$(find . -type d -not -path '*/.*' | fzf)" && ll; } # fuzzy cd
 f() { echo "$(find . -type f -not -path '*/.*' | fzf)" | pbcopy } # fuzzy find and copy to clipboard
 fv() { nvim "$(find . -type f -not -path '*/.*' | fzf)" } # fuzzy find and open in nvim
+mkc() { mkdir -p "$1" && cd "$1" } # create dir and move inside 
+mkcv() { mkdir -p "$1" && cd "$1" && v . } # create dir, move inside and init neovim
 
 # Git config default location
 export GIT_CONFIG_GLOBAL=~/.config/git/.gitconfig
