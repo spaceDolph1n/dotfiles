@@ -87,7 +87,7 @@ return {
 		"mbbill/undotree",
 		cmd = "UndotreeToggle",
 		keys = {
-			{ "<leader>tu", "<cmd>UndotreeToggle<cr>", desc = "Toggle Undo Tree" },
+			{ "<leader>xu", "<cmd>UndotreeToggle<cr>", desc = "Toggle Undo Tree" },
 		},
 		init = function()
 			-- Persist undo, refer https://github.com/mbbill/undotree#usage
@@ -109,28 +109,28 @@ return {
 		lazy = true,
 		keys = {
 			{
-				"<leader>ts",
+				"<leader>xs",
 				function()
 					require("spectre").toggle()
 				end,
 				desc = "Spectre",
 			},
 			{
-				"<leader>tS",
+				"<leader>xS",
 				function()
 					require("spectre").toggle()
 				end,
 				desc = "Toggle Spectre",
 			},
 			{
-				"<leader>tsw",
+				"<leader>xsw",
 				function()
 					require("spectre").open_visual({ select_word = true })
 				end,
 				desc = "Search current word",
 			},
 			{
-				"<leader>tsc",
+				"<leader>xsc",
 				function()
 					require("spectre").open_file_search({ select_word = true })
 				end,

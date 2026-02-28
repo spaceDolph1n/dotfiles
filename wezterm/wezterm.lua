@@ -1,7 +1,7 @@
 local wezterm = require("wezterm")
 return {
 	enable_tab_bar = false,
-	font_size = 12.0,
+	font_size = 12.5,
 	font = wezterm.font("JetBrains Mono"),
 	-- macos_window_background_blur = 30,
 	window_background_opacity = 1,

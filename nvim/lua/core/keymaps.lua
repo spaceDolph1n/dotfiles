@@ -82,7 +82,7 @@ keymap.set("n", "[t", function()
 	require("todo-comments").jump_prev()
 end, { desc = "Previous todo comment" })
 
-keymap.set("n", "<leader>tr", function()
+keymap.set("n", "<leader>xr", function()
 	vim.lsp.buf.rename()
 end, { desc = "LSP rename" })
 

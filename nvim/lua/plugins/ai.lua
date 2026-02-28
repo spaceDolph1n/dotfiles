@@ -38,6 +38,17 @@ return {
 			{ "<leader>ap", "<cmd>CodeCompanionActions<cr>", desc = "Prompt Actions", mode = { "n", "v" } },
 		},
 		opts = {
+			adapters = {
+				acp = {
+					gemini_cli = function()
+						return require("codecompanion.adapters").extend("gemini_cli", {
+							defaults = {
+								auth_method = "oauth-personal",
+							},
+						})
+					end,
+				},
+			},
 			extensions = {
 				spinner = {},
 			},
@@ -51,20 +62,15 @@ return {
 			},
 			strategies = {
 				chat = {
-					adapter = {
-						name = "copilot",
-						model = "claude-sonnet-4",
-					},
+					adapter = "gemini_cli",
 					roles = {
-						llm = function(adapter)
-							return "" .. adapter.formatted_name .. "(" .. adapter.model.name .. ")"
-						end,
 						user = "spaceDolphin",
 					},
 				},
 				inline = {
-					adapter = "copilot",
+					adapter = "gemini",
 				},
+				cmd = { adapter = "gemini" },
 			},
 			show_defaults = false,
 			prompt_library = {
