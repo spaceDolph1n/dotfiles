@@ -69,6 +69,14 @@ return {
 				end,
 				desc = "Show Output",
 			},
+			{
+				"<leader>tp",
+				function()
+					-- This triggers the project selector you mentioned
+					vim.cmd("NeotestPlaywrightProject")
+				end,
+				desc = "Select Playwright Project",
+			},
 		},
 	},
 }
