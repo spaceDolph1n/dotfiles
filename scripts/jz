@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# --- 1. Config & Check ---
+EXTENSIONS=("-e" "ts" "-e" "tsx")
+JSON_INPUT=$1
+
+# Validation
+if [[ -z "$JSON_INPUT" ]] || [[ ! -f "$JSON_INPUT" ]]; then
+    echo "Usage: jz <input.json>"
+    exit 1
+fi
+
+# Dependency Check
+for cmd in gemini fd bat pbcopy; do
+    if ! command -v "$cmd" &> /dev/null; then
+        echo "Error: $cmd is not installed. Please brew install it."
+        exit 1
+    fi
+done
+
+# --- 2. Smart Context Gathering ---
+# fd respects .gitignore and finds relevant domain files to feed the AI context.
+PROJECT_CONTEXT=$(fd "${EXTENSIONS[@]}" --max-depth 3 --exec grep -lE "type|interface|z.object" {} | xargs cat)
+
+# --- 3. The "Product Engineer" Prompt --
+INSTRUCTIONS="ACT AS A SENIOR TYPESCRIPT ARCHITECT & CODE REVIEWER.
+TASK: Convert JSON (stdin) into a production-ready, strictly typed Zod schema.
+
+STRICT MECHANICAL CONSTRAINTS:
+1. OUTPUT ONLY CODE. No markdown backticks, no preamble, no talk.
+2. TYPESCRIPT SAFETY: Explicitly type 'z.preprocess' args as 'unknown' (Fixes TS7006).
+   Example: z.preprocess((arg: unknown) => (typeof arg === 'string' ? new Date(arg) : arg), z.date())
+3. REUSE DOMAIN TYPES: Use 'as z.ZodType<TypeName>' for context matches.
+4. INTELLIGENT PATH ALIASES: 
+   - If you reuse types, add an import at the top.
+   - Use PATH ALIASES (e.g., '@/domain/installation/shared') instead of relative paths.
+   - Strip 'src/' and '.ts' from the path.
+   - Add a '// TODO: Verify path alias' comment.
+5. EXPORT: Always export the final schema AND the inferred TypeScript type.
+
+CODE REVIEW & CLEAN CODE PASS:
+- Use descriptive, PascalCase names for any nested sub-schemas.
+- Group related fields logically.
+- Ensure the output is formatted for immediate production use.
+
+PROJECT CONTEXT FOR REFERENCE:
+$PROJECT_CONTEXT"
+
+# --- 4. Execution, Preview, and Clipboard ---
+# Capture output, highlight in terminal for the demo, and copy to clipboard.
+RESULT=$(cat "$JSON_INPUT" | gemini "$INSTRUCTIONS")
+
+# Preview with syntax highlighting
+echo "$RESULT" | bat --language typescript --style=plain --paging=never
+
+# Copy to clipboard
+echo "$RESULT" | pbcopy

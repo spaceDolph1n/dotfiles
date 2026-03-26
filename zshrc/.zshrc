@@ -84,7 +84,7 @@ export XDG_CONFIG_HOME="$HOME/.config"
 
 # navigation
 cl() { cd "$@" && ll; } # cd and list
-cv() { cd "$@" && ll; } # cd and open in nvim
+cv() { cd "$@" && v; } # cd and open in nvim
 fcd() { cd "$(find . -type d -not -path '*/.*' | fzf)" && ll; } # fuzzy cd
 f() { echo "$(find . -type f -not -path '*/.*' | fzf)" | pbcopy } # fuzzy find and copy to clipboard
 fv() { nvim "$(find . -type f -not -path '*/.*' | fzf)" } # fuzzy find and open in nvim
