@@ -22,13 +22,6 @@ return {
 					require("neotest-python")({
 						dap = { adapter = "debugpy" },
 					}),
-					require("neotest-jest")({
-						jestCommand = "npm test --",
-						env = { CI = true },
-						cwd = function(path)
-							return vim.fn.getcwd()
-						end,
-					}),
 					require("neotest-phpunit"),
 					require("neotest-bash"),
 					require("neotest-playwright").adapter({
@@ -36,6 +29,17 @@ return {
 							persist_project_selection = true,
 							enable_dynamic_test_discovery = true,
 						},
+					}),
+					require("neotest-jest")({
+						jestCommand = "npm test --",
+						jestArguments = function(defaultArguments, context)
+							return defaultArguments
+						end,
+						env = { CI = true },
+						cwd = function(path)
+							return vim.fn.getcwd()
+						end,
+						isTestFile = require("neotest-jest.jest-util").defaultIsTestFile,
 					}),
 				},
 			})
