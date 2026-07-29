@@ -89,6 +89,8 @@ fcd() { cd "$(find . -type d -not -path '*/.*' | fzf)" && ll; } # fuzzy cd
 f() { echo "$(find . -type f -not -path '*/.*' | fzf)" | pbcopy } # fuzzy find and copy to clipboard
 fv() { nvim "$(find . -type f -not -path '*/.*' | fzf)" } # fuzzy find and open in nvim
 mkc() { mkdir -p "$1" && cd "$1" } # create dir and move inside 
+cmkc() { cd "$1" && mkdir -p "$2" && cd "$2" } # move to first dir, create dir and move inside 
+cmkcv() { cd "$1" && mkdir -p "$2" && cd "$2" && v . } # move to first dir, create dir and move inside and init neovim
 mkcv() { mkdir -p "$1" && cd "$1" && v . } # create dir, move inside and init neovim
 
 # Git config default location
