@@ -1,14 +1,11 @@
 return {
 	{
 		"saghen/blink.cmp",
-		-- optional: provides snippets for the snippet source
 		dependencies = {
 			"rafamadriz/friendly-snippets",
-			"onsails/lspkind.nvim",
 			"giuxtaposition/blink-cmp-copilot",
 		},
 
-		-- use a release tag to download pre-built binaries
 		version = "1.*",
 
 		---@module 'blink.cmp'

@@ -55,7 +55,7 @@ return {
 		},
 		-- git = { enabled = true },
 		indent = { enabled = true },
-		image = { enabled = true },
+		image = { enabled = true, doc = { enabled = false } },
 		-- input = { enabled = true },
 		lazygit = { enabled = true },
 		notifier = {
