@@ -1,15 +1,8 @@
-[user]
-    name = spaceDolph1n
-    email = tiagojsr1@gmail.com
+[includeIf "gitdir:~/.config/dotfiles/"]
+  path = ~/.config/git/gitconfig-personal
 
-[pull]
-    rebase = true
+[includeIf "gitdir:~/.sb/"]
+  path = ~/.config/git/gitconfig-personal
 
-[push]
-    default = upstream
-
-[init]
-    defaultBranch = main
-
-[rebase]
-	autoStash = true
+[includeIf "gitdir:~/Documents/work/"]
+  path = ~/.config/git/gitconfig-work

@@ -4,6 +4,7 @@ return {
 		dependencies = {
 			"williamboman/mason-lspconfig.nvim",
 			"neovim/nvim-lspconfig",
+			"saghen/blink.cmp",
 		},
 		opts = {
 			servers = {
@@ -45,23 +46,26 @@ return {
 				marksman = {},
 			},
 		},
-		config = function()
-			-- Only global setup, no per-server setup!
+		config = function(_, opts)
 			require("mason").setup()
+
+			local lspconfig = require("lspconfig")
+			local blink = require("blink.cmp")
+
 			require("mason-lspconfig").setup({
-				ensure_installed = {
-					"lua_ls",
-					"html",
-					"emmet_ls",
-					"tailwindcss",
-					"vue_ls",
-					"vtsls",
-					"phpactor",
-					"eslint",
-					"marksman",
-				},
+				-- Automatically installs all keys defined in opts.servers
+				ensure_installed = vim.tbl_keys(opts.servers),
 				automatic_installation = true,
+				handlers = {
+					function(server_name)
+						local server_opts = opts.servers[server_name] or {}
+						-- Injects blink.cmp completion capabilities into each LSP
+						server_opts.capabilities = blink.get_lsp_capabilities(server_opts.capabilities)
+						lspconfig[server_name].setup(server_opts)
+					end,
+				},
 			})
+
 			-- Global diagnostics settings
 			vim.diagnostic.config({
 				virtual_text = false,

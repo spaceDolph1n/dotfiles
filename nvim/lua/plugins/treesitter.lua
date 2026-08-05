@@ -1,5 +1,6 @@
 return {
 	"nvim-treesitter/nvim-treesitter",
+	enabled = false,
 	branch = "master",
 	lazy = false,
 	build = ":TSUpdate",
@@ -46,6 +47,7 @@ return {
 			highlight = {
 				enable = true,
 				additional_vim_regex_highlighting = false,
+				disabled = { "markdown", "markdown_inline" },
 			},
 		})
 		-- -- Additional configuration to add Blade filetype detection

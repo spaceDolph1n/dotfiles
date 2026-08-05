@@ -1,0 +1,23 @@
+[user]
+    name = spaceDolph1n
+    email = tiagojsr1@gmail.com
+
+[core]
+    sshCommand = ssh -i ~/.ssh/id_ed25519_personal -o IdentitiesOnly=yes
+
+[pull]
+    rebase = true
+
+[push]
+    default = upstream
+    # Automatically sets upstream branch on first push
+    autoSetupRemote = true
+
+[fetch]
+    prune = true
+
+[init]
+    defaultBranch = main
+
+[rebase]
+	autoStash = true

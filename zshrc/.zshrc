@@ -5,7 +5,6 @@ export PATH=/opt/homebrew/bin:$PATH
 export PATH=$PATH:$HOME/.local/bin
 
 export SCRIPTS="$HOME/.config/scripts"
-export SECOND_BRAIN=$HOME/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Second\ Brain
 export PATH="$PATH:$SCRIPTS"
 
 export ESLINT_USE_FLAT_CONFIG=true
@@ -13,7 +12,7 @@ export ESLINT_CONFIG="$HOME/.config/eslint/eslint.config.js"
 
 alias dotfiles="cd ~/.config/dotfiles/"
 alias scripts='cd ~/.config/scripts'
-alias sb='cd $SECOND_BRAIN'
+alias sb='cd ~/.sb/second-brain/'
 alias v="nvim"
 
 # for NVM

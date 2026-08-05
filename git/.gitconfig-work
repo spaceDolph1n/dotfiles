@@ -1,0 +1,33 @@
+[user]
+    name = tiagorodrigues-smallpdf
+    email = tiago.rodrigues@smallpdf.com 
+    signingkey = ~/.ssh/id_ed25519_sk.pub
+
+[gpg]
+    format = ssh
+
+[core]
+    sshCommand = ssh -i ~/.ssh/id_ed25519_sk -o IdentitiesOnly=yes
+
+[pull]
+    rebase = true
+
+[push]
+    default = upstream
+    # Automatically sets upstream branch on first push
+    autoSetupRemote = true
+
+[init]
+    defaultBranch = main
+
+[rebase]
+	  autoStash = true
+
+[commit]
+    gpgsign = true
+
+[tag]
+    gpgsign = true
+
+[fetch]
+    prune = true
