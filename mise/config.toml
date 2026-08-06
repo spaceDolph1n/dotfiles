@@ -1,0 +1,14 @@
+# Global mise config. `mise use -g <tool>@<ver>` edits this file, so global
+# runtime versions stay tracked in the dotfiles repo.
+
+[tools]
+node = "lts"
+
+[settings]
+# Read `.nvmrc` / `.node-version` the way fnm's `--use-on-cd` did.
+#
+# mise calls these "idiomatic version files" and ships them DISABLED by default
+# (it prefers an explicit mise.toml). Without this, walking into a repo with a
+# .nvmrc silently kept the global Node version -- which is exactly the fnm
+# behaviour we were replacing.
+idiomatic_version_file_enable_tools = ["node"]
