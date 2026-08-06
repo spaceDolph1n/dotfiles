@@ -38,7 +38,21 @@ return {
 		-- mini.icons' shim instead, so nvim-web-devicons can be dropped.
 		MiniIcons.mock_nvim_web_devicons()
 
-		require("mini.operators").setup()
+		-- Two of mini.operators' default prefixes collide with things that
+		-- matter more here:
+		--
+		--   `gr` (replace) shadows Neovim 0.11's native LSP maps -- `grr`
+		--        (references) was overridden outright by "replace line", and
+		--        grn/gra/gri/grt each had to wait out timeoutlen first.
+		--        `cr` is upstream's own suggested alternative.
+		--   `gs` (sort) became a prefix of mini.surround's gsa/gsd/gsr after
+		--        surround moved off `s`, so every sort waited on the ambiguity.
+		--
+		-- `gx` is left alone: mini relocates the native URL-open to `gX`.
+		require("mini.operators").setup({
+			replace = { prefix = "cr" },
+			sort = { prefix = "gz" },
+		})
 		require("mini.pairs").setup()
 		require("mini.splitjoin").setup()
 
