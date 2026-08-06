@@ -1,17 +1,17 @@
 return {
 	{
 		"nvim-neotest/neotest",
+		-- FixCursorHold dropped: a workaround for a CursorHold bug fixed in
+		-- Neovim years ago. neotest-plenary (Lua plugin tests) and neotest-bash
+		-- dropped: no such tests in this stack.
 		dependencies = {
 			"nvim-neotest/nvim-nio",
 			"nvim-lua/plenary.nvim",
-			"antoinemadec/FixCursorHold.nvim",
 			"nvim-treesitter/nvim-treesitter",
 			-- Adapters
 			"marilari88/neotest-vitest",
 			"nvim-neotest/neotest-jest",
 			"nvim-neotest/neotest-python",
-			"nvim-neotest/neotest-plenary",
-			"rcasia/neotest-bash",
 			"thenbe/neotest-playwright",
 		},
 		config = function()
@@ -21,7 +21,6 @@ return {
 					require("neotest-python")({
 						dap = { adapter = "debugpy" },
 					}),
-					require("neotest-bash"),
 					require("neotest-playwright").adapter({
 						options = {
 							persist_project_selection = true,

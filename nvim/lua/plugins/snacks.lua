@@ -53,11 +53,28 @@ return {
 				{ section = "startup" },
 			},
 		},
+		-- Disables treesitter, LSP and syntax above a size threshold. Now that
+		-- treesitter runs on every filetype, a 4MB bundle or a big lockfile is
+		-- otherwise parsed on open (measured: ~1.4s for 4MB of JS, and that was
+		-- headless -- no rendering and no LSP attach).
+		bigfile = { enabled = true },
 		-- git = { enabled = true },
+		-- Renders the file before plugins finish loading.
+		quickfile = { enabled = true },
 		indent = { enabled = true },
 		image = { enabled = true, doc = { enabled = false } },
-		-- input = { enabled = true },
+		-- Replaces vim.ui.input; the DAP conditional-breakpoint prompt uses it.
+		input = { enabled = true },
 		lazygit = { enabled = true },
+		-- LSP-aware file renames -- wired to mini.files below.
+		rename = { enabled = true },
+		gitbrowse = { enabled = true },
+		-- Fold column + signs in one place. Replaces nvim-origami's contribution
+		-- now that treesitter provides foldexpr.
+		statuscolumn = { enabled = true },
+		-- NOTE: `scope` is deliberately NOT enabled. Its default keys map [i / ]i,
+		-- which mini.bracketed already uses for indent jumps, and its ii / ai
+		-- textobjects overlap mini.ai.
 		notifier = {
 			enabled = true,
 			timeout = 3000,
@@ -125,6 +142,16 @@ return {
 				Snacks.lazygit.log()
 			end,
 			desc = "Lazygit Log (cwd)",
+		},
+		{
+			-- Opens the current line (or visual range) on GitHub at the exact
+			-- commit -- the link is stable, unlike a branch URL.
+			"<leader>go",
+			function()
+				Snacks.gitbrowse()
+			end,
+			mode = { "n", "x" },
+			desc = "Open in GitHub",
 		},
 		-- NOTE: no <leader>e here. mini.files also binds <leader>e and loads
 		-- later, so snacks.explorer was permanently unreachable.
@@ -275,6 +302,17 @@ return {
 				Snacks.toggle.zoom():map("<leader>uz")
 				Snacks.toggle.indent():map("<leader>ug")
 				Snacks.toggle.dim():map("<leader>uD")
+			end,
+		})
+
+		-- Make mini.files renames LSP-aware: renaming a component through the
+		-- explorer now asks every attached server to update imports, instead of
+		-- leaving a trail of broken paths to fix by hand.
+		vim.api.nvim_create_autocmd("User", {
+			pattern = "MiniFilesActionRename",
+			group = vim.api.nvim_create_augroup("snacks_lsp_rename", { clear = true }),
+			callback = function(ev)
+				Snacks.rename.on_rename_file(ev.data.from, ev.data.to)
 			end,
 		})
 	end,
