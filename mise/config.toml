@@ -3,6 +3,7 @@
 
 [tools]
 node = "lts"
+python = "3.13"
 
 [settings]
 # Read `.nvmrc` / `.node-version` the way fnm's `--use-on-cd` did.

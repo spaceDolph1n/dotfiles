@@ -53,26 +53,6 @@ return {
 			replace = { prefix = "cr" },
 			sort = { prefix = "gz" },
 		})
-		require("mini.pairs").setup()
-		require("mini.splitjoin").setup()
-
-		-- Moved off the default `s` prefix onto `gs`.
-		--
-		-- mini.surround's defaults (sa/sd/sr/sf/sF/sh/sn) made plain `s` a
-		-- prefix of 16 longer mappings, so flash.nvim's `s` jump could not fire
-		-- until `timeoutlen` (500ms) elapsed -- on every single jump. Surround
-		-- is the lower-frequency action, so it is the one that moved.
-		require("mini.surround").setup({
-			mappings = {
-				add = "gsa",
-				delete = "gsd",
-				find = "gsf",
-				find_left = "gsF",
-				highlight = "gsh",
-				replace = "gsr",
-				update_n_lines = "gsn",
-			},
-		})
 
 		vim.keymap.set("n", "<leader>gd", function()
 			MiniDiff.toggle_overlay()
