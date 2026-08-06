@@ -38,41 +38,11 @@ return {
 			-- refer to the configuration section below
 		},
 	},
-	{
-		"folke/noice.nvim",
-		event = "VeryLazy",
-		opts = {
-			lsp = {
-				-- Render LSP markdown (hover, signature help) with treesitter.
-				override = {
-					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-					["vim.lsp.util.stylize_markdown"] = true,
-					-- ["cmp.entry.get_documentation"] dropped: that override is
-					-- for hrsh7th/nvim-cmp, which this config does not use.
-				},
-			},
-			-- You can enable a preset for easier configuration
-			presets = {
-				bottom_search = false, -- Use a classic bottom cmdline for search
-				command_palette = true, -- Position the cmdline and popupmenu together
-				long_message_to_split = true, -- Long messages will be sent to a split
-				inc_rename = false, -- Enables an input dialog for inc-rename.nvim
-				lsp_doc_border = false, -- Add a border to hover docs and signature help
-			},
-		},
-		dependencies = {
-			"MunifTanjim/nui.nvim",
-		},
-	},
-	{
-		"chrisgrieser/nvim-origami",
-		event = "VeryLazy",
-		opts = {}, -- needed even when using default config
-
-		-- recommended: disable vim's auto-folding
-		init = function()
-			vim.opt.foldlevel = 99
-			vim.opt.foldlevelstart = 99
-		end,
-	},
+	-- noice.nvim removed: it hooked Neovim's message/cmdline internals, which
+	-- made it the most upgrade-fragile plugin here, and snacks.notifier already
+	-- owns notifications. The native cmdline is back.
+	--
+	-- nvim-origami removed: treesitter now supplies foldexpr and
+	-- snacks.statuscolumn draws the fold column, so it had nothing left to add.
+	-- foldlevel/foldlevelstart live in core/options.lua.
 }
