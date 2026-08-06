@@ -56,6 +56,17 @@ pattern = "~/Documents/work/*"
 startup_command = "nvim ."
 icon = " "
 
+# --- Demo: something obvious to try `prefix + O` against ---------------------
+# Its startup_command is deliberately visible rather than an editor, so you can
+# tell at a glance whether the window flow picked the command up. Delete this
+# entry once you have tried it.
+[[session]]
+name = "demo · tree"
+path = "~/Documents/work"
+startup_command = "eza --tree --level=2 --icons --git --no-user"
+alias = "demo"
+icon = " "
+
 # =============================================================================
 # Richer layouts — all commented. Uncomment and adapt.
 # =============================================================================
