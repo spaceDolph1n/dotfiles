@@ -1,8 +1,8 @@
 [includeIf "gitdir:~/.config/dotfiles/"]
-  path = ~/.config/git/gitconfig-personal
+  path = ~/.config/git/.gitconfig-personal
 
 [includeIf "gitdir:~/.sb/"]
-  path = ~/.config/git/gitconfig-personal
+  path = ~/.config/git/.gitconfig-personal
 
 [includeIf "gitdir:~/Documents/work/"]
-  path = ~/.config/git/gitconfig-work
+  path = ~/.config/git/.gitconfig-work

@@ -10,7 +10,7 @@
     sshCommand = ssh -i ~/.ssh/id_ed25519_sk -o IdentitiesOnly=yes
 
 [pull]
-    rebase = true
+    ff = only
 
 [push]
     default = upstream
