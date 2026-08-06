@@ -1,38 +1,48 @@
-# General OS and editor files
-.DS_Store       # macOS folder metadata
-Thumbs.db       # Windows thumbnail cache
-*.swp           # Vim swap files
-*~              # Backup files
-*.bak           # Backup files
+# NOTE: git does not support trailing comments on a pattern line. Every rule in
+# the previous version of this file was written as `.DS_Store  # macOS metadata`
+# and therefore matched a literal filename with spaces and a hash in it -- i.e.
+# nothing. That is how .DS_Store and a stray tmux log ended up committed.
 
-# Temporary files
+# macOS / editor cruft
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+*.swp
+*.swo
+*~
+*.bak
+
+# Logs and temp files
+*.log
 .cache/
 .tmp/
 temp/
 
-# Sensitive files
+# Secrets
 .env
+.env.*
 .secret
 *.key
 *.pem
-id_rsa          # Private SSH key
-id_rsa.pub      # Public SSH key (optional to include)
+id_rsa
+id_ed25519
+id_ecdsa
+# Signature allow-list is generated per machine from ~/.ssh
+allowed_signers
 
-# Version control
-.git/
-
-# IDE-specific files
-.idea/
-.vscode/
-
-# Language-specific (optional)
+# Tooling
 node_modules/
 __pycache__/
 *.pyc
+.idea/
+.vscode/
 
-# Local overrides (optional)
+# Local, machine-specific overrides
 local/
 local.*
+*.local
 
-# TMUX plugins
+# tmux plugin manager checkouts
 /tmux/plugins/
