@@ -1,15 +1,51 @@
 -- Formatting. conform.nvim is the single source of truth; every language
--- server that offers formatting has it disabled in nvim/lsp/<name>.lua.
+-- server that offers formatting has it disabled in nvim/after/lsp/<name>.lua.
 --
 -- `{ "prettierd", "prettier" }` means "run prettierd, THEN prettier" unless
 -- `stop_after_first` is set -- the config used to double-format every JS/TS
 -- file on save. The prettier list is built once and shared below.
+--
+-- conform resolves a project-local node_modules/.bin/prettier before the Mason
+-- one, and prettierd honours the repo's pinned prettier major, so a repo on
+-- prettier 2 keeps prettier 2's defaults.
 local prettier = { "prettierd", "prettier", stop_after_first = true }
+
+--- Executable prettier configs get require()d into the prettierd daemon and
+--- cached in its Node module registry, which is never invalidated -- edit
+--- .prettierrc.js and you keep getting the previous formatting until the daemon
+--- restarts. Static configs (.prettierrc.json, package.json#prettier) are
+--- re-read correctly, so this only needs to cover the executable ones.
+local PRETTIER_EXECUTABLE_CONFIGS = {
+	".prettierrc.js",
+	".prettierrc.cjs",
+	".prettierrc.mjs",
+	".prettierrc.ts",
+	"prettier.config.js",
+	"prettier.config.cjs",
+	"prettier.config.mjs",
+	"prettier.config.ts",
+}
 
 return {
 	"stevearc/conform.nvim",
 	event = { "BufWritePre" },
 	cmd = "ConformInfo",
+	init = function()
+		vim.api.nvim_create_autocmd("BufWritePost", {
+			group = vim.api.nvim_create_augroup("prettierd_reload", { clear = true }),
+			pattern = PRETTIER_EXECUTABLE_CONFIGS,
+			callback = function()
+				if vim.fn.executable("prettierd") == 0 then
+					return
+				end
+				vim.system({ "prettierd", "restart" }, { text = true }, function()
+					vim.schedule(function()
+						vim.notify("prettierd restarted (config changed)", vim.log.levels.INFO)
+					end)
+				end)
+			end,
+		})
+	end,
 	keys = {
 		{
 			"<leader>uf",
