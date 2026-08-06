@@ -127,7 +127,7 @@ Layout:
 | ------------------- | ---------------------------------------------------- |
 | `nvim/lua/core/`    | options, keymaps, autocmds, diagnostics               |
 | `nvim/lua/plugins/` | one lazy.nvim spec per concern                        |
-| `nvim/lsp/`         | per-server config, read natively off the runtimepath  |
+| `nvim/after/lsp/`   | per-server config; `after/` so it wins over nvim-lspconfig |
 
 ### Treesitter
 
@@ -152,7 +152,7 @@ plugin mappings were removed because these already existed.
 | --- | --- |
 | `grn` | Rename symbol (replaced `<leader>xr`) |
 | `gra` | Code action — normal and visual |
-| `grr` | References |
+| `grr` | References (mini.operators' `gr` moved to `cr` so this works) |
 | `gri` | Implementation |
 | `grt` | Type definition |
 | `grl` | Codelens run |
@@ -182,7 +182,7 @@ disabled in favour of these):
 | Key | Action |
 | --- | --- |
 | `gc` / `gcc` / `gbc` | Comment operator / line / block (native since 0.10) |
-| `gx` | Open URL under cursor |
+| `gX` | Open URL under cursor (mini.operators owns `gx`) |
 | `g==` | Execute the Lua/Vim code under the cursor |
 | `zi` | Toggle folds (treesitter folds are on) |
 | `y` then `:h quickfix` | — |
@@ -196,7 +196,7 @@ disabled in favour of these):
 
 Servers and CLI tools are declared at the top of `nvim/lua/plugins/lsp.lua` and
 installed by Mason on startup. ESLint picks flat vs. legacy `.eslintrc` config
-**per project root** (see `nvim/lsp/eslint.lua`) — there is deliberately no
+**per project root** (see `nvim/after/lsp/eslint.lua`) — there is deliberately no
 global `ESLINT_USE_FLAT_CONFIG` export in `.zshrc`.
 
 ---
@@ -227,3 +227,88 @@ interchangeably via vim-tmux-navigator.
 | No syntax highlighting     | `:checkhealth nvim-treesitter`, then `:TSUpdate`           |
 | LSP not attaching          | `:checkhealth lsp` and `:Mason` to confirm the binary      |
 | Formatter not running      | `:ConformInfo`                                             |
+
+---
+
+# 🔁 Changelog — 2026-08-06 overhaul
+
+Everything below changed in a single session. The tables marked **retrain**
+are the ones that will fight existing muscle memory.
+
+## 1. Keys that MOVED — retrain
+
+| Was | Now | What |
+| --- | --- | --- |
+| `sa` `sd` `sr` `sf` `sh` | **`gsa` `gsd` `gsr` `gsf` `gsh`** | Surround (add/delete/replace/find/highlight). Moved so `s` (flash jump) fires instantly instead of waiting 500ms behind 16 surround maps. |
+| `gr` | **`cr`** | mini.operators *replace* — it was shadowing native LSP `gr*`. |
+| `gs` | **`gz`** | mini.operators *sort* — it had become a prefix of the surround maps. |
+| `gx` | **`gX`** | Open URL under cursor (mini.operators owns `gx` for exchange). |
+| `<leader>l*` | **`<leader>g*`** | Git: `gg` lazygit · `gb` blame · `gd` diff overlay · `gf` file history · `gl` log |
+| `<leader>g*` | **`<leader>l*`** | LSP: `ld` definition · `lr` references · `li` implementation · `lt` type · `ls` symbols |
+| `<leader>xsw` `<leader>xsc` | **`<leader>xw` `<leader>xc`** | Search & replace sub-commands (so `<leader>xs` fires immediately). |
+| `jjw` | **gone** | Use `<leader>w` to save. Its existence made every `jj` wait 500ms. |
+| `<leader>xr` | **`grn`** | Rename — native since 0.11. |
+| `<leader>xS` | gone | Was a duplicate of `<leader>xs`. |
+
+## 2. New keys
+
+| Key | Does |
+| --- | --- |
+| `<leader>1`–`<leader>4` | Jump to pinned file (harpoon, per-repo) |
+| `<leader>ha` / `<leader>hh` | Pin current file / open pinned list |
+| `<leader>aa` / `<leader>ac` | Toggle AI CLI / focus Claude (runs in tmux) |
+| `<leader>af` / `<leader>ad` | Send file / diagnostics to the AI CLI |
+| `<leader>ap` / `<leader>as` | Prompt picker / send visual selection |
+| `<leader>rs` `<leader>ra` `<leader>rr` | HTTP: send request / send all / replay (in `.http` files) |
+| `<leader>rb` | HTTP scratchpad |
+| `<leader>go` | Open current line (or selection) **on GitHub** |
+| `<leader>xa` | Structural find/replace via ast-grep |
+| `<leader>xs` `<leader>xw` `<leader>xc` | Search & replace: project / word / current file |
+| `<leader>uf` | Toggle format-on-save |
+| `<leader>d*` | Debugger — `dc` start · `db` breakpoint · `do/di/dO` step · `du` UI · `de` eval |
+
+## 3. Native Neovim keys now relied on
+
+These replaced plugin mappings. Nothing in the config defines them.
+
+| Key | Does |
+| --- | --- |
+| `grn` `gra` `grr` `gri` `grt` | Rename · code action · references · implementation · type def |
+| `gO` | Document symbols (outline) |
+| `K` / `<C-s>` | Hover / signature help (insert) |
+| `[d` `]d` | Prev/next diagnostic (opens float on landing) |
+| `[b` `]b` / `[q` `]q` | Prev/next buffer / quickfix item |
+| `gc` `gcc` | Comment operator / line |
+| `zi` | Toggle folds (treesitter-based) |
+| `:Inspect` / `:InspectTree` | Highlight groups / live syntax tree |
+
+## 4. New CLI tools
+
+| Tool | Use |
+| --- | --- |
+| **`tuicr`** | Code review TUI, vim keys. `tuicr -w` uncommitted · `tuicr -r main..HEAD` branch · `tuicr pr 123` GitHub PR. `c` comment, `:submit` to approve/request-changes with inline comments. `--stdout` pipes markdown to an agent. |
+| **`gh dash`** | PR/issue triage dashboard. `a` approve, `o` checkout. |
+| **`sesh`** | Session picker — `prefix + o` in tmux. Creates the session if it doesn't exist. |
+| **`atuin`** | `Ctrl-R` history search. `Tab` cycles filter modes — *directory* mode shows only commands run in this repo. |
+| **`mise`** | Runtimes. Honours `.nvmrc`; `mise use node@22` writes a local `mise.toml`. |
+| **`ast-grep`** | Structural search, backs `<leader>xa`. |
+
+## 5. Behaviour changes worth knowing
+
+- **Format on save no longer runs twice.** `prettierd` is used, falling back to `prettier`; both honour the repo's local binary *and* its pinned major version.
+- **ESLint picks flat vs legacy `.eslintrc` per project root** — no global env var. Legacy repos need nothing special.
+- **Editing an executable prettier config** (`.prettierrc.js`, `prettier.config.mjs`) restarts `prettierd` automatically; static configs never needed it.
+- **Renaming a file in the explorer updates imports** (LSP-aware, via mini.files).
+- **Large files** skip treesitter/LSP automatically.
+- **`C-h/j/k/l`** now crosses Neovim splits *and* tmux panes seamlessly.
+- **Undercurl works inside tmux** (`tmux-256color` + `usstyle`).
+- **Python**: `ruff` (lint/format/imports) + `basedpyright` (types).
+- Sessions are **not** restored automatically any more — create them on demand with `sesh`.
+
+## 6. Removed
+
+`noice.nvim`, `nui.nvim`, `nvim-origami`, `FixCursorHold.nvim`, `nvim-lint`,
+`nvim-spectre` (→ grug-far), `telescope.nvim`, `neogen`, `Comment.nvim` +
+`nvim-ts-context-commentstring` (→ ts-comments), `nvim-web-devicons` (→
+mini.icons), `mason-conform.nvim`, all Copilot/CodeCompanion plugins, all PHP
+support, `neotest-phpunit/-plenary/-bash`, `fnm` (→ mise), Ghostty config.
