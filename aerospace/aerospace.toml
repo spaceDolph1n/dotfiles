@@ -1,5 +1,10 @@
-# Place a copy of this config to ~/.aerospace.toml
-# After that, you can edit ~/.aerospace.toml to your liking
+# Stowed to ~/.config/aerospace/aerospace.toml.
+
+# v1 inferred persistent workspaces from the right-hand side of key bindings,
+# which upstream deprecated as error-prone. v2 requires declaring them, so the
+# alt-1..alt-9 workspaces below survive becoming empty.
+config-version = 2
+persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 # You can use it to add commands that run after login to macOS user session.
 # 'start-at-login' needs to be 'true' for 'after-login-command' to work
@@ -13,11 +18,11 @@ after-startup-command = [
     'exec-and-forget borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0 hidpi=on'
 ]
 
-# Notify Sketchybar about workspace change
-exec-on-workspace-change = ['/bin/bash', '-c',
-    'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE',
-    'exec-and-forget borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0 hidpi=on'
-]
+# `exec-on-workspace-change` removed. It spawned /bin/bash on every workspace
+# switch to notify sketchybar, which is not installed. Its 4th array element was
+# also dead: `bash -c SCRIPT ARG` passes ARG as $0 to the script, so the borders
+# command was never run -- and it did not need to be, since `borders` is already
+# started once by after-startup-command above and stays resident.
 
 # Start AeroSpace at login
 start-at-login = false
@@ -52,7 +57,9 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 automatically-unhide-macos-hidden-apps = false
 
 [[on-window-detected]]
-if.app-name-regex-substring = 'finder|spotify|notion calendar|todoist|1password|local|preview'
+# `local` was a substring match, so it also floated anything containing "local"
+# in its app name (Localhost-*, Local Send, ...). Anchored to the actual app.
+if.app-name-regex-substring = 'finder|spotify|notion calendar|todoist|1password|^local$|preview'
 run = 'layout floating'
 
 [[on-window-detected]]
@@ -77,7 +84,10 @@ inner.horizontal = 20
 inner.vertical =   20
 outer.left =       20
 outer.bottom =     20
-outer.top = [ { monitor."LG ULTRAGEAR" = 20 }, { monitor = { "LG ULTRAWIDE" = 60 } }, 20 ]
+# The second entry used to be written `{ monitor = { "LG ULTRAWIDE" = 60 } }`,
+# which is a different (and unsupported) shape from the first -- the per-monitor
+# override silently never applied.
+outer.top = [ { monitor."LG ULTRAGEAR" = 20 }, { monitor."LG ULTRAWIDE" = 60 }, 20 ]
 outer.right =      20
 
 
