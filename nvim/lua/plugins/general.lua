@@ -8,12 +8,10 @@ return {
 			require("nvim-ts-autotag").setup({
 				filetypes = {
 					"astro",
-					"blade",
 					"html",
 					"javascript",
 					"jsx",
 					"markdown",
-					"php",
 					"tsx",
 					"typescript",
 					"vue",
@@ -22,19 +20,13 @@ return {
 		end,
 	},
 	{
-		"numToStr/Comment.nvim",
-		config = function()
-			local prehook = require("ts_context_commentstring.integrations.comment_nvim").create_pre_hook()
-			require("Comment").setup({
-				pre_hook = prehook,
-			})
-		end,
-		event = "InsertEnter",
-		lazy = true,
-		dependencies = {
-			"nvim-treesitter/nvim-treesitter",
-			"JoosepAlviste/nvim-ts-context-commentstring",
-		},
+		-- Replaces Comment.nvim + nvim-ts-context-commentstring (2 plugins, ~1.5k
+		-- LOC) with ~100 LOC. Neovim 0.10+ already ships the `gc`/`gcc`/`gbc`
+		-- operators; the only thing still missing is a correct `commentstring`
+		-- inside JSX/Vue <script>/<template> regions, which is all this does.
+		"folke/ts-comments.nvim",
+		event = "VeryLazy",
+		opts = {},
 	},
 	{
 		"folke/flash.nvim",
@@ -57,90 +49,76 @@ return {
     },
 	},
 	{
-		-- FIX: not worth, delete?
-		"danymat/neogen",
-		version = "*",
-		config = function()
-			require("neogen").setup({
-				-- ignore_injections = false,
-				languages = {
-					typescript = {
-						template = {
-							annotation_convention = "jsdoc",
-						},
-					},
-					typescriptreact = {
-						template = {
-							annotation_convention = "jsdoc",
-						},
-					},
-					vue = {
-						template = {
-							annotation_convention = "jsdoc",
-						},
-					},
-				},
-			})
-		end,
-	},
-	{
 		"mbbill/undotree",
 		cmd = "UndotreeToggle",
 		keys = {
 			{ "<leader>xu", "<cmd>UndotreeToggle<cr>", desc = "Toggle Undo Tree" },
 		},
 		init = function()
-			-- Persist undo, refer https://github.com/mbbill/undotree#usage
-			local undodir = vim.fn.expand("~/.undo-nvim")
-
-			if vim.fn.has("persistent_undo") == 1 then
-				if vim.fn.isdirectory(undodir) == 0 then
-					os.execute("mkdir -p " .. undodir)
-				end
-
-				vim.opt.undodir = undodir
-				vim.opt.undofile = true
-			end
+			-- `undofile`/`undodir` now live in core/options.lua: persistent undo
+			-- is a core editor setting, not something that should require a
+			-- plugin's `init` to have run.
 			vim.g.undotree_WindowLayout = 2
 		end,
 	},
 	{
-		"nvim-pack/nvim-spectre",
-		lazy = true,
+		-- Project-wide search & replace, replacing nvim-pack/nvim-spectre.
+		--
+		-- Same mental model (search buffer -> edit replacement -> apply), but the
+		-- buffer is a normal editable buffer: ordinary motions, undo and `:w`
+		-- all work. Drives ripgrep's own `--replace` rather than shelling out to
+		-- sed, and can switch engine to ast-grep for syntax-aware rewrites
+		-- (e.g. `$A.map($B)` -> `$A.flatMap($B)`), which regex cannot express.
+		--
+		-- NOTE: this is for *text*. To rename a code symbol use `grn` (native
+		-- LSP rename) -- it is scope-aware and updates imports.
+		"MagicDuck/grug-far.nvim",
+		cmd = { "GrugFar", "GrugFarWithin" },
 		keys = {
 			{
 				"<leader>xs",
 				function()
-					require("spectre").toggle()
+					require("grug-far").open()
 				end,
-				desc = "Spectre",
+				desc = "Search & Replace (project)",
 			},
 			{
-				"<leader>xS",
+				"<leader>xw",
 				function()
-					require("spectre").toggle()
+					require("grug-far").open({ prefills = { search = vim.fn.expand("<cword>") } })
 				end,
-				desc = "Toggle Spectre",
+				desc = "Replace current word",
 			},
 			{
-				"<leader>xsw",
+				"<leader>xw",
 				function()
-					require("spectre").open_visual({ select_word = true })
+					require("grug-far").with_visual_selection()
 				end,
-				desc = "Search current word",
+				mode = "x",
+				desc = "Replace selection",
 			},
 			{
-				"<leader>xsc",
+				"<leader>xc",
 				function()
-					require("spectre").open_file_search({ select_word = true })
+					require("grug-far").open({ prefills = { paths = vim.fn.expand("%") } })
 				end,
-				desc = "Search on current file",
+				desc = "Replace in current file",
+			},
+			{
+				"<leader>xa",
+				function()
+					require("grug-far").open({ engine = "astgrep" })
+				end,
+				desc = "Structural Replace (ast-grep)",
 			},
 		},
-		cmd = {
-			"Spectre",
+		---@module "grug-far"
+		---@type GrugFarOptionsOverride
+		opts = {
+			-- Keep the results buffer out of the way of the file you came from.
+			windowCreationCommand = "botright vsplit",
+			transient = true,
 		},
-		opts = {},
 	},
 	{
 		"andrewferrier/debugprint.nvim",

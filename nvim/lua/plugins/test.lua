@@ -11,7 +11,6 @@ return {
 			"nvim-neotest/neotest-jest",
 			"nvim-neotest/neotest-python",
 			"nvim-neotest/neotest-plenary",
-			"olimorris/neotest-phpunit",
 			"rcasia/neotest-bash",
 			"thenbe/neotest-playwright",
 		},
@@ -22,7 +21,6 @@ return {
 					require("neotest-python")({
 						dap = { adapter = "debugpy" },
 					}),
-					require("neotest-phpunit"),
 					require("neotest-bash"),
 					require("neotest-playwright").adapter({
 						options = {
