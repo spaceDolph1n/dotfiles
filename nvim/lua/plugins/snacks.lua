@@ -97,43 +97,37 @@ return {
 			end,
 			desc = "Dismiss All Notifications",
 		},
-		-- Git
+		-- Git (moved from <leader>l to match the near-universal convention)
 		{
-			"<leader>lb",
+			"<leader>gb",
 			function()
 				Snacks.git.blame_line()
 			end,
 			desc = "Git Blame Line",
 		},
 		{
-			"<leader>lf",
+			"<leader>gf",
 			function()
 				Snacks.lazygit.log_file()
 			end,
 			desc = "Lazygit Current File History",
 		},
 		{
-			"<leader>lg",
+			"<leader>gg",
 			function()
 				Snacks.lazygit()
 			end,
 			desc = "Lazygit",
 		},
 		{
-			"<leader>ll",
+			"<leader>gl",
 			function()
 				Snacks.lazygit.log()
 			end,
 			desc = "Lazygit Log (cwd)",
 		},
-		-- Explorer
-		{
-			"<leader>e",
-			function()
-				Snacks.explorer.open()
-			end,
-			desc = "Open Explorer",
-		},
+		-- NOTE: no <leader>e here. mini.files also binds <leader>e and loads
+		-- later, so snacks.explorer was permanently unreachable.
 		-- Picker
 		{
 			"<leader><space>",
@@ -199,23 +193,25 @@ return {
 			end,
 			desc = "Quickfix List",
 		},
-		-- LSP
+		-- LSP (moved from <leader>g, which is now Git).
+		-- Neovim 0.11+ also has native gd/grr/gri/grt/grn/gra -- these give the
+		-- same navigation through the snacks picker UI.
 		{
-			"<leader>gd",
+			"<leader>ld",
 			function()
 				Snacks.picker.lsp_definitions()
 			end,
 			desc = "Definition",
 		},
 		{
-			"<leader>gD",
+			"<leader>lD",
 			function()
 				Snacks.picker.lsp_declarations()
 			end,
 			desc = "Declaration",
 		},
 		{
-			"<leader>gr",
+			"<leader>lr",
 			function()
 				Snacks.picker.lsp_references()
 			end,
@@ -223,25 +219,25 @@ return {
 			desc = "References",
 		},
 		{
-			"<leader>gi",
+			"<leader>li",
 			function()
 				Snacks.picker.lsp_implementations()
 			end,
 			desc = "Implementation",
 		},
 		{
-			"<leader>gt",
+			"<leader>lt",
 			function()
 				Snacks.picker.lsp_type_definitions()
 			end,
 			desc = "Type Definition",
 		},
 		{
-			"<leader>fl",
+			"<leader>ls",
 			function()
 				Snacks.picker.lsp_symbols()
 			end,
-			desc = "LSP Symbols",
+			desc = "Document Symbols",
 		},
 		-- Other
 		{
