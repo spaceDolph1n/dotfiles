@@ -312,3 +312,25 @@ These replaced plugin mappings. Nothing in the config defines them.
 `nvim-ts-context-commentstring` (→ ts-comments), `nvim-web-devicons` (→
 mini.icons), `mason-conform.nvim`, all Copilot/CodeCompanion plugins, all PHP
 support, `neotest-phpunit/-plenary/-bash`, `fnm` (→ mise), Ghostty config.
+
+## 7. Not yet verified in real use
+
+Everything below was wired up and checked as far as a scratch fixture allows,
+but never exercised against a real project. If something misbehaves, start here.
+
+| # | What to test | What good looks like | If it fails |
+| - | ------------ | -------------------- | ----------- |
+| 1 | **DAP · TypeScript** — breakpoint in a Next.js route, `<leader>db` then `<leader>dc` → *Attach to running Node process* (start `next dev` first) | Execution stops on the line; dap-ui opens with scopes | `:checkhealth dap`; confirm `js-debug-adapter` in `:Mason` |
+| 2 | **DAP · Python** — breakpoint in a FastAPI handler, `<leader>dc` → *FastAPI (uvicorn)* | Stops on request; variables populate | Check `debugpy` in `:Mason` |
+| 3 | **neotest · jest vs vitest** — open a repo with `*.test.ts` and `<leader>ts` | Each test appears **once**, run by the right runner | Both adapters can claim the same files. If duplicated, drop the unused adapter from `plugins/test.lua` |
+| 4 | **neotest · discovery** — `<leader>tr` on a test | Test runs, output in summary | Discovery is treesitter-driven; `:TSUpdate` if empty |
+| 5 | **ESLint · work repo** — open a file in `work/web` | Diagnostics match `npx eslint` on the same file | Compare `:LspInfo` root with the repo root; see `nvim/after/lsp/eslint.lua` |
+| 6 | **Formatting · work repo** — save a `.ts` file | Diff matches `npx prettier --write` exactly | `:ConformInfo` shows which binary ran |
+| 7 | **kulala** — real endpoint with auth/env vars in a `.http` file | `<leader>rs` returns the response in a split | Env vars resolve per `environment_scope`; `<leader>re` selects environment |
+| 8 | **sidekick** — `<leader>ac`, then `<leader>af` to send the file | Claude session opens in tmux with the file as context; survives closing nvim | `:checkhealth sidekick` |
+| 9 | **harpoon** — pin 3 files, close nvim, reopen | Same pins, per repo. A different repo has its own | Keyed by cwd — check you reopened from the same directory |
+| 10 | **tuicr** — `tuicr pr <n>` on a real PR, comment, `:submit` → *Comment* | Inline comments land on the right lines on GitHub | Try `tuicr -r main..HEAD` locally first |
+| 11 | **swap recovery** — open a file, edit without saving, `kill -9` the nvim, reopen | Neovim offers `:recover` | Requires `swapfile = true` (now on) |
+| 12 | **`prefix + O`** — pick a project | Opens as a *new numbered window*, runs its `sesh.toml` startup command; picking it again selects the existing window | After editing `tmux.conf` you must reload with `prefix + R` |
+| 13 | **`<leader>go`** — cursor on a line, in a repo with a GitHub remote | Browser opens at that line, pinned to the commit | |
+| 14 | **LSP rename via explorer** — `<leader>e`, rename a component file | Imports across the project update automatically | Needs the LSP attached before renaming |
