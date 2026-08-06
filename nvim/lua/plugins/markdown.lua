@@ -1,13 +1,15 @@
 return {
 	{
 		"MeanderingProgrammer/render-markdown.nvim",
-		-- Removed nvim-treesitter dependency. Neovim 0.10+ handles rendering
-		-- natively without requiring the nvim-treesitter plugin runtime.
+		-- Rendering needs the `markdown` + `markdown_inline` parsers, which
+		-- core bundles -- no nvim-treesitter dependency required.
 		dependencies = { "echasnovski/mini.icons" },
+		ft = { "markdown", "mdx" },
 		---@module 'render-markdown'
 		---@type render.md.UserConfig
 		opts = {
-			ft = { "markdown", "codecompanion", "mdx" },
+			-- "codecompanion" dropped along with the AI plugins.
+			ft = { "markdown", "mdx" },
 		},
 	},
 	{
