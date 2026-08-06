@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+#
+# Pick a project and open it as a WINDOW in the current tmux session.
+#
+# This is the window-oriented counterpart to sesh: sesh switches between
+# *sessions*, whereas this keeps one session and gives each project its own
+# numbered window -- so dotfiles stays #1, web becomes #2, and so on.
+#
+# If a window for that project already exists it is selected rather than
+# duplicated, so hammering the key is idempotent.
+#
+# Bound to `prefix + O` (see tmux.conf), which runs it inside a popup so fzf
+# has a real terminal.
+
+set -euo pipefail
+
+SESH_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/sesh/sesh.toml"
+
+# Candidates: paths declared in sesh.toml first (the curated ones), then
+# everything zoxide knows about. `awk` keeps first occurrence only.
+list_candidates() {
+	if [[ -f "$SESH_CONFIG" ]]; then
+		sed -n 's/^[[:space:]]*path[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' "$SESH_CONFIG"
+	fi
+	zoxide query -l 2>/dev/null || true
+}
+
+selected=$(
+	list_candidates |
+		sed "s|^~|$HOME|" |
+		awk '!seen[$0]++' |
+		fzf --prompt='  window  ' \
+			--border-label=' project → new window ' \
+			--height=100% --reverse \
+			--preview 'eza --tree --level=1 --icons --git --no-user --color=always {} 2>/dev/null || ls -la {}' \
+			--preview-window=right:55%
+) || exit 0
+
+[[ -n "$selected" && -d "$selected" ]] || exit 0
+
+name=$(basename "$selected")
+
+# Reuse an existing window for this project instead of opening a second one.
+if tmux list-windows -F '#W' | grep -qxF "$name"; then
+	tmux select-window -t "$name"
+	exit 0
+fi
+
+# Opens a shell in the project. Append a command (e.g. `nvim .`) here if you
+# would rather land straight in the editor.
+tmux new-window -c "$selected" -n "$name"

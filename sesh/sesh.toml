@@ -1,0 +1,129 @@
+# sesh — tmux SESSION manager.
+#
+#   prefix + o   this picker (project -> its own session)
+#   prefix + O   project -> a WINDOW in the current session, if you would rather
+#                keep one session and number projects as windows.
+#                See scripts/tmux-project-window.
+#
+# Sessions are created on demand; nothing is restored at startup. `startup_command`
+# only runs when the session is CREATED, never on reconnect.
+#
+# Entries here show under the `^g` (config) filter. Anything else still appears
+# via zoxide (`^x`) — this file is only for projects worth a fixed name, alias
+# and layout.
+
+[default_session]
+preview_command = "eza --tree --level=1 --icons --git --no-user --color=always {}"
+
+# --- Config -----------------------------------------------------------------
+
+[[session]]
+name = "dotfiles"
+path = "~/.config/dotfiles"
+startup_command = "nvim ."
+alias = "dot"
+icon = " "
+
+# --- Notes ------------------------------------------------------------------
+
+[[session]]
+name = "second brain"
+path = "~/.sb/second-brain"
+startup_command = "nvim ."
+alias = "sb"
+icon = " "
+
+# --- Work -------------------------------------------------------------------
+
+[[session]]
+name = "web"
+path = "~/Documents/work/web"
+startup_command = "nvim ."
+alias = "web"
+icon = " "
+
+[[session]]
+name = "test"
+path = "~/Documents/work/test"
+startup_command = "nvim ."
+alias = "test"
+icon = " "
+
+# Any repo under ~/Documents/work that is not named above still opens with nvim,
+# so a freshly cloned project needs no edit here.
+[[wildcard]]
+pattern = "~/Documents/work/*"
+startup_command = "nvim ."
+icon = " "
+
+# =============================================================================
+# Richer layouts — all commented. Uncomment and adapt.
+# =============================================================================
+#
+# --- 1. Open straight into specific files ------------------------------------
+# `startup_command` is just a shell command, so anything nvim accepts works:
+# several files become buffers, and `-O` / `-o` open them as vertical /
+# horizontal splits.
+#
+# [[session]]
+# name = "web · api"
+# path = "~/Documents/work/web"
+# startup_command = "nvim -O src/routes/api.ts src/lib/client.ts"
+# alias = "api"
+#
+# --- 2. Extra windows in the same session ------------------------------------
+# Define named windows once, then list them per session. A window without its
+# own `path` inherits the session's. The session lands on its first window.
+#
+# [[window]]
+# name = "server"
+# startup_script = "npm run dev"
+#
+# [[window]]
+# name = "git"
+# startup_script = "lazygit"
+#
+# [[window]]
+# name = "test"
+# startup_script = "npm run test -- --watch"
+#
+# [[session]]
+# name = "web · full"
+# path = "~/Documents/work/web"
+# startup_command = "nvim ."
+# windows = ["server", "git", "test"]
+# alias = "wf"
+#
+# --- 3. Split panes ----------------------------------------------------------
+# sesh has no native pane/split syntax — `[[window]]` is as granular as it goes.
+# For panes, drive tmux from the startup command: editor on the left, dev server
+# top-right, shell bottom-right.
+#
+# [[session]]
+# name = "web · ide"
+# path = "~/Documents/work/web"
+# startup_command = """
+# tmux split-window -h -p 35 -c '#{pane_current_path}' 'npm run dev' \\; \
+# split-window -v -c '#{pane_current_path}' \\; \
+# select-pane -L \\; \
+# send-keys 'nvim .' C-m
+# """
+# alias = "ide"
+#
+# --- 4. Per-project environment ----------------------------------------------
+# Chain with `&&` to set things up before the editor starts. mise already
+# handles runtime versions on cd, so this is for anything it does not cover.
+#
+# [[session]]
+# name = "web · staging"
+# path = "~/Documents/work/web"
+# startup_command = "export API_ENV=staging && nvim ."
+# alias = "stg"
+#
+# --- 5. Suppress the startup command ------------------------------------------
+# Handy for a session you want to land in as a plain shell.
+#
+# [[session]]
+# name = "scratch"
+# path = "~/Documents/work"
+# disable_startup_command = true
