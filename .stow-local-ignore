@@ -1,0 +1,28 @@
+# Files stow must NOT symlink into ~/.config.
+#
+# Defining this file REPLACES stow's built-in ignore list, so the defaults worth
+# keeping (VCS metadata, README/LICENSE) are repeated here.
+#
+# This exists because a stray .DS_Store in the repo collided with the one in
+# ~/.config and made `stow -t ~/.config .` abort *entirely* -- silently leaving
+# Brewfile, .editorconfig, .stylua.toml and mise/ unlinked.
+
+# macOS cruft
+\.DS_Store
+\._.*
+
+# VCS
+\.git
+\.gitignore
+\.gitmodules
+
+# Docs
+README.*
+LICENSE.*
+
+# Tool state that belongs to the repo, not to ~/.config
+\.claude
+\.stow-local-ignore
+
+# Stowed separately into $HOME, not ~/.config (see README)
+zshrc

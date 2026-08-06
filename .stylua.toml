@@ -1,0 +1,10 @@
+# Matches what the bulk of this repo was already formatted as (stylua defaults).
+# Previously absent, which is why format.lua and telescope.lua drifted to
+# 2-space indentation while every other file used tabs.
+column_width = 120
+line_endings = "Unix"
+indent_type = "Tabs"
+indent_width = 4
+quote_style = "AutoPreferDouble"
+call_parentheses = "Always"
+collapse_simple_statement = "Never"
