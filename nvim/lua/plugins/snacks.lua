@@ -62,7 +62,12 @@ return {
 		-- Renders the file before plugins finish loading.
 		quickfile = { enabled = true },
 		indent = { enabled = true },
-		image = { enabled = true, doc = { enabled = false } },
+		-- Disabled: image rendering needs the kitty graphics protocol, which the
+		-- current WezTerm build (20240203, the Homebrew stable) does not
+		-- implement, and the converters it relies on (magick, gs, mmdc) are not
+		-- installed either. `:checkhealth snacks` reported five errors for a
+		-- feature that could never render. Re-enable if WezTerm gains support.
+		image = { enabled = false },
 		-- Replaces vim.ui.input; the DAP conditional-breakpoint prompt uses it.
 		input = { enabled = true },
 		lazygit = { enabled = true },

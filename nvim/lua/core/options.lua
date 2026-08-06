@@ -56,7 +56,12 @@ o.confirm = true
 o.spelloptions = "camel"
 
 -- files & undo
-o.swapfile = false
+-- Swap is ON. Neovim writes swap files to stdpath("state")/swap, not next to
+-- your code, so the historical reason to disable it (litter in the repo) no
+-- longer applies. With it off, a killed tmux session or a crash loses every
+-- unsaved buffer with no recovery path -- which is exactly what nearly
+-- happened when clearing out stale sessions. `:recover` needs this.
+o.swapfile = true
 -- Persistent undo. Previously buried in the undotree plugin's `init`, which
 -- meant undo history depended on a plugin having loaded.
 o.undofile = true
