@@ -46,6 +46,12 @@ brew "yarn"
 # ---------------------------------------------------------------------------
 brew "gh"
 brew "lazygit"
+# Code-review TUI with vim keys: local ranges (`tuicr -r main..HEAD`),
+# uncommitted work (`tuicr -w`) and real GitHub PRs (`tuicr pr 123`),
+# submitting inline comments back with `:submit`.
+brew "tuicr"
+# gh-dash is a gh CLI extension rather than a formula, so it is not listed
+# here. Install with:  gh extension install dlvhdr/gh-dash
 # Uncomment together with the [core] pager block in git/.gitconfig:
 # brew "git-delta"
 

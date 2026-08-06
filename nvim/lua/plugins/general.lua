@@ -150,4 +150,68 @@ return {
 		lazy = false, -- Required to make line highlighting work before debugprint is first used
 		version = "*", -- Remove if you DON'T want to use the stable version
 	},
+	{
+		-- harpoon2 -- pinned files, scoped per project.
+		--
+		-- Complements the picker rather than duplicating it: the picker is
+		-- *search* (recall a name, type, filter), harpoon is *muscle memory* --
+		-- <leader>2 is the same file all day for the feature you are on. A
+		-- typical set while working a Vue feature: component, composable, api
+		-- client, test. Direct leader+digit, no chording.
+		"ThePrimeagen/harpoon",
+		branch = "harpoon2",
+		dependencies = { "nvim-lua/plenary.nvim" },
+		keys = function()
+			local keys = {
+				{
+					"<leader>ha",
+					function()
+						require("harpoon"):list():add()
+					end,
+					desc = "Pin file",
+				},
+				{
+					"<leader>hh",
+					function()
+						local h = require("harpoon")
+						h.ui:toggle_quick_menu(h:list())
+					end,
+					desc = "Pinned files",
+				},
+				{
+					"<leader>hn",
+					function()
+						require("harpoon"):list():next()
+					end,
+					desc = "Next pinned",
+				},
+				{
+					"<leader>hp",
+					function()
+						require("harpoon"):list():prev()
+					end,
+					desc = "Previous pinned",
+				},
+			}
+			for i = 1, 4 do
+				table.insert(keys, {
+					"<leader>" .. i,
+					function()
+						require("harpoon"):list():select(i)
+					end,
+					desc = "Pinned file " .. i,
+				})
+			end
+			return keys
+		end,
+		opts = {
+			settings = {
+				save_on_toggle = true,
+				-- Key the list by cwd, so each repo keeps its own pins.
+				key = function()
+					return vim.uv.cwd()
+				end,
+			},
+		},
+	},
 }
