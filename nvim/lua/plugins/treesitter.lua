@@ -63,12 +63,28 @@ return {
 		vim.api.nvim_create_autocmd("FileType", {
 			group = vim.api.nvim_create_augroup("TreesitterStart", { clear = true }),
 			callback = function(ev)
+				-- `get_lang` falls back to returning the filetype itself, so this
+				-- is never nil for plugin UI buffers like `minifiles` or `lazy`.
 				local lang = vim.treesitter.language.get_lang(ev.match)
-				if not lang or not pcall(vim.treesitter.language.add, lang) then
-					return -- no parser installed for this filetype; leave regex syntax alone
+				if not lang then
+					return
 				end
 
-				vim.treesitter.start(ev.buf, lang)
+				-- `language.add()` returns false/nil when no parser is installed
+				-- and does NOT raise, so pcall's first value only tells us it
+				-- did not throw -- the second is the one that matters. Checking
+				-- pcall alone lets every parser-less filetype through to
+				-- `start()`, which then asserts: opening a directory hit
+				-- mini.files' `minifiles` buffer and errored on every plugin UI
+				-- buffer thereafter.
+				local ok, added = pcall(vim.treesitter.language.add, lang)
+				if not ok or not added then
+					return -- no parser for this filetype; leave regex syntax alone
+				end
+
+				if not pcall(vim.treesitter.start, ev.buf, lang) then
+					return
+				end
 
 				-- Treesitter folds. `foldlevel`/`foldlevelstart` are pinned to 99
 				-- by nvim-origami, so nothing is folded on open.
