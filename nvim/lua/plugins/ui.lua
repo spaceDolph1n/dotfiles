@@ -23,17 +23,14 @@ return {
 				{ "<leader>W", hidden = true },
 				{ "<leader>q", hidden = true },
 				{ "<leader>Q", hidden = true },
-				{ "<leader>a", group = "AI", icon = { icon = "🤖" } },
-				{ "<leader>d", group = "Debug" },
+				{ "<leader>d", group = "Debug", icon = { icon = "🐞" } },
 				{ "<leader>f", group = "Find" },
-				{ "<leader>g", group = "Go", icon = { icon = "⏩" } },
-				{ "<leader>l", group = "Git" },
-				{ "<leader>o", group = "Git PRs" },
+				{ "<leader>g", group = "Git", icon = { icon = "🌿" } },
+				{ "<leader>l", group = "LSP", icon = { icon = "⏩" } },
 				{ "<leader>s", group = "Window" },
 				{ "<leader>t", group = "Tests", icon = { icon = "🔧" } },
 				{ "<leader>u", group = "UI" },
 				{ "<leader>x", group = "Tools", icon = { icon = "🔧" } },
-				{ "<leader>xs", group = "Spectre", icon = { icon = "🔍" } },
 				{ "<leader>/", desc = "Terminal", icon = { icon = "" } },
 			},
 			-- your configuration comes here
@@ -46,11 +43,12 @@ return {
 		event = "VeryLazy",
 		opts = {
 			lsp = {
-				-- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+				-- Render LSP markdown (hover, signature help) with treesitter.
 				override = {
 					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
 					["vim.lsp.util.stylize_markdown"] = true,
-					["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
+					-- ["cmp.entry.get_documentation"] dropped: that override is
+					-- for hrsh7th/nvim-cmp, which this config does not use.
 				},
 			},
 			-- You can enable a preset for easier configuration

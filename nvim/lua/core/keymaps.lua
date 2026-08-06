@@ -1,15 +1,16 @@
--- set leader key to space
-vim.g.mapleader = " "
+-- Leader is set in init.lua, before any plugin spec is loaded.
 
 local keymap = vim.keymap -- for conciseness
-local fn = vim.fn -- for conciseness
 
 ---------------------
 -- General Keymaps -------------------
 
--- use jj to exit insert mode
+-- Exit insert mode.
+--
+-- `jjw` (exit + save) used to exist alongside this. Because `jj` was a prefix
+-- of it, every single insert-mode exit blocked for `timeoutlen` (500ms) waiting
+-- to see whether a `w` was coming. `<leader>w` already saves.
 keymap.set("i", "jj", "<ESC>", { desc = "Exit insert mode with jj" })
-keymap.set("i", "jjw", "<ESC>:w!<cr>", { desc = "Exit insert mode and save" })
 
 -- clear search highlights
 keymap.set("n", "<leader>uh", ":nohl<CR>", { desc = "Clear search highlights" })
@@ -61,14 +62,8 @@ keymap.set("n", "N", "Nzzzv")
 keymap.set("n", "<C-d>", "<C-d>zz")
 keymap.set("n", "<C-u>", "<C-u>zz")
 
--- Keep last yanked when pasting
-keymap.set("v", "p", '"_dP')
-
--- Octo and Prs
--- keymap.set("n", "<leader>oo", ":Octo<CR>", { desc = "Open Octo" })
--- keymap.set("n", "<leader>op", ":Octo pr list<CR>", { desc = "PR list" })
--- keymap.set("n", "<leader>oc", ":Octo pr create<CR>", { desc = "Create PR" })
--- keymap.set("n", "<leader>or", ":Octo review start<CR>", { desc = "Start PR Review" })
+-- (The "keep last yanked when pasting" mapping for `v p` is already set above;
+--  it used to be defined a second time here.)
 
 -- Go to the beginning and end of the line
 keymap.set({ "n", "o", "v" }, "H", "^", { desc = "Go to beginning of the line" })
@@ -82,9 +77,8 @@ keymap.set("n", "[t", function()
 	require("todo-comments").jump_prev()
 end, { desc = "Previous todo comment" })
 
-keymap.set("n", "<leader>xr", function()
-	vim.lsp.buf.rename()
-end, { desc = "LSP rename" })
+-- `<leader>xr` (LSP rename) removed: Neovim 0.11+ binds this natively as `grn`.
+-- See the native-defaults list in the README.
 
 -- Macros
 
