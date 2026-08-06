@@ -1,39 +1,72 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# jz -- convert a JSON sample into a production-ready Zod schema.
+#
+# Usage: jz <input.json>
+#
+# Env:
+#   JZ_AI          AI CLI to pipe the prompt through (default: claude)
+#   JZ_MAX_BYTES   cap on the project context sent as reference (default: 60000)
 
-# --- 1. Config & Check ---
-EXTENSIONS=("-e" "ts" "-e" "tsx")
-JSON_INPUT=$1
+set -euo pipefail
 
-# Validation
-if [[ -z "$JSON_INPUT" ]] || [[ ! -f "$JSON_INPUT" ]]; then
-    echo "Usage: jz <input.json>"
-    exit 1
+AI_CLI="${JZ_AI:-claude}"
+MAX_CONTEXT_BYTES="${JZ_MAX_BYTES:-60000}"
+
+die() {
+	printf 'jz: %s\n' "$1" >&2
+	exit 1
+}
+
+# --- 1. Validate input -------------------------------------------------------
+if [[ $# -ne 1 ]]; then
+	die "usage: jz <input.json>"
 fi
 
-# Dependency Check
-for cmd in gemini fd bat pbcopy; do
-    if ! command -v "$cmd" &> /dev/null; then
-        echo "Error: $cmd is not installed. Please brew install it."
-        exit 1
-    fi
+JSON_INPUT="$1"
+[[ -f "$JSON_INPUT" ]] || die "no such file: $JSON_INPUT"
+[[ -s "$JSON_INPUT" ]] || die "file is empty: $JSON_INPUT"
+
+# Fail before burning an API call on malformed JSON.
+if command -v jq >/dev/null 2>&1; then
+	jq empty <"$JSON_INPUT" 2>/dev/null || die "not valid JSON: $JSON_INPUT"
+fi
+
+for cmd in "$AI_CLI" rg bat pbcopy; do
+	command -v "$cmd" >/dev/null 2>&1 || die "$cmd is not installed (set JZ_AI to pick another CLI)"
 done
 
-# --- 2. Smart Context Gathering ---
-# fd respects .gitignore and finds relevant domain files to feed the AI context.
-PROJECT_CONTEXT=$(fd "${EXTENSIONS[@]}" --max-depth 3 --exec grep -lE "type|interface|z.object" {} | xargs cat)
+# --- 2. Gather project context ----------------------------------------------
+# Was: fd -e ts -e tsx --max-depth 3 --exec grep -lE ... | xargs cat
+#   * `--exec` forked one grep per file; ripgrep walks the tree once and
+#     respects .gitignore the same way.
+#   * `xargs cat` with zero matches reads from stdin and hangs the script.
+#   * the result was unbounded -- a large repo produced a multi-MB prompt.
+PROJECT_CONTEXT=""
+if matches=$(rg --files-with-matches --type ts --max-depth 3 -e '\b(type|interface)\b' -e 'z\.object' . 2>/dev/null); then
+	if [[ -n "$matches" ]]; then
+		PROJECT_CONTEXT=$(printf '%s\n' "$matches" | tr '\n' '\0' | xargs -0 cat | head -c "$MAX_CONTEXT_BYTES")
+	fi
+fi
 
-# --- 3. The "Product Engineer" Prompt --
-INSTRUCTIONS="ACT AS A SENIOR TYPESCRIPT ARCHITECT & CODE REVIEWER.
-TASK: Convert JSON (stdin) into a production-ready, strictly typed Zod schema.
+if [[ -z "$PROJECT_CONTEXT" ]]; then
+	PROJECT_CONTEXT="(no local type definitions found -- infer types from the JSON alone)"
+	printf 'jz: no domain types found nearby; continuing without project context\n' >&2
+fi
+
+# --- 3. Prompt ---------------------------------------------------------------
+read -r -d '' INSTRUCTIONS <<EOF || true
+ACT AS A SENIOR TYPESCRIPT ARCHITECT & CODE REVIEWER.
+TASK: Convert the JSON on stdin into a production-ready, strictly typed Zod schema.
 
 STRICT MECHANICAL CONSTRAINTS:
 1. OUTPUT ONLY CODE. No markdown backticks, no preamble, no talk.
-2. TYPESCRIPT SAFETY: Explicitly type 'z.preprocess' args as 'unknown' (Fixes TS7006).
+2. TYPESCRIPT SAFETY: Explicitly type 'z.preprocess' args as 'unknown' (fixes TS7006).
    Example: z.preprocess((arg: unknown) => (typeof arg === 'string' ? new Date(arg) : arg), z.date())
 3. REUSE DOMAIN TYPES: Use 'as z.ZodType<TypeName>' for context matches.
-4. INTELLIGENT PATH ALIASES: 
+4. INTELLIGENT PATH ALIASES:
    - If you reuse types, add an import at the top.
-   - Use PATH ALIASES (e.g., '@/domain/installation/shared') instead of relative paths.
+   - Use PATH ALIASES (e.g. '@/domain/installation/shared') instead of relative paths.
    - Strip 'src/' and '.ts' from the path.
    - Add a '// TODO: Verify path alias' comment.
 5. EXPORT: Always export the final schema AND the inferred TypeScript type.
@@ -44,14 +77,13 @@ CODE REVIEW & CLEAN CODE PASS:
 - Ensure the output is formatted for immediate production use.
 
 PROJECT CONTEXT FOR REFERENCE:
-$PROJECT_CONTEXT"
+$PROJECT_CONTEXT
+EOF
 
-# --- 4. Execution, Preview, and Clipboard ---
-# Capture output, highlight in terminal for the demo, and copy to clipboard.
-RESULT=$(cat "$JSON_INPUT" | gemini "$INSTRUCTIONS")
+# --- 4. Run, preview, copy ---------------------------------------------------
+RESULT=$("$AI_CLI" -p "$INSTRUCTIONS" <"$JSON_INPUT")
+[[ -n "$RESULT" ]] || die "$AI_CLI returned no output"
 
-# Preview with syntax highlighting
-echo "$RESULT" | bat --language typescript --style=plain --paging=never
-
-# Copy to clipboard
-echo "$RESULT" | pbcopy
+printf '%s\n' "$RESULT" | bat --language typescript --style=plain --paging=never
+printf '%s' "$RESULT" | pbcopy
+printf 'jz: copied to clipboard (%s bytes)\n' "${#RESULT}" >&2
