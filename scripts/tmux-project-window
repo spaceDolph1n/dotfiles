@@ -4,24 +4,48 @@
 #
 # This is the window-oriented counterpart to sesh: sesh switches between
 # *sessions*, whereas this keeps one session and gives each project its own
-# numbered window -- so dotfiles stays #1, web becomes #2, and so on.
+# numbered window -- dotfiles #1, web #2, and so on.
 #
 # If a window for that project already exists it is selected rather than
-# duplicated, so hammering the key is idempotent.
+# duplicated, so pressing the key repeatedly is idempotent.
 #
-# Bound to `prefix + O` (see tmux.conf), which runs it inside a popup so fzf
-# has a real terminal.
+# Projects declared in sesh.toml contribute both their path AND their
+# `startup_command`, so `prefix + O` and `prefix + o` land you in the same
+# layout -- the difference is only window vs session. Paths that come from
+# zoxide just open a shell.
+#
+# Bound to `prefix + O` (see tmux.conf), run inside a popup so fzf has a real
+# terminal.
 
 set -euo pipefail
 
 SESH_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/sesh/sesh.toml"
 
-# Candidates: paths declared in sesh.toml first (the curated ones), then
-# everything zoxide knows about. `awk` keeps first occurrence only.
+# Emit "path<TAB>startup_command" for each [[session]] in sesh.toml.
+# Comment lines are skipped, so the commented examples never leak in.
+sesh_entries() {
+	[[ -f "$SESH_CONFIG" ]] || return 0
+	awk '
+		/^[[:space:]]*#/ { next }
+		/^[[:space:]]*\[\[/ {
+			if (path != "") print path "\t" cmd
+			path = ""; cmd = ""; next
+		}
+		/^[[:space:]]*path[[:space:]]*=/ {
+			if (match($0, /"[^"]*"/)) path = substr($0, RSTART+1, RLENGTH-2)
+			next
+		}
+		/^[[:space:]]*startup_command[[:space:]]*=/ {
+			if (match($0, /"[^"]*"/)) cmd = substr($0, RSTART+1, RLENGTH-2)
+			next
+		}
+		END { if (path != "") print path "\t" cmd }
+	' "$SESH_CONFIG"
+}
+
+# Candidate list: curated sesh paths first, then zoxide history.
 list_candidates() {
-	if [[ -f "$SESH_CONFIG" ]]; then
-		sed -n 's/^[[:space:]]*path[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' "$SESH_CONFIG"
-	fi
+	sesh_entries | cut -f1
 	zoxide query -l 2>/dev/null || true
 }
 
@@ -46,6 +70,12 @@ if tmux list-windows -F '#W' | grep -qxF "$name"; then
 	exit 0
 fi
 
-# Opens a shell in the project. Append a command (e.g. `nvim .`) here if you
-# would rather land straight in the editor.
+# Look up a startup command for this exact path, if sesh.toml declares one.
+startup=$(sesh_entries | sed "s|^~|$HOME|" | awk -F'\t' -v p="$selected" '$1 == p { print $2; exit }')
+
 tmux new-window -c "$selected" -n "$name"
+if [[ -n "$startup" ]]; then
+	# send-keys rather than passing the command to new-window, so quitting the
+	# editor leaves you in a shell instead of closing the window.
+	tmux send-keys -t "$name" "$startup" C-m
+fi
