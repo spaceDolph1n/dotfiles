@@ -19,6 +19,17 @@ return {
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 		},
+		-- Links only go one way in the file itself. These make the vault
+		-- navigable in both directions from inside Neovim, which is the whole
+		-- reason to keep obsidian.nvim now that Obsidian itself is gone.
+		keys = {
+			{ "<leader>kb", "<cmd>Obsidian backlinks<cr>", ft = "markdown", desc = "Backlinks to this note" },
+			{ "<leader>kl", "<cmd>Obsidian links<cr>", ft = "markdown", desc = "Links in this note" },
+			{ "<leader>ko", "<cmd>Obsidian quick_switch<cr>", desc = "Open note" },
+			{ "<leader>ks", "<cmd>Obsidian search<cr>", desc = "Search vault" },
+			{ "<leader>kt", "<cmd>Obsidian tags<cr>", ft = "markdown", desc = "Tags" },
+			{ "<leader>kc", "<cmd>Obsidian toc<cr>", ft = "markdown", desc = "Table of contents" },
+		},
 		---@module 'obsidian'
 		---@type obsidian.config
 		opts = {
