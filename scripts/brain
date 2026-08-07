@@ -114,6 +114,56 @@ sys.stdout.write(text)
 '
 }
 
+# Notes get written after the entries that mention them -- you log something
+# about Smallpdf on Monday and create the note on Friday. Without this, the
+# Monday entry never points at it. Re-runs autolink over every existing entry;
+# already-linked text is skipped, so it is safe to run repeatedly.
+relink() {
+	local before after
+	for f in "$LOG" "$DECISIONS"; do
+		[[ -f "$f" ]] || continue
+		before=$(grep -c '\[\[' "$f" || true)
+		python3 - "$f" "$VAULT" <<'PY'
+import os, re, sys
+path, vault = sys.argv[1], sys.argv[2]
+stems = []
+for root, dirs, files in os.walk(vault):
+    dirs[:] = [d for d in dirs if d not in (".obsidian", ".git", "files")]
+    for f in files:
+        if f.endswith(".md") and f not in ("log.md", "decisions.md"):
+            s = f[:-3]
+            if "-" in s or len(s) >= 8: stems.append(s)
+stems.sort(key=len, reverse=True)
+out = []
+for line in open(path, encoding="utf-8"):
+    if not line.lstrip().startswith(("- ", "### ")):
+        out.append(line); continue
+    linked, added = set(re.findall(r"\[\[([^\]|#]+)", line)), 0
+    linked = {x.lower() for x in linked}
+    for s in stems:
+        if added >= 3: break
+        if s.lower() in linked: continue
+        pat = r"\b" + re.escape(s).replace(r"\-", r"[-\s]") + r"\b"
+        for m in re.finditer(pat, line, re.I):
+            # never rewrite inside an existing link
+            if "[[" in line[max(0, m.start() - 2):m.start()]: continue
+            if "]]" in line[m.end():m.end() + 2]: continue
+            hit = m.group(0)
+            rep = "[[%s]]" % hit if hit.lower() == s.lower() else "[[%s|%s]]" % (s, hit)
+            line = line[:m.start()] + rep + line[m.end():]
+            linked.add(s.lower()); added += 1
+            break
+    out.append(line)
+open(path, "w", encoding="utf-8").write("".join(out))
+PY
+		after=$(grep -c '\[\[' "$f" || true)
+		printf '%s: %s -> %s linked lines\n' "$(basename "$f")" "$before" "$after"
+	done
+	git -C "$VAULT" add -- "$LOG" "$DECISIONS" >/dev/null 2>&1 || true
+	git -C "$VAULT" commit --quiet -m "relink: connect past entries to notes created since" \
+		-- "$LOG" "$DECISIONS" >/dev/null 2>&1 || true
+}
+
 add_log() {
 	local text="$1"
 	[[ -n "${text// /}" ]] || die "nothing to capture"
@@ -130,36 +180,61 @@ add_log() {
 	fi
 }
 
+# The heading IS the "what" -- a separate **what** field just restated it, so
+# it is gone. Fields left blank are omitted rather than written as empty
+# bullets: an entry that only warrants a `why` should look finished, not
+# half-filled. Not every decision needs an `expected`.
 add_decision() {
-	local title="$1"
+	local title="$1" why="${2:-}" expected="${3:-}"
 	[[ -n "${title// /}" ]] || die "a decision needs a title"
 	ensure_file "$DECISIONS" "Decisions"
 	ensure_month_header "$DECISIONS"
-	cat >>"$DECISIONS" <<EOF
 
-### $(date '+%Y-%m-%d') — $title
-- **what**
-- **why**
-- **expected**
-- **instead**
-- **tags**
-EOF
+	local linked_title
+	linked_title=$(printf '%s' "$title" | autolink)
+
+	{
+		printf '\n### %s — %s\n' "$(date '+%Y-%m-%d')" "$linked_title"
+		if [[ -n "${why// /}" || -n "${expected// /}" ]]; then
+			[[ -n "${why// /}" ]] && printf -- '- **why** %s\n' "$(printf '%s' "$why" | autolink)"
+			[[ -n "${expected// /}" ]] && printf -- '- **expected** %s\n' "$(printf '%s' "$expected" | autolink)"
+		else
+			# Nothing supplied -- lay out the scaffold and let the editor fill it.
+			printf -- '- **why**\n- **expected**\n- **instead**\n- **tags**\n'
+		fi
+	} >>"$DECISIONS"
+
 	commit "$DECISIONS" "decision: $title"
-	# Land on the **what** line, ready to type.
-	open_editor "$DECISIONS" "$(($(wc -l <"$DECISIONS") - 4))"
+
+	# A decision captured complete from Raycast needs no editor at all.
+	if [[ -n "${why// /}" || -n "${expected// /}" ]]; then
+		printf 'decision captured\n'
+	else
+		open_editor "$DECISIONS" "$(($(wc -l <"$DECISIONS") - 3))"
+	fi
 }
 
 # --- args -------------------------------------------------------------------
 
 case "${1:-}" in
 -h | --help | "") usage ;;
+-r | --relink)
+	# Re-scan the log and decisions for concepts that have a note NOW but did
+	# not when the entry was written. Notes get created after the fact, so
+	# without this a past entry never points at the note it is about.
+	relink
+	;;
 -d | --decision)
 	shift
-	title="${*:-}"
+	# Positional: title, why, expected. Everything after the title is optional,
+	# which is what lets Raycast pass all three and skip the editor entirely.
+	title="${1:-}"
+	why="${2:-}"
+	expected="${3:-}"
 	if [[ -z "$title" && -t 0 ]]; then
 		read -r -p "decision: " title
 	fi
-	add_decision "$title"
+	add_decision "$title" "$why" "$expected"
 	;;
 *) add_log "$*" ;;
 esac
