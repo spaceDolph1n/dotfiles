@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+#
+# Commit (and push) any uncommitted work in the repos worth not losing.
+# Run by a LaunchAgent daily and at login. Safe to run by hand.
+#
+#   daily-snapshot            commit and push
+#   daily-snapshot --no-push  commit only
+#
+# Deliberately separate from `brain`: capture writes files, this handles
+# version control.
+
+set -euo pipefail
+
+# Only these. Not a scan of the filesystem -- an auto-commit loose in a work
+# repo is how you push something half-finished to a shared branch.
+REPOS=(
+	"$HOME/.sb/second-brain"
+	"$HOME/.config/dotfiles"
+)
+
+PUSH=1
+[[ "${1:-}" == "--no-push" ]] && PUSH=0
+
+# launchd gives a minimal environment: no .zshrc, so no PATH additions and no
+# GIT_CONFIG_GLOBAL. Without the latter git never reads ~/.config/git/.gitconfig,
+# the includeIf rules never apply, and commits are authored as user@hostname.
+export PATH="/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export GIT_CONFIG_GLOBAL="${GIT_CONFIG_GLOBAL:-$HOME/.config/git/.gitconfig}"
+
+stamp=$(date '+%Y-%m-%d %H:%M')
+touched=0
+
+for repo in "${REPOS[@]}"; do
+	name=$(basename "$repo")
+
+	[[ -d "$repo/.git" ]] || { printf '%s  %-14s skipped (not a repo)\n' "$stamp" "$name"; continue; }
+
+	# Cheapest possible check, and the first thing done per repo: if the tree is
+	# clean there is nothing to spend time on -- no add, no commit, no network.
+	dirty=$(git -C "$repo" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+	[[ "$dirty" -eq 0 ]] && continue
+
+	git -C "$repo" add -A
+	git -C "$repo" commit --quiet -m "chore: snapshot of uncommitted work ($dirty changed)"
+	printf '%s  %-14s committed %s file(s)' "$stamp" "$name" "$dirty"
+	touched=1
+
+	if [[ $PUSH -eq 1 ]]; then
+		# Best effort. Being offline must not turn into a failed job, and must
+		# not stop the next repo being handled.
+		if git -C "$repo" push --quiet origin HEAD 2>/dev/null; then
+			printf ', pushed\n'
+		else
+			printf ', push failed (offline?)\n'
+		fi
+	else
+		printf '\n'
+	fi
+done
+
+[[ $touched -eq 0 ]] && printf '%s  nothing to commit\n' "$stamp"
+exit 0

@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>com.spacedolph1n.brain-commit</string>
+  <string>com.spacedolph1n.daily-snapshot</string>
 
   <key>ProgramArguments</key>
   <array>
-    <string>/Users/tiagorodrigues/.config/scripts/brain-commit</string>
+    <string>/Users/tiagorodrigues/.config/scripts/daily-snapshot</string>
   </array>
 
   <!-- 23:00 daily. If the Mac is asleep or off, launchd runs it on next wake. -->
@@ -22,8 +22,8 @@
   <true/>
 
   <key>StandardOutPath</key>
-  <string>/tmp/brain-commit.log</string>
+  <string>/tmp/daily-snapshot.log</string>
   <key>StandardErrorPath</key>
-  <string>/tmp/brain-commit.log</string>
+  <string>/tmp/daily-snapshot.log</string>
 </dict>
 </plist>
