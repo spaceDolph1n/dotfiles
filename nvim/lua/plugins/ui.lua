@@ -28,6 +28,7 @@ return {
 				{ "<leader>f", group = "Find" },
 				{ "<leader>g", group = "Git", icon = { icon = "🌿" } },
 				{ "<leader>h", group = "Harpoon", icon = { icon = "🧷" } },
+				{ "<leader>k", group = "Knowledge", icon = { icon = "🧠" } },
 				{ "<leader>l", group = "LSP", icon = { icon = "⏩" } },
 				{ "<leader>r", group = "REST", icon = { icon = "🌐" } },
 				{ "<leader>s", group = "Window" },

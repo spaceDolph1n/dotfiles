@@ -77,14 +77,57 @@ open_editor() {
 
 # --- entry points -----------------------------------------------------------
 
+# Turn concept names into [[wikilinks]] automatically.
+#
+# This exists because capture happens from Raycast, where you cannot be
+# expected to recall exact note filenames. Matching is on filenames only --
+# free-form aliases produce wrong targets (a CI "pipeline" resolving to
+# nodejs-pipe-vs-pipeline). Hyphens in a filename also match spaces, so
+# "performance testing" finds performance-testing.
+autolink() {
+	VAULT="$VAULT" python3 -c '
+import os, re, sys
+vault = os.environ["VAULT"]
+text = sys.stdin.read()
+stems = []
+for root, dirs, files in os.walk(vault):
+    dirs[:] = [d for d in dirs if d not in (".obsidian", ".git", "files")]
+    for f in files:
+        if f.endswith(".md") and f not in ("log.md", "decisions.md"):
+            s = f[:-3]
+            if "-" in s or len(s) >= 8: stems.append(s)
+stems.sort(key=len, reverse=True)
+linked, added = set(), 0
+for s in stems:
+    if added >= 3: break          # keep a line readable
+    if s.lower() in linked: continue
+    pat = r"\b" + re.escape(s).replace(r"\-", r"[-\s]") + r"\b"
+    m = re.search(pat, text, re.I)
+    if not m: continue
+    if "[[" in text[max(0, m.start()-2):m.start()]: continue
+    hit = m.group(0)
+    # No redundant alias when the text already reads exactly like the note.
+    link = "[[%s]]" % hit if hit.lower() == s.lower() else "[[%s|%s]]" % (s, hit)
+    text = text[:m.start()] + link + text[m.end():]
+    linked.add(s.lower()); added += 1
+sys.stdout.write(text)
+'
+}
+
 add_log() {
 	local text="$1"
 	[[ -n "${text// /}" ]] || die "nothing to capture"
 	ensure_file "$LOG" "Log"
 	ensure_month_header "$LOG"
-	printf -- '- %s — %s\n' "$(date '+%Y-%m-%d %H:%M')" "$text" >>"$LOG"
+	local linked
+	linked=$(printf '%s' "$text" | autolink)
+	printf -- '- %s — %s\n' "$(date '+%Y-%m-%d %H:%M')" "$linked" >>"$LOG"
 	commit "$LOG" "log: ${text:0:60}"
-	printf 'captured\n'
+	if [[ "$linked" != "$text" ]]; then
+		printf 'captured (linked)\n'
+	else
+		printf 'captured\n'
+	fi
 }
 
 add_decision() {
