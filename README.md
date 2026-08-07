@@ -229,25 +229,32 @@ brain -d "Dropped the queue" [why] [expected] # -> decisions.md
 brain --relink                                # link past entries to newer notes
 ```
 
-`brain` only writes files — it never touches git. Committing is separate:
+`brain` only writes files — it never touches git. Committing is separate, and
+covers **both** this repo and the vault:
 
 ```bash
-brain-commit             # commit and push
-brain-commit --no-push   # commit only
+daily-snapshot             # commit and push anything uncommitted
+daily-snapshot --no-push   # commit only
 ```
 
-A LaunchAgent runs `brain-commit` daily at 23:00 and at login. Install it with:
+A LaunchAgent runs it daily at 23:00 and at login. It checks `git status` first
+per repo and exits immediately when both are clean, so a clean day costs
+nothing. Install with:
 
 ```bash
-ln -sf ~/.config/dotfiles/launchd/com.spacedolph1n.brain-commit.plist ~/Library/LaunchAgents/
-launchctl load ~/Library/LaunchAgents/com.spacedolph1n.brain-commit.plist
-tail -f /tmp/brain-commit.log
+ln -sf ~/.config/dotfiles/launchd/com.spacedolph1n.daily-snapshot.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.spacedolph1n.daily-snapshot.plist
+tail -f /tmp/daily-snapshot.log
 ```
+
+The repo list is hardcoded in the script — deliberately not a filesystem scan,
+since an auto-commit loose in a work repo is how half-finished work reaches a
+shared branch.
 
 > Anything launched by launchd, Raycast or Shortcuts does **not** source
 > `.zshrc`, so `GIT_CONFIG_GLOBAL` is unset, git never reads
 > `~/.config/git/.gitconfig`, and commits get authored as `user@hostname`.
-> Both scripts set it explicitly for that reason.
+> The scripts set it explicitly for that reason.
 
 Raycast Script Commands live in `~/.config/scripts/raycast` — add that directory
 under Raycast → Extensions → Script Commands.
