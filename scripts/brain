@@ -3,8 +3,9 @@
 # brain -- append-only capture into the second brain.
 #
 #   brain "Marco knows the payments service"    one-liner  -> log.md
-#   brain -d "Dropped the job queue"            decision   -> decisions.md, opens $EDITOR
+#   brain -d "Dropped the queue" [why] [expected]  decision -> decisions.md
 #   brain -d                                    decision, prompts for the title
+#   brain --relink                              link past entries to newer notes
 #
 # Design notes:
 #   * Append-only. Nothing is filed, named or categorised at capture time --
@@ -12,9 +13,10 @@
 #   * Every line carries a full ISO timestamp so `rg 2026-08-07` returns the
 #     entry itself, not a header three rows above it. Month headers are added
 #     on the first entry of each month purely for scanning by eye.
-#   * Commits immediately, pushes detached, so capture never blocks on network.
-#   * Only ever commits its own file, so unrelated work in the vault is
-#     untouched.
+#   * Writes and exits. It does NOT touch git -- writing the file is what makes
+#     the thought durable; committing is a separate decision and stays yours.
+#     Auto-committing produced one commit per thought and made the vault's
+#     history useless.
 #
 # Tasks do NOT belong here -- those go to Todoist. Code-local reminders belong
 # in a TODO: comment next to the code.
@@ -25,13 +27,6 @@ VAULT="${BRAIN_VAULT:-$HOME/.sb/second-brain}"
 LOG="$VAULT/log.md"
 DECISIONS="$VAULT/decisions.md"
 EDITOR_CMD="${EDITOR:-nvim}"
-
-# Raycast (and Shortcuts, and launchd) do not source .zshrc, so GIT_CONFIG_GLOBAL
-# is unset when the script runs from a launcher. Without it git never reads
-# ~/.config/git/.gitconfig, the includeIf for ~/.sb/ never applies, and commits
-# are authored as user@hostname instead of the real identity. Set it here so the
-# script behaves identically however it is invoked.
-export GIT_CONFIG_GLOBAL="${GIT_CONFIG_GLOBAL:-$HOME/.config/git/.gitconfig}"
 
 die() {
 	printf 'brain: %s\n' "$1" >&2
@@ -59,14 +54,6 @@ ensure_month_header() {
 	grep -qxF "## $month" "$file" || printf '\n## %s\n' "$month" >>"$file"
 }
 
-commit() {
-	local file="$1" msg="$2"
-	git -C "$VAULT" add -- "$file"
-	# Commit only this path, so anything else in flight in the vault is left alone.
-	git -C "$VAULT" commit --quiet -m "$msg" -- "$file" 2>/dev/null || return 0
-	# Detached so a slow or absent network never delays the next capture.
-	(git -C "$VAULT" push --quiet origin HEAD >/dev/null 2>&1 &) || true
-}
 
 # --- editor -----------------------------------------------------------------
 
@@ -168,8 +155,6 @@ PY
 	done
 	refresh_backlinks
 
-	git -C "$VAULT" add -A >/dev/null 2>&1 || true
-	git -C "$VAULT" commit --quiet -m "relink: connect past entries to notes created since" >/dev/null 2>&1 || true
 }
 
 # Write the stream entries that mention a note *into* that note, under a
@@ -238,7 +223,6 @@ add_log() {
 	local linked
 	linked=$(printf '%s' "$text" | autolink)
 	printf -- '- %s — %s\n' "$(date '+%Y-%m-%d %H:%M')" "$linked" >>"$LOG"
-	commit "$LOG" "log: ${text:0:60}"
 	if [[ "$linked" != "$text" ]]; then
 		printf 'captured (linked)\n'
 	else
@@ -270,7 +254,6 @@ add_decision() {
 		fi
 	} >>"$DECISIONS"
 
-	commit "$DECISIONS" "decision: $title"
 
 	# A decision captured complete from Raycast needs no editor at all.
 	if [[ -n "${why// /}" || -n "${expected// /}" ]]; then
