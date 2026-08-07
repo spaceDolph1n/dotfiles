@@ -1,0 +1,460 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e6]:
+        - link [ref=e8] [cursor=pointer]:
+          - /url: /
+          - img "Smallpdf" [ref=e9]
+        - generic [ref=e15]:
+          - button "Tools" [ref=e16] [cursor=pointer]
+          - list [ref=e25]:
+            - listitem [ref=e26]:
+              - link "Compress" [ref=e27] [cursor=pointer]:
+                - /url: /compress-pdf
+            - listitem [ref=e28]:
+              - link "Convert" [ref=e29] [cursor=pointer]:
+                - /url: /pdf-converter
+            - listitem [ref=e30]:
+              - link "Merge" [ref=e31] [cursor=pointer]:
+                - /url: /merge-pdf
+            - listitem [ref=e32]:
+              - link "Edit" [ref=e33] [cursor=pointer]:
+                - /url: /edit-pdf
+            - listitem [ref=e34]:
+              - link "Sign" [ref=e35] [cursor=pointer]:
+                - /url: /sign-pdf
+            - listitem [ref=e36]:
+              - link "AI PDF" [ref=e37] [cursor=pointer]:
+                - /url: /ai-pdf
+        - list [ref=e40]:
+          - listitem [ref=e41]:
+            - link "Pricing" [ref=e42] [cursor=pointer]:
+              - /url: /pricing
+          - listitem [ref=e44]:
+            - link "Teams" [ref=e45] [cursor=pointer]:
+              - /url: /teams
+        - generic [ref=e47]:
+          - button "Log In" [ref=e49] [cursor=pointer]
+          - button "Free Trial" [ref=e53] [cursor=pointer]
+      - banner [ref=e56]:
+        - generic [ref=e57]:
+          - heading "We make PDF easy." [level=1] [ref=e58]
+          - paragraph [ref=e59]: All the tools you’ll need to be more productive and work smarter with documents.
+          - generic [ref=e60]:
+            - button "Start Free Trial" [ref=e63] [cursor=pointer]
+            - link "Explore All PDF Tools" [ref=e67] [cursor=pointer]:
+              - /url: /pdf-tools
+      - generic [ref=e73]:
+        - generic [ref=e74]:
+          - heading "Most Popular PDF Tools" [level=2] [ref=e75]
+          - paragraph [ref=e76]: 30 tools to convert, compress, and edit PDFs for free. Try it out today!
+        - list [ref=e78]:
+          - listitem [ref=e79]:
+            - generic [ref=e80]:
+              - link "PDF to Word" [ref=e81] [cursor=pointer]:
+                - /url: /pdf-to-word
+              - paragraph: Convert PDFs to editable Word documents
+          - listitem [ref=e83]:
+            - generic [ref=e84]:
+              - link "Merge PDF" [ref=e85] [cursor=pointer]:
+                - /url: /merge-pdf
+              - paragraph: Combine multiple PDFs into one unified document
+          - listitem [ref=e87]:
+            - generic [ref=e88]:
+              - link "JPG to PDF" [ref=e89] [cursor=pointer]:
+                - /url: /jpg-to-pdf
+              - paragraph: Transform JPG, PNG, BMP, GIF, and TIFF images to PDF
+          - listitem [ref=e91]:
+            - generic [ref=e92]:
+              - link "Sign PDF" [ref=e93] [cursor=pointer]:
+                - /url: /sign-pdf
+              - paragraph: Create an electronic signature and sign your documents.
+          - listitem [ref=e95]:
+            - generic [ref=e96]:
+              - link "Edit PDF" [ref=e97] [cursor=pointer]:
+                - /url: /edit-pdf
+              - paragraph: Add text, shapes, images and freehand annotations to your PDF
+          - listitem [ref=e99]:
+            - generic [ref=e100]:
+              - link "Compress PDF" [ref=e101] [cursor=pointer]:
+                - /url: /compress-pdf
+              - paragraph: Reduce the size of your PDF without losing quality
+        - link "See All PDF Tools" [ref=e106] [cursor=pointer]:
+          - /url: /pdf-tools
+      - generic [ref=e109]:
+        - generic [ref=e110]:
+          - heading "Keep Your Simple Tasks Simple" [level=2] [ref=e111]
+          - paragraph [ref=e112]: Smallpdf is the first and only PDF software you’ll love. We have all the tools you’ll need to start, manage, and finish your work with digital documents.
+        - generic [ref=e114]:
+          - heading "Work Directly on Your Files" [level=3] [ref=e115]
+          - paragraph [ref=e116]: Do more than just view PDFs. Highlight and add text, images, shapes, and freehand annotations to your documents. You can connect to 30 other tools to enhance your files further.
+          - link "Edit a PDF now" [ref=e119] [cursor=pointer]:
+            - /url: /edit-pdf
+        - generic [ref=e127]:
+          - heading "Digital Signatures Made Easy" [level=3] [ref=e128]
+          - paragraph [ref=e129]: Fill in forms, e-sign contracts, and close deals in a few simple steps. You can also request e-signatures and track your document every step of the way.
+          - link "Try eSign" [ref=e132] [cursor=pointer]:
+            - /url: /sign-pdf
+        - generic [ref=e140]:
+          - heading "Create the Perfect Document" [level=3] [ref=e141]
+          - paragraph [ref=e142]: File too big? Compress it. Need a specific format? Convert it. Things getting chaotic? Merge and split files, or remove excess pages. Smallpdf has it all.
+          - link "View all PDF tools" [ref=e145] [cursor=pointer]:
+            - /url: /pdf-tools
+        - generic [ref=e153]:
+          - heading "Manage Documents—All in One Place" [level=3] [ref=e154]
+          - paragraph [ref=e155]: No more working across multiple apps! Save time by storing, managing, and sharing files across devices—straight from our web platform.
+          - button "Start Free Trial" [ref=e159] [cursor=pointer]
+      - generic [ref=e169]:
+        - heading "Get It on Mobile" [level=2] [ref=e170]
+        - paragraph [ref=e171]: Create PDF scans, organize documents, and share files from all your connected devices with the Smallpdf Mobile App—wherever you are.
+        - generic [ref=e172]:
+          - link [ref=e174] [cursor=pointer]:
+            - /url: https://smallpdf-mobile.onelink.me/LaDa?pid=home&af_xp=custom&af_dp=smallpdf%253A%252F%252F&af_web_dp=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.smallpdf.app.android&local_token=b7c712626ef7ed2fd1b6345a267e27f7&deep_link_value=b7c712626ef7ed2fd1b6345a267e27f7
+            - img "Get it on Google Play" [ref=e175]
+          - link [ref=e177] [cursor=pointer]:
+            - /url: https://smallpdf-mobile.onelink.me/LaDa?pid=home&af_xp=custom&af_dp=smallpdf%253A%252F%252F&af_web_dp=https%3A%2F%2Fapps.apple.com%2Fapp%2Fsmallpdf%2Fid1485259500&local_token=b7c712626ef7ed2fd1b6345a267e27f7&deep_link_value=b7c712626ef7ed2fd1b6345a267e27f7
+            - img "Download on the App Store" [ref=e178]
+      - generic [ref=e182]:
+        - generic [ref=e183]:
+          - heading "Plans & Pricing" [level=2] [ref=e184]
+          - paragraph [ref=e185]: Get unlimited access to Smallpdf tools for you and your team with pricing that’s right for you.
+          - link "Compare Plans" [ref=e188] [cursor=pointer]:
+            - /url: /pricing
+        - generic [ref=e191]:
+          - generic [ref=e193]:
+            - generic [ref=e195]:
+              - heading "Pro" [level=2] [ref=e197]
+              - generic [ref=e198]: "1"
+            - generic [ref=e203]:
+              - generic [ref=e204]: CHF 10.00
+              - generic [ref=e206]: /month
+              - generic [ref=e207]: per user, billed annually.
+          - generic [ref=e210]:
+            - generic [ref=e212]:
+              - heading "Team" [level=2] [ref=e214]
+              - generic [ref=e215]: 2-100
+            - generic [ref=e220]:
+              - generic [ref=e221]: CHF 8.00
+              - generic [ref=e223]: /month
+              - generic [ref=e224]: per user, billed annually.
+      - generic [ref=e225]:
+        - heading "Why Choose Smallpdf?" [level=2] [ref=e227]
+        - list [ref=e228]:
+          - listitem [ref=e229]:
+            - heading "People Trust Us" [level=3] [ref=e232]
+            - generic [ref=e233]: Over a billion users have used our service to simplify their work with digital documents.
+          - listitem [ref=e234]:
+            - heading "Businesses Trust Us" [level=3] [ref=e237]
+            - generic [ref=e238]: "We’re one of the highest-rated PDF software on major B2B software listing platforms: Capterra, G2, and TrustPilot."
+          - listitem [ref=e239]:
+            - heading "Our Partners Trust Us" [level=3] [ref=e242]
+            - generic [ref=e243]: Unlock bonus features with the Smallpdf Chrome Extension, Google Workspace, and Dropbox App—all free to use.
+          - listitem [ref=e244]:
+            - heading "24/7 Customer Support" [level=3] [ref=e247]
+            - generic [ref=e248]: Get all the help you need with our round-the-clock customer support.
+          - listitem [ref=e249]:
+            - heading "256-Bit TLS Encryption" [level=3] [ref=e252]
+            - generic [ref=e253]: We use 256-bit TLS encryption for secure information transfer.
+          - listitem [ref=e254]:
+            - heading "Security Standards" [level=3] [ref=e257]
+            - generic [ref=e258]: Your safety is our priority. Smallpdf is ISO/IEC 27001 certified and GDPR, CCPA, and nFADP compliant.
+      - generic [ref=e261]:
+        - heading "Try Smallpdf for Free" [level=2] [ref=e262]
+        - paragraph [ref=e263]: Start your 7-day free trial and get unlimited access to all Smallpdf tools to convert, compress, e-sign, and more.
+        - button "Start Free Trial" [ref=e266] [cursor=pointer]
+    - contentinfo [ref=e270]:
+      - generic [ref=e271]:
+        - list [ref=e275]:
+          - listitem [ref=e276]:
+            - generic [ref=e277]: Compress
+            - list [ref=e278]:
+              - listitem [ref=e279]:
+                - link "Compress PDF" [ref=e280] [cursor=pointer]:
+                  - /url: /compress-pdf
+            - generic [ref=e281]: Convert
+            - list [ref=e282]:
+              - listitem [ref=e283]:
+                - link "PDF Converter" [ref=e284] [cursor=pointer]:
+                  - /url: /pdf-converter
+              - listitem [ref=e285]:
+                - link "PDF OCR" [ref=e286] [cursor=pointer]:
+                  - /url: /pdf-ocr
+              - listitem [ref=e287]:
+                - link "PDF to PDF/A" [ref=e288] [cursor=pointer]:
+                  - /url: /pdf-to-pdfa
+            - generic [ref=e289]: AI PDF
+            - list [ref=e290]:
+              - listitem [ref=e291]:
+                - link "AI PDF Assistant" [ref=e292] [cursor=pointer]:
+                  - /url: /ai-pdf
+              - listitem [ref=e293]:
+                - link "Chat with PDF" [ref=e294] [cursor=pointer]:
+                  - /url: /chat-pdf
+              - listitem [ref=e295]:
+                - link "AI PDF Summarizer" [ref=e296] [cursor=pointer]:
+                  - /url: /pdf-summarizer
+              - listitem [ref=e297]:
+                - link "Translate PDF" [ref=e298] [cursor=pointer]:
+                  - /url: /translate-pdf
+              - listitem [ref=e299]:
+                - link "AI Question Generator" [ref=e300] [cursor=pointer]:
+                  - /url: /question-generator
+          - listitem [ref=e301]:
+            - generic [ref=e302]: Organize
+            - list [ref=e303]:
+              - listitem [ref=e304]:
+                - link "Merge PDF" [ref=e305] [cursor=pointer]:
+                  - /url: /merge-pdf
+              - listitem [ref=e306]:
+                - link "Split PDF" [ref=e307] [cursor=pointer]:
+                  - /url: /split-pdf
+              - listitem [ref=e308]:
+                - link "Rotate PDF" [ref=e309] [cursor=pointer]:
+                  - /url: /rotate-pdf
+              - listitem [ref=e310]:
+                - link "Delete PDF Pages" [ref=e311] [cursor=pointer]:
+                  - /url: /delete-pages-from-pdf
+              - listitem [ref=e312]:
+                - link "Extract PDF Pages" [ref=e313] [cursor=pointer]:
+                  - /url: /extract-pdf-pages
+              - listitem [ref=e314]:
+                - link "Organize PDF" [ref=e315] [cursor=pointer]:
+                  - /url: /organize-pdf
+          - listitem [ref=e316]:
+            - generic [ref=e317]: View & Edit
+            - list [ref=e318]:
+              - listitem [ref=e319]:
+                - link "Edit PDF" [ref=e320] [cursor=pointer]:
+                  - /url: /edit-pdf
+              - listitem [ref=e321]:
+                - link "PDF Annotator" [ref=e322] [cursor=pointer]:
+                  - /url: /pdf-annotator
+              - listitem [ref=e323]:
+                - link "PDF Reader" [ref=e324] [cursor=pointer]:
+                  - /url: /pdf-reader
+              - listitem [ref=e325]:
+                - link "Number Pages" [ref=e326] [cursor=pointer]:
+                  - /url: /add-page-numbers-to-pdf
+              - listitem [ref=e327]:
+                - link "Crop PDF" [ref=e328] [cursor=pointer]:
+                  - /url: /crop-pdf
+              - listitem [ref=e329]:
+                - link "Redact PDF" [ref=e330] [cursor=pointer]:
+                  - /url: /redact-pdf
+              - listitem [ref=e331]:
+                - link "Watermark PDF" [ref=e332] [cursor=pointer]:
+                  - /url: /watermark-pdf
+              - listitem [ref=e333]:
+                - link "PDF Form Filler" [ref=e334] [cursor=pointer]:
+                  - /url: /pdf-form-filler
+              - listitem [ref=e335]:
+                - link "Share PDF" [ref=e336] [cursor=pointer]:
+                  - /url: /share-document
+          - listitem [ref=e337]:
+            - generic [ref=e338]: Convert from PDF
+            - list [ref=e339]:
+              - listitem [ref=e340]:
+                - link "PDF to Word" [ref=e341] [cursor=pointer]:
+                  - /url: /pdf-to-word
+              - listitem [ref=e342]:
+                - link "PDF to Excel" [ref=e343] [cursor=pointer]:
+                  - /url: /pdf-to-excel
+              - listitem [ref=e344]:
+                - link "PDF to PPT" [ref=e345] [cursor=pointer]:
+                  - /url: /pdf-to-ppt
+              - listitem [ref=e346]:
+                - link "PDF to JPG" [ref=e347] [cursor=pointer]:
+                  - /url: /pdf-to-jpg
+          - listitem [ref=e348]:
+            - generic [ref=e349]: Convert to PDF
+            - list [ref=e350]:
+              - listitem [ref=e351]:
+                - link "Word to PDF" [ref=e352] [cursor=pointer]:
+                  - /url: /word-to-pdf
+              - listitem [ref=e353]:
+                - link "Excel to PDF" [ref=e354] [cursor=pointer]:
+                  - /url: /excel-to-pdf
+              - listitem [ref=e355]:
+                - link "PPT to PDF" [ref=e356] [cursor=pointer]:
+                  - /url: /ppt-to-pdf
+              - listitem [ref=e357]:
+                - link "JPG to PDF" [ref=e358] [cursor=pointer]:
+                  - /url: /jpg-to-pdf
+              - listitem [ref=e359]:
+                - link "Pages to PDF" [ref=e360] [cursor=pointer]:
+                  - /url: /pages-to-pdf
+              - listitem [ref=e361]:
+                - link "TXT to PDF" [ref=e362] [cursor=pointer]:
+                  - /url: /txt-to-pdf
+              - listitem [ref=e363]:
+                - link "RTF to PDF" [ref=e364] [cursor=pointer]:
+                  - /url: /rtf-to-pdf
+              - listitem [ref=e365]:
+                - link "ODT to PDF" [ref=e366] [cursor=pointer]:
+                  - /url: /odt-to-pdf
+              - listitem [ref=e367]:
+                - link "ODP to PDF" [ref=e368] [cursor=pointer]:
+                  - /url: /odp-to-pdf
+              - listitem [ref=e369]:
+                - link "ODS to PDF" [ref=e370] [cursor=pointer]:
+                  - /url: /ods-to-pdf
+              - listitem [ref=e371]:
+                - link "HWP to PDF" [ref=e372] [cursor=pointer]:
+                  - /url: /hwp-to-pdf
+              - listitem [ref=e373]:
+                - link "HTML to PDF" [ref=e374] [cursor=pointer]:
+                  - /url: /html-to-pdf
+              - listitem [ref=e375]:
+                - link "EPUB to PDF" [ref=e376] [cursor=pointer]:
+                  - /url: /epub-to-pdf
+              - listitem [ref=e377]:
+                - link "ZIP to PDF" [ref=e378] [cursor=pointer]:
+                  - /url: /zip-to-pdf
+              - listitem [ref=e379]:
+                - link "CSV to PDF" [ref=e380] [cursor=pointer]:
+                  - /url: /csv-to-pdf
+          - listitem [ref=e381]:
+            - generic [ref=e382]: Sign
+            - list [ref=e383]:
+              - listitem [ref=e384]:
+                - link "Sign PDF" [ref=e385] [cursor=pointer]:
+                  - /url: /sign-pdf
+              - listitem [ref=e386]:
+                - link "Request Signatures (Sign.com)" [ref=e387] [cursor=pointer]:
+                  - /url: https://sign.com/smallpdf?utm_source=smallpdf&utm_medium=nav&utm_content=tool-list
+            - generic [ref=e388]: More
+            - list [ref=e389]:
+              - listitem [ref=e390]:
+                - link "Unlock PDF" [ref=e391] [cursor=pointer]:
+                  - /url: /unlock-pdf
+              - listitem [ref=e392]:
+                - link "Protect PDF" [ref=e393] [cursor=pointer]:
+                  - /url: /protect-pdf
+              - listitem [ref=e394]:
+                - link "Flatten PDF" [ref=e395] [cursor=pointer]:
+                  - /url: /flatten-pdf
+            - generic [ref=e396]: Scan
+            - list [ref=e397]:
+              - listitem [ref=e398]:
+                - link "PDF Scanner" [ref=e399] [cursor=pointer]:
+                  - /url: /pdf-scanner
+        - generic [ref=e403]:
+          - generic [ref=e404]:
+            - img "Smallpdf" [ref=e406]
+            - generic [ref=e412]: We make PDF easy.
+          - navigation [ref=e413]:
+            - list [ref=e414]:
+              - listitem [ref=e415]:
+                - heading "Solutions" [level=2] [ref=e416]
+              - listitem [ref=e417]:
+                - link "Sales" [ref=e418] [cursor=pointer]:
+                  - /url: /teams/sales
+              - listitem [ref=e419]:
+                - link "Finance" [ref=e420] [cursor=pointer]:
+                  - /url: /teams/finance
+              - listitem [ref=e421]:
+                - link "Real Estate" [ref=e422] [cursor=pointer]:
+                  - /url: /teams/real-estate
+              - listitem [ref=e423]:
+                - link "Education" [ref=e424] [cursor=pointer]:
+                  - /url: /education
+            - list [ref=e425]:
+              - listitem [ref=e426]:
+                - heading "Company" [level=2] [ref=e427]
+              - listitem [ref=e428]:
+                - link "About" [ref=e429] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e430]:
+                - link "Help" [ref=e431] [cursor=pointer]:
+                  - /url: /support
+              - listitem [ref=e432]:
+                - link "Blog" [ref=e433] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=e434]:
+                - link "Careers" [ref=e436] [cursor=pointer]:
+                  - /url: /careers
+              - listitem [ref=e437]:
+                - link "PDF Statistics" [ref=e438] [cursor=pointer]:
+                  - /url: /pdf-statistics
+            - list [ref=e439]:
+              - listitem [ref=e440]:
+                - heading "Product" [level=2] [ref=e441]
+              - listitem [ref=e442]:
+                - link "Pricing" [ref=e444] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e445]:
+                - link "Teams" [ref=e447] [cursor=pointer]:
+                  - /url: /teams
+              - listitem [ref=e449]:
+                - link "Embed PDF" [ref=e450] [cursor=pointer]:
+                  - /url: /embed-pdf
+              - listitem [ref=e451]:
+                - link "Developers" [ref=e452] [cursor=pointer]:
+                  - /url: /library-detail
+              - listitem [ref=e453]:
+                - link "Sign.com" [ref=e454] [cursor=pointer]:
+                  - /url: https://sign.com/?utm_source=smallpdf&utm_medium=nav&utm_content=footer
+              - listitem [ref=e455]:
+                - link "Compare" [ref=e456] [cursor=pointer]:
+                  - /url: /compare/adobe-vs-foxit-vs-smallpdf
+              - listitem [ref=e457]:
+                - link "Accessible PDF" [ref=e458] [cursor=pointer]:
+                  - /url: /accessible-pdf
+            - list [ref=e459]:
+              - listitem [ref=e460]:
+                - heading "Apps" [level=2] [ref=e461]
+              - listitem [ref=e462]:
+                - link "Download Smallpdf" [ref=e463] [cursor=pointer]:
+                  - /url: /download
+              - listitem [ref=e464]:
+                - link "PDF Scanner" [ref=e465] [cursor=pointer]:
+                  - /url: /pdf-scanner
+              - listitem [ref=e466]:
+                - link "Windows App" [ref=e467] [cursor=pointer]:
+                  - /url: /download/windows#
+        - generic [ref=e471]:
+          - list [ref=e472]:
+            - listitem [ref=e473]:
+              - link "LinkedIn" [ref=e474] [cursor=pointer]:
+                - /url: https://www.linkedin.com/company/smallpdf
+            - listitem [ref=e478]:
+              - link "Facebook" [ref=e479] [cursor=pointer]:
+                - /url: https://www.facebook.com/smallpdf
+            - listitem [ref=e483]:
+              - link "YouTube" [ref=e484] [cursor=pointer]:
+                - /url: https://www.youtube.com/channel/UCnBx8Kzxocmk44G_fRPfcPg
+            - listitem [ref=e488]:
+              - link "X" [ref=e489] [cursor=pointer]:
+                - /url: https://x.com/smallpdf
+          - generic [ref=e494]:
+            - link [ref=e496] [cursor=pointer]:
+              - /url: /download/windows#sd=1&trigger=footer
+              - img "Download for Windows" [ref=e497]
+            - link [ref=e499] [cursor=pointer]:
+              - /url: https://smallpdf-mobile.onelink.me/LaDa?pid=footer&af_xp=custom&af_dp=smallpdf%253A%252F%252F&af_web_dp=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.smallpdf.app.android&local_token=b7c712626ef7ed2fd1b6345a267e27f7&deep_link_value=b7c712626ef7ed2fd1b6345a267e27f7
+              - img "Get it on Google Play" [ref=e500]
+            - link [ref=e502] [cursor=pointer]:
+              - /url: https://smallpdf-mobile.onelink.me/LaDa?pid=footer&af_xp=custom&af_dp=smallpdf%253A%252F%252F&af_web_dp=https%3A%2F%2Fapps.apple.com%2Fapp%2Fsmallpdf%2Fid1485259500&local_token=b7c712626ef7ed2fd1b6345a267e27f7&deep_link_value=b7c712626ef7ed2fd1b6345a267e27f7
+              - img "Download on the App Store" [ref=e503]
+      - generic [ref=e507]:
+        - generic [ref=e508]: © 2026 Smallpdf AG — Made withfor the people of the internet.
+        - generic [ref=e512]:
+          - link "Privacy Notice" [ref=e514] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms & Conditions" [ref=e516] [cursor=pointer]:
+            - /url: /terms
+          - link "Imprint" [ref=e518] [cursor=pointer]:
+            - /url: /imprint
+          - button "Contact Us" [ref=e520] [cursor=pointer]
+          - button [ref=e522] [cursor=pointer]
+  - generic [ref=e526]:
+    - generic [ref=e527]:
+      - generic [ref=e528]: We use cookies
+      - generic [ref=e531]:
+        - text: This website uses cookies and similar technologies (together “cookies”) that are essential for the operations of this website and its core functions. Other cookies will only be placed with your consent. For more details visit our
+        - link "Privacy Policy" [ref=e532] [cursor=pointer]:
+          - /url: /privacy
+        - text: .
+    - generic [ref=e533]:
+      - button "Accept All" [ref=e534] [cursor=pointer]
+      - button "Cookie settings" [ref=e537] [cursor=pointer]

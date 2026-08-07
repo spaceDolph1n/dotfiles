@@ -1,0 +1,483 @@
+- generic [ref=f1e3]:
+  - generic [ref=f1e4]:
+    - generic [ref=f1e6]:
+      - link [ref=f1e8] [cursor=pointer]:
+        - /url: /
+        - img "Smallpdf" [ref=f1e9]
+      - generic [ref=f1e15]:
+        - button "Tools" [ref=f1e16] [cursor=pointer]
+        - list [ref=f1e25]:
+          - listitem [ref=f1e26]:
+            - link "Compress" [ref=f1e27] [cursor=pointer]:
+              - /url: /compress-pdf
+          - listitem [ref=f1e28]:
+            - link "Convert" [ref=f1e29] [cursor=pointer]:
+              - /url: /pdf-converter
+          - listitem [ref=f1e30]:
+            - link "Merge" [ref=f1e31] [cursor=pointer]:
+              - /url: /merge-pdf
+          - listitem [ref=f1e32]:
+            - link "Edit" [ref=f1e33] [cursor=pointer]:
+              - /url: /edit-pdf
+          - listitem [ref=f1e34]:
+            - link "Sign" [ref=f1e35] [cursor=pointer]:
+              - /url: /sign-pdf
+          - listitem [ref=f1e36]:
+            - link "AI PDF" [ref=f1e37] [cursor=pointer]:
+              - /url: /ai-pdf
+      - list [ref=f1e40]:
+        - listitem [ref=f1e41]:
+          - link "Pricing" [ref=f1e42] [cursor=pointer]:
+            - /url: /pricing
+        - listitem [ref=f1e44]:
+          - link "Teams" [ref=f1e45] [cursor=pointer]:
+            - /url: /teams
+      - generic [ref=f1e47]:
+        - button "Log In" [ref=f1e49] [cursor=pointer]
+        - button "Free Trial" [ref=f1e53] [cursor=pointer]
+    - list [ref=f1e56]:
+      - listitem [ref=f1e57]:
+        - link "Home" [ref=f1e58] [cursor=pointer]:
+          - /url: /
+      - listitem [ref=f1e63]:
+        - generic [ref=f1e64]: ›
+        - generic [ref=f1e65]: Compress PDF
+    - banner [ref=f1e66]:
+      - heading "Compress PDF for Free" [level=1] [ref=f1e68]
+      - generic [ref=f1e74] [cursor=pointer]:
+        - button "Choose Files or drop files here" [ref=f1e75]
+        - generic [ref=f1e78]:
+          - generic [ref=f1e83]:
+            - button "Choose Files" [ref=f1e84]
+            - button "Expand menu" [ref=f1e89]
+          - generic [ref=f1e93]: or drop files here
+      - generic [ref=f1e94]:
+        - paragraph [ref=f1e95]: Compress your PDF to the smallest possible size without losing quality. Smallpdf’s PDF compressor is free, secure, and browser-based – no installation needed.
+        - list [ref=f1e96]:
+          - listitem [ref=f1e97]: Reduce PDF size by up to 99%
+          - listitem [ref=f1e102]: Fast and secure PDF compressor made in Switzerland
+          - listitem [ref=f1e107]: Trusted by over 1 billion users since 2013
+    - generic [ref=f1e112]:
+      - generic [ref=f1e113]:
+        - heading "Shrink PDF Size, Preserve Quality" [level=2] [ref=f1e114]
+        - paragraph [ref=f1e115]: Compress PDFs online for free while maintaining document quality. Reduce the size of your large files for easy sharing and storage in just a few clicks.
+      - generic [ref=f1e116]:
+        - generic [ref=f1e117]:
+          - heading "Fast & Effective PDF compressor" [level=3] [ref=f1e118]
+          - paragraph [ref=f1e119]: "Compress your PDF effortlessly and instantly. Simply drag and drop your file, and our compressor will automatically optimize it within seconds. Enjoy seamless online compression across all major platforms: Mac, Windows, Linux, iOS, and Android."
+        - img "A shrinking PDF showcasing Smallpdf’s Compress PDF tool options" [ref=f1e122]
+      - generic [ref=f1e123]:
+        - generic [ref=f1e124]:
+          - heading "Smaller PDFs, Same High Quality" [level=3] [ref=f1e125]
+          - paragraph [ref=f1e126]: Select between Basic, Moderate, and Strong PDF compression for the optimal balance. Reduce file size without noticeable quality loss.
+        - img "Compress PDF works by removing repetitive patterns to shrink your PDF." [ref=f1e129]
+      - generic [ref=f1e130]:
+        - generic [ref=f1e131]:
+          - heading "Secure Compression, Trusted Worldwide" [level=3] [ref=f1e132]
+          - paragraph [ref=f1e133]: Your PDFs are secured with TLS encryption, adhere to GDPR, and are ISO/IEC 27001 certified. For extra peace of mind, we automatically delete files after one hour.
+        - img "Securely sharing a compressed PDF from any device" [ref=f1e136]
+    - generic [ref=f1e138]:
+      - generic [ref=f1e139]:
+        - heading "How To Compress a PDF Online for Free" [level=2] [ref=f1e140]
+        - list [ref=f1e141]:
+          - listitem [ref=f1e142]:
+            - generic [ref=f1e143]: Drag & drop your file into Smallpdf’s free PDF compressor.
+          - listitem [ref=f1e144]:
+            - generic [ref=f1e145]: Choose Basic, Moderate (Pro), or Strong (Pro) compression, then click ‘Compress’.
+          - listitem [ref=f1e146]:
+            - generic [ref=f1e147]: If needed, edit your PDF with our other tools.
+          - listitem [ref=f1e148]:
+            - generic [ref=f1e149]: Download or share your compressed PDF when you’re done.
+      - generic [ref=f1e150]:
+        - img "Compressing a PDF online for free"
+    - generic [ref=f1e151]:
+      - heading "Everything You Need in a PDF Compressor" [level=2] [ref=f1e153]
+      - list [ref=f1e154]:
+        - listitem [ref=f1e155]:
+          - generic [ref=f1e156]:
+            - img "Compress a PDF in your browser, no installation" [ref=f1e158]
+            - heading "Compress Immediately—No Installation" [level=3] [ref=f1e159]
+          - generic [ref=f1e160]: Compress PDFs directly in your browser—no installations, sign-ups, or learning curves. Just upload, compress, and be on your way.
+        - listitem [ref=f1e161]:
+          - generic [ref=f1e162]:
+            - img "Compress PDFs on any device, desktop to mobile" [ref=f1e164]
+            - heading "Compress PDFs on Any Device" [level=3] [ref=f1e165]
+          - generic [ref=f1e166]: Smallpdf’s tools are cloud-based, so you can reduce your file size online via any browser and on any device, from desktop to tablet and mobile.
+        - listitem [ref=f1e167]:
+          - generic [ref=f1e168]:
+            - img "Compress PDF, Word, Excel, PPT and image files" [ref=f1e170]
+            - heading "Compress PDFs & Other File Formats" [level=3] [ref=f1e171]
+          - generic [ref=f1e172]: Compress more than just PDFs. Use the tool to reduce other file types, such as Word, PPT, Excel, JPG, PNG, GIF, and TIFF.
+        - listitem [ref=f1e173]:
+          - generic [ref=f1e174]:
+            - img "GDPR-compliant PDF compressor" [ref=f1e176]
+            - heading "GDPR Compliance" [level=3] [ref=f1e177]
+          - generic [ref=f1e178]: Smallpdf is GDPR compliant, which means we’re transparent about how we store, collect, and process your personal data.
+        - listitem [ref=f1e179]:
+          - generic [ref=f1e180]:
+            - img "ISO/IEC 27001 certified secure PDF compression" [ref=f1e182]
+            - heading "ISO/IEC 27001 Certified Security" [level=3] [ref=f1e183]
+          - generic [ref=f1e184]: We’re ISO/IEC 27001 certified, so we’re audited annually to ensure the safety, security, and integrity of your documents.
+        - listitem [ref=f1e185]:
+          - generic [ref=f1e186]:
+            - img "PDF compression secured with TLS encryption" [ref=f1e188]
+            - heading "File Transfer Encryption" [level=3] [ref=f1e189]
+          - generic [ref=f1e190]: Smallpdf keeps your documents secure, even while you’re working on them, with state-of-the-art TLS encryption.
+    - generic [ref=f1e193]:
+      - heading "PDF Compressing FAQs" [level=2] [ref=f1e195]
+      - list [ref=f1e196]:
+        - listitem [ref=f1e197]:
+          - group [ref=f1e198]:
+            - heading "Is Smallpdf’s PDF compressor free to use?" [level=3] [ref=f1e200] [cursor=pointer]
+            - paragraph [ref=f1e205]: Absolutely! Our PDF compressor is free for file size reduction, similar to our other tools. You can also compress MS Office files, as well as JPG, PNG, GIF, TIFF, and other image formats, without quality loss. Note that usage limits may apply, and our “Moderate” and “Strong” compression are Pro features. To begin, drag and drop your files into the PDF compressor above.
+        - listitem [ref=f1e206]:
+          - group [ref=f1e207]:
+            - heading "Can I compress PDFs with my whole team?" [level=3] [ref=f1e209] [cursor=pointer]
+        - listitem [ref=f1e214]:
+          - group [ref=f1e215]:
+            - heading "Do I need a paid Smallpdf Pro account to compress files?" [level=3] [ref=f1e217] [cursor=pointer]
+        - listitem [ref=f1e222]:
+          - group [ref=f1e223]:
+            - heading "Will compression affect fonts or document quality?" [level=3] [ref=f1e225] [cursor=pointer]
+        - listitem [ref=f1e230]:
+          - group [ref=f1e231]:
+            - heading "Is the compress tool safe to use?" [level=3] [ref=f1e233] [cursor=pointer]
+        - listitem [ref=f1e238]:
+          - group [ref=f1e239]:
+            - heading "Can I compress PDFs on the go?" [level=3] [ref=f1e241] [cursor=pointer]
+        - listitem [ref=f1e246]:
+          - group [ref=f1e247]:
+            - heading "What is the best online PDF compressor?" [level=3] [ref=f1e249] [cursor=pointer]
+        - listitem [ref=f1e254]:
+          - group [ref=f1e255]:
+            - heading "How does PDF compression work?" [level=3] [ref=f1e257] [cursor=pointer]
+      - link "More FAQs" [ref=f1e265] [cursor=pointer]:
+        - /url: https://smallpdf.com/support
+    - generic [ref=f1e268]:
+      - heading "Tutorials on PDF Compression" [level=2] [ref=f1e270]
+      - list [ref=f1e271]:
+        - listitem [ref=f1e272]:
+          - link "Blog header of a blog article on how to compress PDFs to 100 KB. HOW TO COMPRESS PDF Reduce PDF File Size Below 100 KB Online The best free online tool to compress large PDFs while maintaining file format and quality. No registration needed. Read article" [ref=f1e273] [cursor=pointer]:
+            - /url: https://smallpdf.com/blog/reduce-pdf-file-size-below-100-kb
+            - img "Blog header of a blog article on how to compress PDFs to 100 KB." [ref=f1e275]
+            - generic [ref=f1e276]:
+              - paragraph [ref=f1e277]: HOW TO COMPRESS PDF
+              - heading "Reduce PDF File Size Below 100 KB Online" [level=3] [ref=f1e278]
+              - paragraph [ref=f1e279]: The best free online tool to compress large PDFs while maintaining file format and quality. No registration needed.
+              - generic [ref=f1e280]: Read article
+        - listitem [ref=f1e287]:
+          - link "Blog header of a blog article on shrinking PDFs to around 1 MB. HOW TO COMPRESS PDF Compress PDF to 1 MB for Free Need to shrink a PDF file down to less than 1 MB for online submission? Let Smallpdf help you! Read article" [ref=f1e288] [cursor=pointer]:
+            - /url: https://smallpdf.com/blog/compress-pdf-to-1mb
+            - img "Blog header of a blog article on shrinking PDFs to around 1 MB." [ref=f1e290]
+            - generic [ref=f1e291]:
+              - paragraph [ref=f1e292]: HOW TO COMPRESS PDF
+              - heading "Compress PDF to 1 MB for Free" [level=3] [ref=f1e293]
+              - paragraph [ref=f1e294]: Need to shrink a PDF file down to less than 1 MB for online submission? Let Smallpdf help you!
+              - generic [ref=f1e295]: Read article
+        - listitem [ref=f1e302]:
+          - link "Blog header of a blog article on how to compress PDFs to different sizes. HOW TO COMPRESS PDF How To Compress PDF to a Chosen Size Online Got a PDF file that’s too big? Here are three free tools that you can use to reduce your PDF size online through your browser, and locally on Windows or Mac. Read article" [ref=f1e303] [cursor=pointer]:
+            - /url: https://smallpdf.com/blog/compress-pdf-to-chosen-size
+            - img "Blog header of a blog article on how to compress PDFs to different sizes." [ref=f1e305]
+            - generic [ref=f1e306]:
+              - paragraph [ref=f1e307]: HOW TO COMPRESS PDF
+              - heading "How To Compress PDF to a Chosen Size Online" [level=3] [ref=f1e308]
+              - paragraph [ref=f1e309]: Got a PDF file that’s too big? Here are three free tools that you can use to reduce your PDF size online through your browser, and locally on Windows or Mac.
+              - generic [ref=f1e310]: Read article
+      - link "Show more articles" [ref=f1e320] [cursor=pointer]:
+        - /url: https://smallpdf.com/blog?type=how-to&tool=compress-pdf
+    - generic [ref=f1e325]:
+      - heading "Document Work Made Easy" [level=2] [ref=f1e326]
+      - paragraph [ref=f1e327]: Boost productivity in your business with unlimited access to all Smallpdf’s tools for taking the hassle out of document work. Do more, better, faster.
+      - link "Compare Plans" [ref=f1e330] [cursor=pointer]:
+        - /url: https://smallpdf.com/pricing
+  - generic [ref=f1e333]:
+    - generic [ref=f1e338]:
+      - generic [ref=f1e339]: Rate this tool
+      - generic [ref=f1e351]:
+        - strong [ref=f1e352]: "4.5"
+        - text: / 5 - 505,522 votes
+    - contentinfo [ref=f1e353]:
+      - generic [ref=f1e354]:
+        - list [ref=f1e358]:
+          - listitem [ref=f1e359]:
+            - generic [ref=f1e360]: Compress
+            - list [ref=f1e361]:
+              - listitem [ref=f1e362]:
+                - link "Compress PDF" [ref=f1e363] [cursor=pointer]:
+                  - /url: /compress-pdf
+            - generic [ref=f1e364]: Convert
+            - list [ref=f1e365]:
+              - listitem [ref=f1e366]:
+                - link "PDF Converter" [ref=f1e367] [cursor=pointer]:
+                  - /url: /pdf-converter
+              - listitem [ref=f1e368]:
+                - link "PDF OCR" [ref=f1e369] [cursor=pointer]:
+                  - /url: /pdf-ocr
+              - listitem [ref=f1e370]:
+                - link "PDF to PDF/A" [ref=f1e371] [cursor=pointer]:
+                  - /url: /pdf-to-pdfa
+            - generic [ref=f1e372]: AI PDF
+            - list [ref=f1e373]:
+              - listitem [ref=f1e374]:
+                - link "AI PDF Assistant" [ref=f1e375] [cursor=pointer]:
+                  - /url: /ai-pdf
+              - listitem [ref=f1e376]:
+                - link "Chat with PDF" [ref=f1e377] [cursor=pointer]:
+                  - /url: /chat-pdf
+              - listitem [ref=f1e378]:
+                - link "AI PDF Summarizer" [ref=f1e379] [cursor=pointer]:
+                  - /url: /pdf-summarizer
+              - listitem [ref=f1e380]:
+                - link "Translate PDF" [ref=f1e381] [cursor=pointer]:
+                  - /url: /translate-pdf
+              - listitem [ref=f1e382]:
+                - link "AI Question Generator" [ref=f1e383] [cursor=pointer]:
+                  - /url: /question-generator
+          - listitem [ref=f1e384]:
+            - generic [ref=f1e385]: Organize
+            - list [ref=f1e386]:
+              - listitem [ref=f1e387]:
+                - link "Merge PDF" [ref=f1e388] [cursor=pointer]:
+                  - /url: /merge-pdf
+              - listitem [ref=f1e389]:
+                - link "Split PDF" [ref=f1e390] [cursor=pointer]:
+                  - /url: /split-pdf
+              - listitem [ref=f1e391]:
+                - link "Rotate PDF" [ref=f1e392] [cursor=pointer]:
+                  - /url: /rotate-pdf
+              - listitem [ref=f1e393]:
+                - link "Delete PDF Pages" [ref=f1e394] [cursor=pointer]:
+                  - /url: /delete-pages-from-pdf
+              - listitem [ref=f1e395]:
+                - link "Extract PDF Pages" [ref=f1e396] [cursor=pointer]:
+                  - /url: /extract-pdf-pages
+              - listitem [ref=f1e397]:
+                - link "Organize PDF" [ref=f1e398] [cursor=pointer]:
+                  - /url: /organize-pdf
+          - listitem [ref=f1e399]:
+            - generic [ref=f1e400]: View & Edit
+            - list [ref=f1e401]:
+              - listitem [ref=f1e402]:
+                - link "Edit PDF" [ref=f1e403] [cursor=pointer]:
+                  - /url: /edit-pdf
+              - listitem [ref=f1e404]:
+                - link "PDF Annotator" [ref=f1e405] [cursor=pointer]:
+                  - /url: /pdf-annotator
+              - listitem [ref=f1e406]:
+                - link "PDF Reader" [ref=f1e407] [cursor=pointer]:
+                  - /url: /pdf-reader
+              - listitem [ref=f1e408]:
+                - link "Number Pages" [ref=f1e409] [cursor=pointer]:
+                  - /url: /add-page-numbers-to-pdf
+              - listitem [ref=f1e410]:
+                - link "Crop PDF" [ref=f1e411] [cursor=pointer]:
+                  - /url: /crop-pdf
+              - listitem [ref=f1e412]:
+                - link "Redact PDF" [ref=f1e413] [cursor=pointer]:
+                  - /url: /redact-pdf
+              - listitem [ref=f1e414]:
+                - link "Watermark PDF" [ref=f1e415] [cursor=pointer]:
+                  - /url: /watermark-pdf
+              - listitem [ref=f1e416]:
+                - link "PDF Form Filler" [ref=f1e417] [cursor=pointer]:
+                  - /url: /pdf-form-filler
+              - listitem [ref=f1e418]:
+                - link "Share PDF" [ref=f1e419] [cursor=pointer]:
+                  - /url: /share-document
+          - listitem [ref=f1e420]:
+            - generic [ref=f1e421]: Convert from PDF
+            - list [ref=f1e422]:
+              - listitem [ref=f1e423]:
+                - link "PDF to Word" [ref=f1e424] [cursor=pointer]:
+                  - /url: /pdf-to-word
+              - listitem [ref=f1e425]:
+                - link "PDF to Excel" [ref=f1e426] [cursor=pointer]:
+                  - /url: /pdf-to-excel
+              - listitem [ref=f1e427]:
+                - link "PDF to PPT" [ref=f1e428] [cursor=pointer]:
+                  - /url: /pdf-to-ppt
+              - listitem [ref=f1e429]:
+                - link "PDF to JPG" [ref=f1e430] [cursor=pointer]:
+                  - /url: /pdf-to-jpg
+          - listitem [ref=f1e431]:
+            - generic [ref=f1e432]: Convert to PDF
+            - list [ref=f1e433]:
+              - listitem [ref=f1e434]:
+                - link "Word to PDF" [ref=f1e435] [cursor=pointer]:
+                  - /url: /word-to-pdf
+              - listitem [ref=f1e436]:
+                - link "Excel to PDF" [ref=f1e437] [cursor=pointer]:
+                  - /url: /excel-to-pdf
+              - listitem [ref=f1e438]:
+                - link "PPT to PDF" [ref=f1e439] [cursor=pointer]:
+                  - /url: /ppt-to-pdf
+              - listitem [ref=f1e440]:
+                - link "JPG to PDF" [ref=f1e441] [cursor=pointer]:
+                  - /url: /jpg-to-pdf
+              - listitem [ref=f1e442]:
+                - link "Pages to PDF" [ref=f1e443] [cursor=pointer]:
+                  - /url: /pages-to-pdf
+              - listitem [ref=f1e444]:
+                - link "TXT to PDF" [ref=f1e445] [cursor=pointer]:
+                  - /url: /txt-to-pdf
+              - listitem [ref=f1e446]:
+                - link "RTF to PDF" [ref=f1e447] [cursor=pointer]:
+                  - /url: /rtf-to-pdf
+              - listitem [ref=f1e448]:
+                - link "ODT to PDF" [ref=f1e449] [cursor=pointer]:
+                  - /url: /odt-to-pdf
+              - listitem [ref=f1e450]:
+                - link "ODP to PDF" [ref=f1e451] [cursor=pointer]:
+                  - /url: /odp-to-pdf
+              - listitem [ref=f1e452]:
+                - link "ODS to PDF" [ref=f1e453] [cursor=pointer]:
+                  - /url: /ods-to-pdf
+              - listitem [ref=f1e454]:
+                - link "HWP to PDF" [ref=f1e455] [cursor=pointer]:
+                  - /url: /hwp-to-pdf
+              - listitem [ref=f1e456]:
+                - link "HTML to PDF" [ref=f1e457] [cursor=pointer]:
+                  - /url: /html-to-pdf
+              - listitem [ref=f1e458]:
+                - link "EPUB to PDF" [ref=f1e459] [cursor=pointer]:
+                  - /url: /epub-to-pdf
+              - listitem [ref=f1e460]:
+                - link "ZIP to PDF" [ref=f1e461] [cursor=pointer]:
+                  - /url: /zip-to-pdf
+              - listitem [ref=f1e462]:
+                - link "CSV to PDF" [ref=f1e463] [cursor=pointer]:
+                  - /url: /csv-to-pdf
+          - listitem [ref=f1e464]:
+            - generic [ref=f1e465]: Sign
+            - list [ref=f1e466]:
+              - listitem [ref=f1e467]:
+                - link "Sign PDF" [ref=f1e468] [cursor=pointer]:
+                  - /url: /sign-pdf
+              - listitem [ref=f1e469]:
+                - link "Request Signatures (Sign.com)" [ref=f1e470] [cursor=pointer]:
+                  - /url: https://sign.com/smallpdf?utm_source=smallpdf&utm_medium=nav&utm_content=tool-list
+            - generic [ref=f1e471]: More
+            - list [ref=f1e472]:
+              - listitem [ref=f1e473]:
+                - link "Unlock PDF" [ref=f1e474] [cursor=pointer]:
+                  - /url: /unlock-pdf
+              - listitem [ref=f1e475]:
+                - link "Protect PDF" [ref=f1e476] [cursor=pointer]:
+                  - /url: /protect-pdf
+              - listitem [ref=f1e477]:
+                - link "Flatten PDF" [ref=f1e478] [cursor=pointer]:
+                  - /url: /flatten-pdf
+            - generic [ref=f1e479]: Scan
+            - list [ref=f1e480]:
+              - listitem [ref=f1e481]:
+                - link "PDF Scanner" [ref=f1e482] [cursor=pointer]:
+                  - /url: /pdf-scanner
+        - generic [ref=f1e486]:
+          - generic [ref=f1e487]:
+            - img "Smallpdf" [ref=f1e489]
+            - generic [ref=f1e495]: We make PDF easy.
+          - navigation [ref=f1e496]:
+            - list [ref=f1e497]:
+              - listitem [ref=f1e498]:
+                - heading "Solutions" [level=2] [ref=f1e499]
+              - listitem [ref=f1e500]:
+                - link "Sales" [ref=f1e501] [cursor=pointer]:
+                  - /url: /teams/sales
+              - listitem [ref=f1e502]:
+                - link "Finance" [ref=f1e503] [cursor=pointer]:
+                  - /url: /teams/finance
+              - listitem [ref=f1e504]:
+                - link "Real Estate" [ref=f1e505] [cursor=pointer]:
+                  - /url: /teams/real-estate
+              - listitem [ref=f1e506]:
+                - link "Education" [ref=f1e507] [cursor=pointer]:
+                  - /url: /education
+            - list [ref=f1e508]:
+              - listitem [ref=f1e509]:
+                - heading "Company" [level=2] [ref=f1e510]
+              - listitem [ref=f1e511]:
+                - link "About" [ref=f1e512] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=f1e513]:
+                - link "Help" [ref=f1e514] [cursor=pointer]:
+                  - /url: /support
+              - listitem [ref=f1e515]:
+                - link "Blog" [ref=f1e516] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=f1e517]:
+                - link "Careers" [ref=f1e519] [cursor=pointer]:
+                  - /url: /careers
+              - listitem [ref=f1e520]:
+                - link "PDF Statistics" [ref=f1e521] [cursor=pointer]:
+                  - /url: /pdf-statistics
+            - list [ref=f1e522]:
+              - listitem [ref=f1e523]:
+                - heading "Product" [level=2] [ref=f1e524]
+              - listitem [ref=f1e525]:
+                - link "Pricing" [ref=f1e527] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=f1e528]:
+                - link "Teams" [ref=f1e530] [cursor=pointer]:
+                  - /url: /teams
+              - listitem [ref=f1e532]:
+                - link "Embed PDF" [ref=f1e533] [cursor=pointer]:
+                  - /url: /embed-pdf
+              - listitem [ref=f1e534]:
+                - link "Developers" [ref=f1e535] [cursor=pointer]:
+                  - /url: /library-detail
+              - listitem [ref=f1e536]:
+                - link "Sign.com" [ref=f1e537] [cursor=pointer]:
+                  - /url: https://sign.com/?utm_source=smallpdf&utm_medium=nav&utm_content=footer
+              - listitem [ref=f1e538]:
+                - link "Compare" [ref=f1e539] [cursor=pointer]:
+                  - /url: /compare/adobe-vs-foxit-vs-smallpdf
+              - listitem [ref=f1e540]:
+                - link "Accessible PDF" [ref=f1e541] [cursor=pointer]:
+                  - /url: /accessible-pdf
+            - list [ref=f1e542]:
+              - listitem [ref=f1e543]:
+                - heading "Apps" [level=2] [ref=f1e544]
+              - listitem [ref=f1e545]:
+                - link "Download Smallpdf" [ref=f1e546] [cursor=pointer]:
+                  - /url: /download
+              - listitem [ref=f1e547]:
+                - link "PDF Scanner" [ref=f1e548] [cursor=pointer]:
+                  - /url: /pdf-scanner
+              - listitem [ref=f1e549]:
+                - link "Windows App" [ref=f1e550] [cursor=pointer]:
+                  - /url: /download/windows#
+        - generic [ref=f1e554]:
+          - list [ref=f1e555]:
+            - listitem [ref=f1e556]:
+              - link "LinkedIn" [ref=f1e557] [cursor=pointer]:
+                - /url: https://www.linkedin.com/company/smallpdf
+            - listitem [ref=f1e561]:
+              - link "Facebook" [ref=f1e562] [cursor=pointer]:
+                - /url: https://www.facebook.com/smallpdf
+            - listitem [ref=f1e566]:
+              - link "YouTube" [ref=f1e567] [cursor=pointer]:
+                - /url: https://www.youtube.com/channel/UCnBx8Kzxocmk44G_fRPfcPg
+            - listitem [ref=f1e571]:
+              - link "X" [ref=f1e572] [cursor=pointer]:
+                - /url: https://x.com/smallpdf
+          - generic [ref=f1e577]:
+            - link [ref=f1e579] [cursor=pointer]:
+              - /url: /download/windows#sd=1&trigger=footer
+              - img "Download for Windows" [ref=f1e580]
+            - link [ref=f1e582] [cursor=pointer]:
+              - /url: https://smallpdf-mobile.onelink.me/LaDa?pid=footer&af_xp=custom&af_dp=smallpdf%253A%252F%252F&af_web_dp=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.smallpdf.app.android
+              - img "Get it on Google Play" [ref=f1e583]
+            - link [ref=f1e585] [cursor=pointer]:
+              - /url: https://smallpdf-mobile.onelink.me/LaDa?pid=footer&af_xp=custom&af_dp=smallpdf%253A%252F%252F&af_web_dp=https%3A%2F%2Fapps.apple.com%2Fapp%2Fsmallpdf%2Fid1485259500
+              - img "Download on the App Store" [ref=f1e586]
+      - generic [ref=f1e590]:
+        - generic [ref=f1e591]: © 2026 Smallpdf AG — Made withfor the people of the internet.
+        - generic [ref=f1e595]:
+          - link "Privacy Notice" [ref=f1e597] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms & Conditions" [ref=f1e599] [cursor=pointer]:
+            - /url: /terms
+          - link "Imprint" [ref=f1e601] [cursor=pointer]:
+            - /url: /imprint
+          - button "Contact Us" [ref=f1e603] [cursor=pointer]
+          - button [ref=f1e605] [cursor=pointer]
