@@ -370,3 +370,4 @@ but never exercised against a real project. If something misbehaves, start here.
 | 12 | **`prefix + O`** — pick a project | Opens as a *new numbered window*, runs its `sesh.toml` startup command; picking it again selects the existing window | After editing `tmux.conf` you must reload with `prefix + R` |
 | 13 | **`<leader>go`** — cursor on a line, in a repo with a GitHub remote | Browser opens at that line, pinned to the commit | |
 | 14 | **LSP rename via explorer** — `<leader>e`, rename a component file | Imports across the project update automatically | Needs the LSP attached before renaming |
+
