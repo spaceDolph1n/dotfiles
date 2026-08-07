@@ -218,6 +218,42 @@ interchangeably via vim-tmux-navigator.
 
 ---
 
+## 🧠 Second brain
+
+The vault lives at `~/.sb/second-brain` (its own repo). Capture is one command,
+reachable from a shell, Raycast, and later Siri:
+
+```bash
+brain "Marco knows the payments service"      # -> log.md, concepts auto-linked
+brain -d "Dropped the queue" [why] [expected] # -> decisions.md
+brain --relink                                # link past entries to newer notes
+```
+
+`brain` only writes files — it never touches git. Committing is separate:
+
+```bash
+brain-commit             # commit and push
+brain-commit --no-push   # commit only
+```
+
+A LaunchAgent runs `brain-commit` daily at 23:00 and at login. Install it with:
+
+```bash
+ln -sf ~/.config/dotfiles/launchd/com.spacedolph1n.brain-commit.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.spacedolph1n.brain-commit.plist
+tail -f /tmp/brain-commit.log
+```
+
+> Anything launched by launchd, Raycast or Shortcuts does **not** source
+> `.zshrc`, so `GIT_CONFIG_GLOBAL` is unset, git never reads
+> `~/.config/git/.gitconfig`, and commits get authored as `user@hostname`.
+> Both scripts set it explicitly for that reason.
+
+Raycast Script Commands live in `~/.config/scripts/raycast` — add that directory
+under Raycast → Extensions → Script Commands.
+
+---
+
 ## ⚠️ Troubleshooting
 
 | Symptom                    | Fix                                                       |
