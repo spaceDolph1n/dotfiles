@@ -1,0 +1,58 @@
+- generic [active] [ref=f6e1]:
+  - banner [ref=f6e2]:
+    - navigation [ref=f6e3]:
+      - link [ref=f6e4] [cursor=pointer]:
+        - /url: /
+        - img "iLovePDF" [ref=f6e5]
+      - generic [ref=f6e6]:
+        - list [ref=f6e7]:
+          - listitem [ref=f6e8]:
+            - link "Merge PDF" [ref=f6e9] [cursor=pointer]:
+              - /url: /merge_pdf
+          - listitem [ref=f6e10]:
+            - link "Split PDF" [ref=f6e11] [cursor=pointer]:
+              - /url: /split_pdf
+          - listitem [ref=f6e12]:
+            - link "Compress PDF" [ref=f6e13] [cursor=pointer]:
+              - /url: /compress_pdf
+          - listitem [ref=f6e14] [cursor=pointer]:
+            - generic [ref=f6e15]: Convert PDF
+        - list [ref=f6e17]:
+          - listitem [ref=f6e18] [cursor=pointer]:
+            - generic [ref=f6e19]: All PDF tools
+      - generic [ref=f6e21]:
+        - link "Login" [ref=f6e22] [cursor=pointer]:
+          - /url: /login
+        - link "Sign up" [ref=f6e23] [cursor=pointer]:
+          - /url: /register
+        - list [ref=f6e24]:
+          - listitem [ref=f6e25] [cursor=pointer]
+  - generic [ref=f6e30]:
+    - generic [ref=f6e31]:
+      - heading "Compress PDF files" [level=1] [ref=f6e32]
+      - heading "Reduce file size while optimizing for maximal PDF quality." [level=2] [ref=f6e33]
+    - generic [ref=f6e34]:
+      - link "Select PDF files" [ref=f6e35] [cursor=pointer]:
+        - /url: javascript:;
+      - generic [ref=f6e37]:
+        - generic "Select PDF from Google Drive" [ref=f6e38] [cursor=pointer]
+        - generic "Select PDF from Dropbox" [ref=f6e41] [cursor=pointer]
+      - generic [ref=f6e44]: or drop PDFs here
+      - button "Choose File" [ref=f6e46]
+  - generic [ref=f6e47]: © iLovePDF 2026 ® - Your PDF Editor
+  - generic [ref=f6e50]:
+    - generic [ref=f6e51]: We value your privacy
+    - generic [ref=f6e52]:
+      - text: "We ask your consent to use your personal data to:"
+      - list [ref=f6e53]:
+        - listitem [ref=f6e54]: Personalised advertising and content, advertising and content measurement, audience research and services development.
+        - listitem [ref=f6e55]: Store and/or access information on a device
+      - text: Your personal data - not your files neither your account information - will be processed and information from your device (cookies, unique identifiers, and other device data) may be stored by, accessed by and shared with 153
+      - link "TCF vendors" [ref=f6e56] [cursor=pointer]:
+        - /url: "#"
+      - text: and 54
+      - link "ad partners" [ref=f6e57] [cursor=pointer]:
+        - /url: "#"
+      - text: "or used specifically by this site or app. Some vendors may process your personal data on the basis of legitimate interest, which you can object to by managing your options below. You can change or withdraw your consent at: Help ➜ Legal & Privacy ➜ Cookies."
+      - generic [ref=f6e58] [cursor=pointer]: Manage Options
+      - generic [ref=f6e59] [cursor=pointer]: Accept all
