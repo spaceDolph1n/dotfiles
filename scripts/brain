@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+#
+# brain -- append-only capture into the second brain.
+#
+#   brain "Marco knows the payments service"    one-liner  -> log.md
+#   brain -d "Dropped the job queue"            decision   -> decisions.md, opens $EDITOR
+#   brain -d                                    decision, prompts for the title
+#
+# Design notes:
+#   * Append-only. Nothing is filed, named or categorised at capture time --
+#     that decision is what kills capture habits.
+#   * Every line carries a full ISO timestamp so `rg 2026-08-07` returns the
+#     entry itself, not a header three rows above it. Month headers are added
+#     on the first entry of each month purely for scanning by eye.
+#   * Commits immediately, pushes detached, so capture never blocks on network.
+#   * Only ever commits its own file, so unrelated work in the vault is
+#     untouched.
+#
+# Tasks do NOT belong here -- those go to Todoist. Code-local reminders belong
+# in a TODO: comment next to the code.
+
+set -euo pipefail
+
+VAULT="${BRAIN_VAULT:-$HOME/.sb/second-brain}"
+LOG="$VAULT/log.md"
+DECISIONS="$VAULT/decisions.md"
+EDITOR_CMD="${EDITOR:-nvim}"
+
+die() {
+	printf 'brain: %s\n' "$1" >&2
+	exit 1
+}
+
+usage() {
+	sed -n '3,12p' "$0" | sed 's/^# \{0,1\}//'
+	exit 0
+}
+
+[[ -d "$VAULT" ]] || die "vault not found: $VAULT"
+
+# --- file / header scaffolding ----------------------------------------------
+
+ensure_file() {
+	local file="$1" title="$2"
+	[[ -f "$file" ]] || printf '# %s\n' "$title" >"$file"
+}
+
+# Add a `## YYYY-MM` heading the first time we write in a given month.
+ensure_month_header() {
+	local file="$1" month
+	month=$(date +%Y-%m)
+	grep -qxF "## $month" "$file" || printf '\n## %s\n' "$month" >>"$file"
+}
+
+commit() {
+	local file="$1" msg="$2"
+	git -C "$VAULT" add -- "$file"
+	# Commit only this path, so anything else in flight in the vault is left alone.
+	git -C "$VAULT" commit --quiet -m "$msg" -- "$file" 2>/dev/null || return 0
+	# Detached so a slow or absent network never delays the next capture.
+	(git -C "$VAULT" push --quiet origin HEAD >/dev/null 2>&1 &) || true
+}
+
+# --- editor -----------------------------------------------------------------
+
+open_editor() {
+	local file="$1" line="$2"
+	if [[ -t 0 && -t 1 ]]; then
+		"$EDITOR_CMD" "+$line" "$file"
+	elif command -v wezterm >/dev/null 2>&1; then
+		# Raycast runs scripts without a TTY, so spawn a real terminal.
+		wezterm start --always-new-process -- "$EDITOR_CMD" "+$line" "$file" >/dev/null 2>&1 &
+	else
+		open -a WezTerm >/dev/null 2>&1 || die "no TTY and no wezterm to open $file"
+	fi
+}
+
+# --- entry points -----------------------------------------------------------
+
+add_log() {
+	local text="$1"
+	[[ -n "${text// /}" ]] || die "nothing to capture"
+	ensure_file "$LOG" "Log"
+	ensure_month_header "$LOG"
+	printf -- '- %s — %s\n' "$(date '+%Y-%m-%d %H:%M')" "$text" >>"$LOG"
+	commit "$LOG" "log: ${text:0:60}"
+	printf 'captured\n'
+}
+
+add_decision() {
+	local title="$1"
+	[[ -n "${title// /}" ]] || die "a decision needs a title"
+	ensure_file "$DECISIONS" "Decisions"
+	ensure_month_header "$DECISIONS"
+	cat >>"$DECISIONS" <<EOF
+
+### $(date '+%Y-%m-%d') — $title
+- **what**
+- **why**
+- **expected**
+- **instead**
+- **tags**
+EOF
+	commit "$DECISIONS" "decision: $title"
+	# Land on the **what** line, ready to type.
+	open_editor "$DECISIONS" "$(($(wc -l <"$DECISIONS") - 4))"
+}
+
+# --- args -------------------------------------------------------------------
+
+case "${1:-}" in
+-h | --help | "") usage ;;
+-d | --decision)
+	shift
+	title="${*:-}"
+	if [[ -z "$title" && -t 0 ]]; then
+		read -r -p "decision: " title
+	fi
+	add_decision "$title"
+	;;
+*) add_log "$*" ;;
+esac
