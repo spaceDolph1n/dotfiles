@@ -159,9 +159,68 @@ PY
 		after=$(grep -c '\[\[' "$f" || true)
 		printf '%s: %s -> %s linked lines\n' "$(basename "$f")" "$before" "$after"
 	done
-	git -C "$VAULT" add -- "$LOG" "$DECISIONS" >/dev/null 2>&1 || true
-	git -C "$VAULT" commit --quiet -m "relink: connect past entries to notes created since" \
-		-- "$LOG" "$DECISIONS" >/dev/null 2>&1 || true
+	refresh_backlinks
+
+	git -C "$VAULT" add -A >/dev/null 2>&1 || true
+	git -C "$VAULT" commit --quiet -m "relink: connect past entries to notes created since" >/dev/null 2>&1 || true
+}
+
+# Write the stream entries that mention a note *into* that note, under a
+# `## Backlinks` heading.
+#
+# Opt-in: only notes that already contain the heading are touched, so this
+# never adds churn to the other hundred. `:Obsidian backlinks` shows the same
+# thing in a picker -- this is for the handful of notes (entities, hubs) where
+# you want the history visible as text when you open them.
+refresh_backlinks() {
+	VAULT="$VAULT" python3 - <<'PY'
+import os, re
+vault = os.environ["VAULT"]
+HEAD = "## Backlinks"
+MARK = "<!-- maintained by `brain --relink` — edits below are overwritten -->"
+
+streams = {}
+for name in ("log.md", "decisions.md"):
+    p = os.path.join(vault, name)
+    if os.path.exists(p):
+        streams[name] = open(p, encoding="utf-8").read().split("\n")
+
+targets = []
+for root, dirs, files in os.walk(vault):
+    dirs[:] = [d for d in dirs if d not in (".obsidian", ".git", "files")]
+    for f in files:
+        if not f.endswith(".md") or f in ("log.md", "decisions.md"): continue
+        p = os.path.join(root, f)
+        if HEAD in open(p, encoding="utf-8").read(): targets.append((f[:-3], p))
+
+updated = 0
+for stem, path in targets:
+    hits = []
+    link = re.compile(r"\[\[" + re.escape(stem) + r"(\||\]\])", re.I)
+    for name, lines in streams.items():
+        for ln in lines:
+            if not link.search(ln): continue
+            # strip the leading bullet and the self-link, keep the date
+            m = re.match(r"^[-#\s]*(\d{4}-\d{2}-\d{2})[^—]*—\s*(.*)$", ln.strip())
+            if m:
+                date, text = m.group(1), m.group(2)
+            else:
+                date, text = "", ln.strip("# -")
+            text = re.sub(r"\[\[" + re.escape(stem) + r"(?:\|([^\]]*))?\]\]",
+                          lambda x: x.group(1) or stem, text, flags=re.I)
+            hits.append(f"- {date} — {text}" if date else f"- {text}")
+    body = "\n".join(hits) if hits else "_none yet_"
+
+    t = open(path, encoding="utf-8").read()
+    i = t.index(HEAD)
+    nxt = t.find("\n## ", i + len(HEAD))
+    end = len(t) if nxt == -1 else nxt + 1
+    new = f"{HEAD}\n\n{MARK}\n{body}\n"
+    if t[i:end].rstrip() != new.rstrip():
+        open(path, "w", encoding="utf-8").write(t[:i] + new + t[end:])
+        updated += 1
+print(f"backlink sections refreshed: {updated}/{len(targets)}")
+PY
 }
 
 add_log() {

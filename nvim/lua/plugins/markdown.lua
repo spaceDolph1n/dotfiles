@@ -25,6 +25,31 @@ return {
 		keys = {
 			{ "<leader>kb", "<cmd>Obsidian backlinks<cr>", ft = "markdown", desc = "Backlinks to this note" },
 			{ "<leader>kl", "<cmd>Obsidian links<cr>", ft = "markdown", desc = "Links in this note" },
+			-- Turn the word under the cursor (or a visual selection) into a new
+			-- note and link to it in one step -- the usual way a concept earns a
+			-- note is that you just wrote its name.
+			{
+				"<leader>kn",
+				"<cmd>Obsidian link_new<cr>",
+				mode = { "n", "v" },
+				ft = "markdown",
+				desc = "New note from word/selection",
+			},
+			{
+				"<leader>ki",
+				"<cmd>Obsidian link<cr>",
+				mode = { "n", "v" },
+				ft = "markdown",
+				desc = "Link word to existing note",
+			},
+			{
+				"<leader>kx",
+				"<cmd>Obsidian extract_note<cr>",
+				mode = "v",
+				ft = "markdown",
+				desc = "Extract selection into a note",
+			},
+			{ "<leader>kf", "<cmd>Obsidian follow_link<cr>", ft = "markdown", desc = "Follow link under cursor" },
 			{ "<leader>ko", "<cmd>Obsidian quick_switch<cr>", desc = "Open note" },
 			{ "<leader>ks", "<cmd>Obsidian search<cr>", desc = "Search vault" },
 			{ "<leader>kt", "<cmd>Obsidian tags<cr>", ft = "markdown", desc = "Tags" },
