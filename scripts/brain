@@ -26,6 +26,13 @@ LOG="$VAULT/log.md"
 DECISIONS="$VAULT/decisions.md"
 EDITOR_CMD="${EDITOR:-nvim}"
 
+# Raycast (and Shortcuts, and launchd) do not source .zshrc, so GIT_CONFIG_GLOBAL
+# is unset when the script runs from a launcher. Without it git never reads
+# ~/.config/git/.gitconfig, the includeIf for ~/.sb/ never applies, and commits
+# are authored as user@hostname instead of the real identity. Set it here so the
+# script behaves identically however it is invoked.
+export GIT_CONFIG_GLOBAL="${GIT_CONFIG_GLOBAL:-$HOME/.config/git/.gitconfig}"
+
 die() {
 	printf 'brain: %s\n' "$1" >&2
 	exit 1

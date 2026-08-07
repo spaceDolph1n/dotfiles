@@ -49,7 +49,6 @@ return {
 				ft = "markdown",
 				desc = "Extract selection into a note",
 			},
-			{ "<leader>kf", "<cmd>Obsidian follow_link<cr>", ft = "markdown", desc = "Follow link under cursor" },
 			{ "<leader>ko", "<cmd>Obsidian quick_switch<cr>", desc = "Open note" },
 			{ "<leader>ks", "<cmd>Obsidian search<cr>", desc = "Search vault" },
 			{ "<leader>kt", "<cmd>Obsidian tags<cr>", ft = "markdown", desc = "Tags" },
