@@ -33,6 +33,11 @@ id_ecdsa
 allowed_signers
 
 # Tooling
+# Playwright MCP dumps page snapshots and console logs into whatever directory
+# it was launched from, which is usually this one. They are scratch output of a
+# browsing session -- often of some *other* project's site -- and have no
+# business in a dotfiles repo, let alone a public one.
+.playwright-mcp/
 node_modules/
 __pycache__/
 *.pyc
