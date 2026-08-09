@@ -73,11 +73,15 @@ open_editor() {
 
 # Turn concept names into [[wikilinks]] automatically.
 #
-# `work/` is excluded from every walk below. It holds employer material, while
-# log.md and decisions.md are committed and pushed to a personal GitHub account —
-# so autolinking a work note's *filename* into the stream would leak it. Note that
-# work/ is not in .gitignore (see the vault's .gitignore for why), so these walks
-# cannot rely on git to exclude it.
+# `work/` IS in scope, deliberately. Those notes are local-only and never pushed,
+# so a [[link]] to one in the committed log.md resolves for me and is a dead link
+# for anyone else -- it carries a filename and nothing more. Work entries in the
+# stream are my own takes with confidential detail stripped, so the filename is
+# not worth protecting.
+#
+# Do not "fix" this by excluding work/: the links are the point. If a genuinely
+# confidential name ever needs to stay out, rename the note rather than changing
+# the walk.
 #
 # This exists because capture happens from Raycast, where you cannot be
 # expected to recall exact note filenames. Matching is on filenames only --
@@ -91,7 +95,7 @@ vault = os.environ["VAULT"]
 text = sys.stdin.read()
 stems = []
 for root, dirs, files in os.walk(vault):
-    dirs[:] = [d for d in dirs if d not in (".obsidian", ".git", "files", "work")]
+    dirs[:] = [d for d in dirs if d not in (".obsidian", ".git", "files")]
     for f in files:
         if f.endswith(".md") and f not in ("log.md", "decisions.md"):
             s = f[:-3]
@@ -128,7 +132,7 @@ import os, re, sys
 path, vault = sys.argv[1], sys.argv[2]
 stems = []
 for root, dirs, files in os.walk(vault):
-    dirs[:] = [d for d in dirs if d not in (".obsidian", ".git", "files", "work")]
+    dirs[:] = [d for d in dirs if d not in (".obsidian", ".git", "files")]
     for f in files:
         if f.endswith(".md") and f not in ("log.md", "decisions.md"):
             s = f[:-3]
@@ -185,7 +189,7 @@ for name in ("log.md", "decisions.md"):
 
 targets = []
 for root, dirs, files in os.walk(vault):
-    dirs[:] = [d for d in dirs if d not in (".obsidian", ".git", "files", "work")]
+    dirs[:] = [d for d in dirs if d not in (".obsidian", ".git", "files")]
     for f in files:
         if not f.endswith(".md") or f in ("log.md", "decisions.md"): continue
         p = os.path.join(root, f)
