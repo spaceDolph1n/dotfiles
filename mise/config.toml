@@ -3,6 +3,7 @@
 
 [tools]
 node = "lts"
+"npm:czg" = "latest"
 python = "3.13"
 
 [settings]
