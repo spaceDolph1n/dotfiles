@@ -1,3 +1,9 @@
+git:
+  # The background fetch runs every 60s and authenticates to GitHub with the
+  # YubiKey-backed ~/.ssh/id_ed25519_sk, so it interrupts with a PIN prompt at
+  # random moments. Fetch on demand with `f` instead.
+  autoFetch: false
+
 customCommands:
   - key: "C"
     command: "czg"
