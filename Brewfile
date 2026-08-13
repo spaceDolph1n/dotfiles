@@ -52,8 +52,11 @@ brew "lazygit"
 brew "tuicr"
 # gh-dash is a gh CLI extension rather than a formula, so it is not listed
 # here. Install with:  gh extension install dlvhdr/gh-dash
-# Uncomment together with the [core] pager block in git/.gitconfig:
-# brew "git-delta"
+#   Configured in gh-dash/config.yml: `v` opens tuicr on the PR, `G` opens
+#   lazygit, `d` pipes the diff through diffnav.
+brew "git-delta"      # diff renderer — [core] pager in git/.gitconfig, and lazygit paging
+brew "diffnav"        # delta plus a GitHub-style file tree; gh-dash's diff pager
+brew "yt-dlp"         # pull video transcripts: yt-dlp --skip-download --write-auto-subs
 
 # ---------------------------------------------------------------------------
 # Terminal / system

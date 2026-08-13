@@ -1,3 +1,37 @@
+# ---------------------------------------------------------------------------
+# Diff rendering
+# ---------------------------------------------------------------------------
+# delta is the renderer; diffnav wraps it with a GitHub-style file tree and is
+# what gh-dash and manual `git diff | diffnav` use. delta stays the pager for
+# plain `git diff`/`show`/`log -p` because it streams -- diffnav is a full TUI
+# and is wrong for piping into other commands.
+[core]
+  pager = delta
+
+[interactive]
+  diffFilter = delta --color-only
+
+[delta]
+  navigate = true          # n / N to jump between files
+  line-numbers = true
+  side-by-side = false     # unified reads better at split-pane widths
+  hyperlinks = true
+  ; syntax-theme = Catppuccin Mocha
+
+[alias]
+  # diffnav is diff-only and full-screen, so it cannot be `core.pager` -- that
+  # also handles log/show/blame. These give the file-tree view on demand.
+  # Both take normal git-diff args:  git dn HEAD~3   git dn main...HEAD
+  dn = "!f() { git --no-pager diff \"$@\" | diffnav; }; f"
+  dnc = "!f() { git --no-pager diff --cached \"$@\" | diffnav; }; f"
+  dns = "!f() { git --no-pager show \"$@\" | diffnav; }; f"
+
+[merge]
+  conflictstyle = zdiff3   # shows the common ancestor; strictly better than diff3
+
+[diff]
+  colorMoved = default     # distinguishes moved code from added/removed
+
 [includeIf "gitdir:~/.config/dotfiles/"]
   path = ~/.config/git/.gitconfig-personal
 
