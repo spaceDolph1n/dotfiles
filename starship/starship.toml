@@ -7,12 +7,16 @@ right_format = """$all"""
 command_timeout= 1000
 
 [character]
-vicmd_symbol = "[➜](yellow)" 
+# NORMAL-mode indicator. Deliberately a different *glyph*, not just a different
+# colour: the previous `➜` in yellow vs `➜` in green was the same shape, so
+# landing in vicmd by accident (a slow double-Esc, see .zshrc) was invisible.
+#
+# To revert to colour-only once the mode is second nature again, swap the two
+# vicmd_symbol lines below.
+vicmd_symbol = "[N](bold yellow)"
+# vicmd_symbol = "[➜](yellow)"        # colour-only — the old one
 success_symbol = '[➜](bold green)'
 error_symbol = '[✗](#E84D44)'
-# vicmd_symbol = "[N] >>>"
-# success_symbol = '[➜](bold green)'
-# error_symbol = '[ ✗](#E84D44) '
 
 [git_branch]
 format = '[$symbol$branch (:$remote_branch)]($style)'

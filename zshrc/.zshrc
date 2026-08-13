@@ -97,9 +97,20 @@ cmkcv() { cd "$1" && mkdir -p "$2" && cd "$2" && v .; }        # ...and open nvi
 mkcv() { mkdir -p "$1" && cd "$1" && v .; }                    # create dir, move inside, open nvim
 
 # These three used `find`, which ignores .gitignore and walks node_modules.
-fcd() { local d; d=$(fd --type d --hidden --exclude .git | fzf) && cd "$d" && ll; }
-f() { fd --type f --hidden --exclude .git | fzf | tr -d '\n' | pbcopy; }
-fv() { local file; file=$(fd --type f --hidden --exclude .git | fzf) && nvim "$file"; }
+#
+# The fd invocation is NOT repeated here: these reuse the same FZF_*_COMMAND
+# defined further down, so a file means the same thing to `fv` as it does to
+# Ctrl-T. Written out separately they had already drifted -- the env vars pass
+# --follow and these did not. `${=VAR}` is zsh word-splitting, needed because
+# the variable holds a command plus its arguments. Definition order does not
+# matter: a function body expands when it runs, not when it is defined.
+#
+# Every one of them guards on `&&`. Cancelling fzf prints nothing, and `f`
+# without the guard piped that nothing straight into pbcopy -- so escaping out
+# of the picker silently wiped the clipboard.
+fcd() { local d; d=$(${=FZF_ALT_C_COMMAND} | fzf) && cd "$d" && ll; }
+f() { local file; file=$(${=FZF_DEFAULT_COMMAND} | fzf) && printf '%s' "$file" | pbcopy; }
+fv() { local file; file=$(${=FZF_DEFAULT_COMMAND} | fzf) && nvim "$file"; }
 
 # ---------------------------------------------------------------------------
 # Keybindings -- order matters
@@ -107,6 +118,17 @@ fv() { local file; file=$(fd --type f --hidden --exclude .git | fzf) && nvim "$f
 # `bindkey -v` selects the viins keymap, so it must come BEFORE anything that
 # installs widgets, otherwise those bindings land in a keymap that is not active.
 bindkey -v
+
+# Esc in NORMAL mode returns to INSERT, so Esc toggles instead of trapping.
+#
+# Why this is needed: the omz `sudo` plugin binds `\e\e` to prepend sudo. From
+# insert, `\e` is a *prefix* of that, so zsh waits KEYTIMEOUT (40 = 400ms) for a
+# second Esc. Fast double-Esc gets sudo; slower than 400ms drops you into vicmd
+# instead. Same keypress, two outcomes, depending on typing speed.
+#
+# This does NOT break the sudo binding: `\e\e` lives in the viins keymap and is
+# resolved there before vicmd is ever entered. Verified with `bindkey -M viins`.
+bindkey -M vicmd '\e' vi-insert
 
 # fzf: Ctrl-T (files), Ctrl-R (history, immediately overridden by atuin below),
 # Alt-C (cd). FZF_DEFAULT_COMMAND was never actually set despite the old comment
