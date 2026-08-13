@@ -101,6 +101,44 @@ Verify the split actually took, in both a work repo and this one:
 git config user.email     # must differ per directory
 ```
 
+#### The four git tools, and what each is for
+
+They divide cleanly — that separation is the point, not an accident:
+
+| Tool | Job |
+| --- | --- |
+| **lazygit** | staging, committing, branch work — the daily driver |
+| **gh-dash** | triage: what needs my review, what am I blocking |
+| **tuicr** | reviewing a PR properly — vim keys, inline comments, `:submit` |
+| **diffnav** | reading any diff — delta plus a GitHub-style file tree |
+
+`gh-dash` is a `gh` extension, not a formula:
+
+```bash
+gh extension install dlvhdr/gh-dash
+```
+
+**Diff rendering.** `delta` is `core.pager` in `git/.gitconfig` and the pager in
+`lazygit/config.yml` (`git.pagers` — a *list*, not `paging`), so diffs look identical in the
+CLI and in lazygit. `diffnav` can't be `core.pager` because that also handles `log`, `show`
+and `blame`, which it would mangle — so it's on aliases instead:
+
+```bash
+git dn              # working tree, in diffnav
+git dnc             # staged
+git dns HEAD~2      # a specific commit
+```
+
+**gh-dash keybindings** (`gh-dash/config.yml`) — `v` and `G` open a new tmux window so the
+dashboard keeps its state:
+
+| Key | Does |
+| --- | --- |
+| `v` | review the PR in tuicr |
+| `G` | lazygit on that repo |
+| `C` | check the branch out, then lazygit |
+| `d` | pipe the PR diff through diffnav |
+
 ### 7. Neovim
 
 Requires **Neovim 0.12+**. Plugins are managed by lazy.nvim and bootstrap
@@ -186,6 +224,9 @@ launchctl list | grep daily-snapshot
 | LSP not attaching | `:checkhealth lsp`, then `:Mason` to confirm the binary |
 | Formatter not running | `:ConformInfo` |
 | New tmux binding does nothing | `prefix + R` to reload `tmux.conf` |
+| lazygit diffs look unstyled | The key is `git.pagers` (a **list**), not `paging` — a wrong key is ignored silently |
+| `git dn` opens nothing | diffnav is a TUI; it needs a real terminal, not a pipe into another command |
+| gh-dash `v`/`G` do nothing | They shell out to `tmux new-window`; outside tmux they fall back to running in place |
 | Commits authored as `user@hostname` | `GIT_CONFIG_GLOBAL` unset — see step 9 |
 | `.nvmrc` ignored | `idiomatic_version_file_enable_tools` in `mise/config.toml` |
 

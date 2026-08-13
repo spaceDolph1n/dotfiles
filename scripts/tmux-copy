@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Clipboard copy for tmux copy-mode, with a sized confirmation.
+#
+# Reads the selection on stdin, puts it on the macOS clipboard, then reports how
+# much was copied — the count is the useful part, because it distinguishes "I
+# grabbed the line" from "I grabbed three words of it" without re-reading the
+# buffer.
+#
+# Wired from tmux.conf (after tpm, so tmux-yank cannot overwrite it):
+#   bind -T copy-mode-vi y send -X copy-pipe-and-cancel '~/.config/dotfiles/scripts/tmux-copy'
+set -uo pipefail
+
+buf="$(command cat)"
+
+printf '%s' "$buf" | pbcopy
+
+chars=${#buf}
+lines=$(printf '%s\n' "$buf" | wc -l | tr -d ' ')
+
+# Singular/plural matters more than it seems — "1 chars" reads as a bug.
+if [ "$chars" -eq 1 ]; then
+  msg="1 char"
+else
+  msg="$chars chars"
+fi
+
+# Only mention lines when there is more than one; on a single-line copy the
+# character count already says everything.
+if [ "$lines" -gt 1 ]; then
+  msg="$lines lines · $msg"
+fi
+
+# -d 1000 overrides the global display-time of 4000ms.
+tmux display-message -d 1000 " ✓ copied  $msg "

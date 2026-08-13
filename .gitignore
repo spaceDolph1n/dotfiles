@@ -44,6 +44,13 @@ __pycache__/
 .idea/
 .vscode/
 
+# gh-dash: its config is a list of employer repo names, local work paths and
+# team review filters. This repo is public, so that config is the one file here
+# that cannot be in it. ~/.config/gh-dash still symlinks to gh-dash/, so the
+# tool works exactly as before -- the file is simply unversioned, and has to be
+# rewritten by hand on a new machine.
+/gh-dash/
+
 # Local, machine-specific overrides
 local/
 local.*

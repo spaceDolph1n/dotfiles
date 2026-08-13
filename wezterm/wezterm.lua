@@ -61,7 +61,12 @@ config.line_height = 1.05
 config.enable_tab_bar = false
 config.window_decorations = "RESIZE"
 config.window_background_opacity = 1
-config.window_padding = { left = 8, right = 8, top = 8, bottom = 0 }
+-- top is deliberately larger than left/right: it is the gap above the tmux
+-- status bar, and tmux itself can only pad in whole rows (~17px at this font
+-- size), which is too much. Pixels are the only way to get a fraction of a
+-- row, so the gap above the window names is tuned here, not in tmux.conf.
+-- 8 is the baseline, so top = 8 + however much of a 17px row you want.
+config.window_padding = { left = 8, right = 8, top = 24, bottom = 0 }
 config.force_reverse_video_cursor = true
 config.adjust_window_size_when_changing_font_size = false
 
@@ -87,6 +92,35 @@ config.mouse_bindings = {
 		event = { Up = { streak = 1, button = "Left" } },
 		mods = "CTRL",
 		action = act.OpenLinkAtMouseCursor,
+	},
+
+	-- Select-to-copy, mirroring the tmux binding so the behaviour is the same
+	-- with or without tmux on top.
+	--
+	-- WezTerm's default here is CompleteSelection("PrimarySelection"), which does
+	-- nothing on macOS -- there is no primary selection -- so a bare WezTerm
+	-- window silently dropped the selection. Matters rarely, since tmux is almost
+	-- always running and intercepts the mouse first, but "almost" is why this
+	-- exists.
+	--
+	-- ClipboardAndPrimarySelection, not Clipboard, so the same config still does
+	-- the right thing on Linux.
+	{
+		event = { Up = { streak = 1, button = "Left" } },
+		mods = "NONE",
+		action = act.CompleteSelection("ClipboardAndPrimarySelection"),
+	},
+
+	-- Double/triple-click select word/line, then copy the same way.
+	{
+		event = { Up = { streak = 2, button = "Left" } },
+		mods = "NONE",
+		action = act.CompleteSelection("ClipboardAndPrimarySelection"),
+	},
+	{
+		event = { Up = { streak = 3, button = "Left" } },
+		mods = "NONE",
+		action = act.CompleteSelection("ClipboardAndPrimarySelection"),
 	},
 }
 

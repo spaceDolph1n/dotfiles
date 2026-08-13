@@ -3,7 +3,11 @@ git:
   # YubiKey-backed ~/.ssh/id_ed25519_sk, so it interrupts with a PIN prompt at
   # random moments. Fetch on demand with `f` instead.
   autoFetch: false
-
+  pagers:
+    - # Same renderer as the git CLI and diffnav, so a diff looks identical
+      # wherever you read it. --paging=never because lazygit does its own.
+      colorArg: always
+      pager: delta --dark --paging=never --line-numbers --hyperlinks
 customCommands:
   - key: "C"
     command: "czg"
