@@ -21,15 +21,15 @@ set -euo pipefail
 
 SESH_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/sesh/sesh.toml"
 
-# Emit "path<TAB>startup_command" for each [[session]] in sesh.toml.
-# Comment lines are skipped, so the commented examples never leak in.
+# Emit "path<TAB>startup_command<TAB>name<TAB>icon" for each [[session]] in
+# sesh.toml. Comment lines are skipped, so the commented examples never leak in.
 sesh_entries() {
 	[[ -f "$SESH_CONFIG" ]] || return 0
 	awk '
 		/^[[:space:]]*#/ { next }
 		/^[[:space:]]*\[\[/ {
-			if (path != "") print path "\t" cmd
-			path = ""; cmd = ""; next
+			if (path != "") print path "\t" cmd "\t" name "\t" icon
+			path = ""; cmd = ""; name = ""; icon = ""; next
 		}
 		/^[[:space:]]*path[[:space:]]*=/ {
 			if (match($0, /"[^"]*"/)) path = substr($0, RSTART+1, RLENGTH-2)
@@ -39,24 +39,65 @@ sesh_entries() {
 			if (match($0, /"[^"]*"/)) cmd = substr($0, RSTART+1, RLENGTH-2)
 			next
 		}
-		END { if (path != "") print path "\t" cmd }
+		/^[[:space:]]*name[[:space:]]*=/ {
+			if (match($0, /"[^"]*"/)) name = substr($0, RSTART+1, RLENGTH-2)
+			next
+		}
+		/^[[:space:]]*icon[[:space:]]*=/ {
+			if (match($0, /"[^"]*"/)) icon = substr($0, RSTART+1, RLENGTH-2)
+			next
+		}
+		END { if (path != "") print path "\t" cmd "\t" name "\t" icon }
 	' "$SESH_CONFIG"
 }
 
-# Candidate list: curated sesh paths first, then zoxide history.
-list_candidates() {
-	sesh_entries | cut -f1
-	zoxide query -l 2>/dev/null || true
+# Emit "pattern<TAB>startup_command" for each [[wildcard]] in sesh.toml, so a
+# path that only matches a wildcard still gets its startup command. Without
+# this, every uncurated repo under ~/Documents/work opened a bare shell.
+sesh_wildcards() {
+	[[ -f "$SESH_CONFIG" ]] || return 0
+	awk '
+		/^[[:space:]]*#/ { next }
+		/^[[:space:]]*\[\[/ {
+			if (pattern != "") print pattern "\t" cmd
+			pattern = ""; cmd = ""; next
+		}
+		/^[[:space:]]*pattern[[:space:]]*=/ {
+			if (match($0, /"[^"]*"/)) pattern = substr($0, RSTART+1, RLENGTH-2)
+			next
+		}
+		/^[[:space:]]*startup_command[[:space:]]*=/ {
+			if (match($0, /"[^"]*"/)) cmd = substr($0, RSTART+1, RLENGTH-2)
+			next
+		}
+		END { if (pattern != "") print pattern "\t" cmd }
+	' "$SESH_CONFIG"
 }
 
+# Candidate list: "label<TAB>path". Curated sesh entries show their name and icon
+# so the picker reads like the sesh one; zoxide paths fall back to the basename.
+list_candidates() {
+	sesh_entries | sed "s|~|$HOME|" | awk -F'\t' '{
+		label = $3 != "" ? $3 : $1
+		if ($4 != "") { label = $4 label }
+		print label "\t" $1
+	}'
+	zoxide query -l 2>/dev/null | awk -F'\t' '{
+		n = split($1, parts, "/")
+		print "  " parts[n] "\t" $1
+	}' || true
+}
+
+# fzf shows only the label (field 1); field 2 carries the path through invisibly,
+# which is why --with-nth/--accept-nth split on the tab.
 selected=$(
 	list_candidates |
-		sed "s|^~|$HOME|" |
-		awk '!seen[$0]++' |
+		awk -F'\t' '!seen[$2]++' |
 		fzf --prompt='  window  ' \
 			--border-label=' project → new window ' \
 			--height=100% --reverse \
-			--preview 'eza --tree --level=1 --icons --git --no-user --color=always {} 2>/dev/null || ls -la {}' \
+			--delimiter='\t' --with-nth=1 --accept-nth=2 \
+			--preview 'eza --tree --level=1 --icons --git --no-user --color=always {2} 2>/dev/null || ls -la {2}' \
 			--preview-window=right:55%
 ) || exit 0
 
@@ -70,8 +111,21 @@ if tmux list-windows -F '#W' | grep -qxF "$name"; then
 	exit 0
 fi
 
-# Look up a startup command for this exact path, if sesh.toml declares one.
-startup=$(sesh_entries | sed "s|^~|$HOME|" | awk -F'\t' -v p="$selected" '$1 == p { print $2; exit }')
+# Look up a startup command: an exact [[session]] path first, then the first
+# [[wildcard]] whose pattern matches. Without the wildcard fallback, any repo not
+# named in sesh.toml opened a bare shell here while sesh gave it an editor.
+startup=$(sesh_entries | sed "s|~|$HOME|" | awk -F'\t' -v p="$selected" '$1 == p { print $2; exit }')
+
+if [[ -z "$startup" ]]; then
+	while IFS=$'\t' read -r pattern cmd; do
+		[[ -n "$pattern" ]] || continue
+		# shellcheck disable=SC2053  # glob match is the point
+		if [[ "$selected" == ${pattern/#\~/$HOME} ]]; then
+			startup="$cmd"
+			break
+		fi
+	done < <(sesh_wildcards)
+fi
 
 tmux new-window -c "$selected" -n "$name"
 if [[ -n "$startup" ]]; then

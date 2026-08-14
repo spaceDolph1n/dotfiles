@@ -20,7 +20,7 @@ preview_command = "eza --tree --level=1 --icons --git --no-user --color=always {
 [[session]]
 name = "dotfiles"
 path = "~/.config/dotfiles"
-startup_command = "nvim ."
+startup_command = "nvim"
 alias = "dot"
 icon = " "
 
@@ -29,7 +29,7 @@ icon = " "
 [[session]]
 name = "second brain"
 path = "~/.sb/second-brain"
-startup_command = "nvim ."
+startup_command = "nvim"
 alias = "sb"
 icon = " "
 
@@ -38,14 +38,14 @@ icon = " "
 [[session]]
 name = "web"
 path = "~/Documents/work/web"
-startup_command = "nvim ."
+startup_command = "nvim"
 alias = "web"
 icon = " "
 
 [[session]]
 name = "test"
 path = "~/Documents/work/test"
-startup_command = "nvim ."
+startup_command = "nvim"
 alias = "test"
 icon = " "
 
@@ -53,18 +53,7 @@ icon = " "
 # so a freshly cloned project needs no edit here.
 [[wildcard]]
 pattern = "~/Documents/work/*"
-startup_command = "nvim ."
-icon = " "
-
-# --- Demo: something obvious to try `prefix + O` against ---------------------
-# Its startup_command is deliberately visible rather than an editor, so you can
-# tell at a glance whether the window flow picked the command up. Delete this
-# entry once you have tried it.
-[[session]]
-name = "demo · tree"
-path = "~/Documents/work"
-startup_command = "eza --tree --level=2 --icons --git --no-user"
-alias = "demo"
+startup_command = "nvim"
 icon = " "
 
 # =============================================================================
