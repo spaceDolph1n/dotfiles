@@ -66,7 +66,7 @@ config.window_background_opacity = 1
 -- size), which is too much. Pixels are the only way to get a fraction of a
 -- row, so the gap above the window names is tuned here, not in tmux.conf.
 -- 8 is the baseline, so top = 8 + however much of a 17px row you want.
-config.window_padding = { left = 8, right = 8, top = 24, bottom = 0 }
+config.window_padding = { left = 8, right = 8, top = 24, bottom = 8 }
 config.force_reverse_video_cursor = true
 config.adjust_window_size_when_changing_font_size = false
 
