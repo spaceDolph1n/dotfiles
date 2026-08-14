@@ -43,6 +43,24 @@ o.winborder = "rounded"
 o.laststatus = 3
 o.winbar = "%t"
 
+-- Floating cmdline and message windows, built into Neovim 0.12 (`:h ui2`).
+-- This is what noice.nvim used to do here -- see the note in plugins/ui.lua --
+-- but in core, so it moves with Neovim instead of chasing its internals.
+-- `targets = "msg"` puts native messages in the ephemeral floating window;
+-- snacks.notifier still owns vim.notify, which ui2 does not touch.
+--
+-- cmdheight = 0 is what actually reclaims the bottom line, and it is only set
+-- when ui2 is on: `:h 'cmdheight'` warns that zero is experimental and "works
+-- better with |ui2| enabled", so without it the messages would go somewhere
+-- invisible. `vim._core.ui2` is an underscore-private path that can be renamed
+-- between releases, so a failure here leaves the cmdline exactly as it was
+-- rather than breaking startup.
+if pcall(function()
+	require("vim._core.ui2").enable({ msg = { targets = "msg" } })
+end) then
+	o.cmdheight = 0
+end
+
 -- editing behaviour
 o.clipboard = "unnamedplus"
 o.splitright = true
@@ -74,7 +92,9 @@ o.autoread = true
 o.updatetime = 200
 
 -- folding: treesitter provides `foldexpr` per buffer (plugins/treesitter.lua);
--- nvim-origami pins foldlevel to 99 so nothing starts folded.
+-- these pin foldlevel so nothing starts folded, and `h`/`l` fold ergonomics live
+-- in core/keymaps.lua. nvim-origami supplied all three until it was dropped
+-- 2026-08-06 -- the removal note only accounted for foldexpr and the fold column.
 o.foldenable = true
 o.foldlevel = 99
 o.foldlevelstart = 99

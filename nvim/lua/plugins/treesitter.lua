@@ -87,7 +87,7 @@ return {
 				end
 
 				-- Treesitter folds. `foldlevel`/`foldlevelstart` are pinned to 99
-				-- by nvim-origami, so nothing is folded on open.
+				-- in core/options.lua, so nothing is folded on open.
 				pcall(function()
 					vim.wo[0][0].foldmethod = "expr"
 					vim.wo[0][0].foldexpr = "v:lua.vim.treesitter.foldexpr()"

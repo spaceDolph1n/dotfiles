@@ -35,6 +35,31 @@ keymap.set("v", "Y", "myY`y")
 keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true })
 keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true })
 
+-- Fold with h / l, the one thing lost when nvim-origami was dropped. Treesitter
+-- still supplies `foldexpr`; this is only the ergonomics.
+--   h  closes the fold when the cursor sits at or before the first non-blank
+--   l  opens a closed fold
+-- Both fall through to normal motion otherwise, and with any count, so `5h`
+-- and `d2l` are untouched.
+keymap.set("n", "h", function()
+	if vim.v.count > 0 or vim.fn.foldlevel(".") == 0 then
+		return "h"
+	end
+
+	local firstNonBlank = vim.fn.match(vim.fn.getline("."), "\\S") + 1
+	local isAtIndent = firstNonBlank > 0 and vim.fn.col(".") <= firstNonBlank
+
+	return isAtIndent and "zc" or "h"
+end, { expr = true, desc = "Close fold at indent, else left" })
+
+keymap.set("n", "l", function()
+	if vim.v.count > 0 then
+		return "l"
+	end
+
+	return vim.fn.foldclosed(".") ~= -1 and "zo" or "l"
+end, { expr = true, desc = "Open a closed fold, else right" })
+
 -- Paste replace visual selection without copying it.
 keymap.set("v", "p", '"_dP')
 
