@@ -68,6 +68,8 @@ alias scripts='cd ~/.config/scripts'
 alias sb='cd ~/.sb/second-brain/'
 alias v="nvim"
 
+alias prs="gh dash"
+
 alias cat=bat
 alias ll="eza -l --icons --git -a --no-user"
 alias lt="eza --tree --level=2 --long --icons --git --no-user"
