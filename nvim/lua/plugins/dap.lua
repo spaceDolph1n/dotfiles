@@ -200,7 +200,11 @@ return {
 				require("dap-python").setup(debugpy)
 			end
 
-			table.insert(dap.configurations.python or {}, {
+			-- Assign before inserting: `table.insert(x or {}, …)` writes into a
+			-- throwaway table when x is nil, so the config vanishes silently if
+			-- the debugpy guard above didn't run.
+			dap.configurations.python = dap.configurations.python or {}
+			table.insert(dap.configurations.python, {
 				type = "python",
 				request = "launch",
 				name = "FastAPI (uvicorn)",

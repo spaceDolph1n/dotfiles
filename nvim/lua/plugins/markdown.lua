@@ -25,16 +25,12 @@ return {
 		keys = {
 			{ "<leader>kb", "<cmd>Obsidian backlinks<cr>", ft = "markdown", desc = "Backlinks to this note" },
 			{ "<leader>kl", "<cmd>Obsidian links<cr>", ft = "markdown", desc = "Links in this note" },
-			-- Turn the word under the cursor (or a visual selection) into a new
-			-- note and link to it in one step -- the usual way a concept earns a
-			-- note is that you just wrote its name.
-			{
-				"<leader>kn",
-				"<cmd>Obsidian link_new<cr>",
-				mode = { "n", "v" },
-				ft = "markdown",
-				desc = "New note from word/selection",
-			},
+			-- Note *creation* commands (link_new, extract_note) are deliberately
+			-- not bound: notes get created and named directly in mini.files, so
+			-- obsidian.nvim's note_id_func never runs and can't impose its
+			-- default timestamp IDs on the kebab-case convention.
+			-- quick_switch/search dropped too -- the snacks pickers (<leader>ff,
+			-- <leader>fg) already cover finding notes.
 			{
 				"<leader>ki",
 				"<cmd>Obsidian link<cr>",
@@ -42,15 +38,6 @@ return {
 				ft = "markdown",
 				desc = "Link word to existing note",
 			},
-			{
-				"<leader>kx",
-				"<cmd>Obsidian extract_note<cr>",
-				mode = "v",
-				ft = "markdown",
-				desc = "Extract selection into a note",
-			},
-			{ "<leader>ko", "<cmd>Obsidian quick_switch<cr>", desc = "Open note" },
-			{ "<leader>ks", "<cmd>Obsidian search<cr>", desc = "Search vault" },
 			{ "<leader>kt", "<cmd>Obsidian tags<cr>", ft = "markdown", desc = "Tags" },
 			{ "<leader>kc", "<cmd>Obsidian toc<cr>", ft = "markdown", desc = "Table of contents" },
 		},
@@ -70,7 +57,34 @@ return {
 			picker = {
 				name = "snacks.pick",
 			},
+			-- render-markdown.nvim does all the rendering; running obsidian.nvim's
+			-- UI as well double-conceals the same syntax.
 			ui = { enable = false },
+			-- Frontmatter is written on save for any note in the vault, which is
+			-- what gives manually-created notes (mini.files) their header. The
+			-- default builtin only emits id/aliases/tags, so this matches the
+			-- vault's own schema instead and leaves everything else alone.
+			frontmatter = {
+				enabled = true,
+				func = function(note)
+					local out = {
+						id = note.id,
+						aliases = note.aliases,
+						tags = note.tags,
+					}
+					-- Carry over fields obsidian.nvim doesn't know about --
+					-- `created`, `found-in`, and anything added later.
+					if note.metadata and not vim.tbl_isempty(note.metadata) then
+						for key, value in pairs(note.metadata) do
+							out[key] = value
+						end
+					end
+					-- Stamped once, on the first write; never rewritten after.
+					out.created = out.created or os.date("%Y-%m-%d")
+					return out
+				end,
+				sort = { "id", "aliases", "tags", "created", "found-in" },
+			},
 		},
 	},
 }

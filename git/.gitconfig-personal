@@ -16,6 +16,9 @@
 [fetch]
     prune = true
 
+[merge]
+  conflictstyle = zdiff3   # shows the common ancestor; strictly better than diff3
+
 [init]
     defaultBranch = main
 

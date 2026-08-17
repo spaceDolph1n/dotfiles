@@ -87,6 +87,7 @@ return {
 				function()
 					require("grug-far").open({ prefills = { search = vim.fn.expand("<cword>") } })
 				end,
+				mode = "n",
 				desc = "Replace current word",
 			},
 			{
