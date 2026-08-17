@@ -26,9 +26,6 @@
   dnc = "!f() { git --no-pager diff --cached \"$@\" | diffnav; }; f"
   dns = "!f() { git --no-pager show \"$@\" | diffnav; }; f"
 
-[merge]
-  conflictstyle = zdiff3   # shows the common ancestor; strictly better than diff3
-
 [diff]
   colorMoved = default     # distinguishes moved code from added/removed
 

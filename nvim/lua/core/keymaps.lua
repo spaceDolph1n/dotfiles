@@ -87,6 +87,38 @@ keymap.set("n", "N", "Nzzzv")
 keymap.set("n", "<C-d>", "<C-d>zz")
 keymap.set("n", "<C-u>", "<C-u>zz")
 
+-- Copy the current file's path to the system clipboard. `clipboard =
+-- "unnamedplus"` is set in core/options.lua, so "+" is the system clipboard.
+-- Native equivalents, if you ever need them without the keymap:
+--   :let @+ = @%              relative path (the read-only % register)
+--   :let @+ = expand('%:p')   absolute path
+local function yank_path(modifier, label)
+	return function()
+		local path = vim.fn.expand("%" .. modifier)
+		if path == "" then
+			vim.notify("Buffer has no file name", vim.log.levels.WARN, { title = "Yank path" })
+			return
+		end
+		vim.fn.setreg("+", path)
+		vim.notify(path, vim.log.levels.INFO, { title = "Yanked " .. label })
+	end
+end
+
+keymap.set("n", "<leader>yy", yank_path(":.", "relative path"), { desc = "Yank relative path" })
+keymap.set("n", "<leader>yY", yank_path(":p", "absolute path"), { desc = "Yank absolute path" })
+keymap.set("n", "<leader>yn", yank_path(":t", "filename"), { desc = "Yank filename" })
+keymap.set("n", "<leader>yd", yank_path(":h", "directory"), { desc = "Yank directory" })
+keymap.set("n", "<leader>yl", function()
+	local file = vim.fn.expand("%:.")
+	if file == "" then
+		vim.notify("Buffer has no file name", vim.log.levels.WARN, { title = "Yank path" })
+		return
+	end
+	local path = ("%s:%d"):format(file, vim.fn.line("."))
+	vim.fn.setreg("+", path)
+	vim.notify(path, vim.log.levels.INFO, { title = "Yanked path:line" })
+end, { desc = "Yank path:line" })
+
 -- (The "keep last yanked when pasting" mapping for `v p` is already set above;
 --  it used to be defined a second time here.)
 

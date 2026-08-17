@@ -1,6 +1,6 @@
 [user]
     name = tiagorodrigues-smallpdf
-    email = tiago.rodrigues@smallpdf.com 
+    email = tiago.rodrigues@smallpdf.com
     signingkey = ~/.ssh/id_ed25519_sk.pub
 
 [gpg]
@@ -16,9 +16,6 @@
     default = upstream
     # Automatically sets upstream branch on first push
     autoSetupRemote = true
-
-[init]
-    defaultBranch = main
 
 [rebase]
 	  autoStash = true

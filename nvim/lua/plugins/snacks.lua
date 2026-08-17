@@ -176,7 +176,7 @@ return {
 			desc = "Files",
 		},
 		{
-			"<leader>fs",
+			"<leader>fg",
 			function()
 				Snacks.picker.grep()
 			end,

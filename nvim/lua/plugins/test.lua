@@ -57,6 +57,17 @@ return {
 				desc = "Run File",
 			},
 			{
+				-- Routes through nvim-dap. Wired for Python via the
+				-- `dap = { adapter = "debugpy" }` option on neotest-python above;
+				-- the JS adapters need their own `dap` option before this works
+				-- for vitest/jest.
+				"<leader>td",
+				function()
+					require("neotest").run.run({ strategy = "dap" })
+				end,
+				desc = "Debug Nearest",
+			},
+			{
 				"<leader>ts",
 				function()
 					require("neotest").summary.toggle()

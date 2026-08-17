@@ -35,6 +35,7 @@ return {
 				{ "<leader>t", group = "Tests", icon = { icon = "🔧" } },
 				{ "<leader>u", group = "UI" },
 				{ "<leader>x", group = "Tools", icon = { icon = "🔧" } },
+				{ "<leader>y", group = "Yank", icon = { icon = "📋" } },
 				{ "<leader>/", desc = "Terminal", icon = { icon = "" } },
 			},
 			-- your configuration comes here
