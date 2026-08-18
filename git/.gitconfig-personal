@@ -23,3 +23,8 @@
 
 [rebase]
 	autoStash = true
+
+# This rewrite applies only where the includeIf rules load this file — ~/.claude,
+# ~/.sb, ~/.config/dotfiles — so work repos are untouched.
+[url "git@github-personal:"]
+    insteadOf = git@github.com:

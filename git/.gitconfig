@@ -35,5 +35,8 @@
 [includeIf "gitdir:~/.sb/"]
   path = ~/.config/git/.gitconfig-personal
 
+[includeIf "gitdir:~/.claude/"]
+  path = ~/.config/git/.gitconfig-personal
+
 [includeIf "gitdir:~/Documents/work/"]
   path = ~/.config/git/.gitconfig-work
