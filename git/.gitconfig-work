@@ -13,8 +13,6 @@
     ff = only
 
 [push]
-    default = upstream
-    # Automatically sets upstream branch on first push
     autoSetupRemote = true
 
 [rebase]

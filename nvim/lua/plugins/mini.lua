@@ -33,6 +33,39 @@ return {
 		require("mini.diff").setup()
 		require("mini.files").setup()
 
+		-- Open the entry under the cursor in a split, mirroring the pickers'
+		-- <C-s>/<C-v>/<C-t>. mini.files has no built-in for this: the trick is to
+		-- swap its target window for a freshly made split, then "go in". Cursor on
+		-- a directory just enters it -- splitting there would strand an empty
+		-- window.
+		local map_split = function(buf_id, lhs, direction, desc)
+			vim.keymap.set("n", lhs, function()
+				local entry = MiniFiles.get_fs_entry()
+				if entry == nil or entry.fs_type ~= "file" then
+					return MiniFiles.go_in({})
+				end
+
+				local target = MiniFiles.get_explorer_state().target_window
+				local new_target = vim.api.nvim_win_call(target, function()
+					vim.cmd(direction .. " split")
+					return vim.api.nvim_get_current_win()
+				end)
+				MiniFiles.set_target_window(new_target)
+
+				MiniFiles.go_in({ close_on_file = true })
+			end, { buffer = buf_id, desc = desc })
+		end
+
+		vim.api.nvim_create_autocmd("User", {
+			pattern = "MiniFilesBufferCreate",
+			callback = function(args)
+				local buf_id = args.data.buf_id
+				map_split(buf_id, "<C-s>", "belowright horizontal", "Open in horizontal split")
+				map_split(buf_id, "<C-v>", "belowright vertical", "Open in vertical split")
+				map_split(buf_id, "<C-t>", "tab", "Open in new tab")
+			end,
+		})
+
 		require("mini.icons").setup()
 		-- Single icon source. Plugins that hard-require nvim-web-devicons get
 		-- mini.icons' shim instead, so nvim-web-devicons can be dropped.
