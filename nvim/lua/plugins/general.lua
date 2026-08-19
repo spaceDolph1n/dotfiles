@@ -20,10 +20,8 @@ return {
 		end,
 	},
 	{
-		-- Replaces Comment.nvim + nvim-ts-context-commentstring (2 plugins, ~1.5k
-		-- LOC) with ~100 LOC. Neovim 0.10+ already ships the `gc`/`gcc`/`gbc`
-		-- operators; the only thing still missing is a correct `commentstring`
-		-- inside JSX/Vue <script>/<template> regions, which is all this does.
+		-- Neovim 0.10+ ships the `gc`/`gcc`/`gbc` operators; the only gap is a
+		-- correct `commentstring` inside JSX/Vue regions, which is all this does.
 		"folke/ts-comments.nvim",
 		event = "VeryLazy",
 		opts = {},
@@ -62,16 +60,9 @@ return {
 		end,
 	},
 	{
-		-- Project-wide search & replace, replacing nvim-pack/nvim-spectre.
-		--
-		-- Same mental model (search buffer -> edit replacement -> apply), but the
-		-- buffer is a normal editable buffer: ordinary motions, undo and `:w`
-		-- all work. Drives ripgrep's own `--replace` rather than shelling out to
-		-- sed, and can switch engine to ast-grep for syntax-aware rewrites
-		-- (e.g. `$A.map($B)` -> `$A.flatMap($B)`), which regex cannot express.
-		--
-		-- NOTE: this is for *text*. To rename a code symbol use `grn` (native
-		-- LSP rename) -- it is scope-aware and updates imports.
+		-- Project-wide search & replace in a normal editable buffer, driving
+		-- ripgrep's `--replace`; switches to ast-grep for syntax-aware rewrites.
+		-- For *text* only -- rename a code symbol with `grn` (native LSP rename).
 		"MagicDuck/grug-far.nvim",
 		cmd = { "GrugFar", "GrugFarWithin" },
 		keys = {
@@ -152,13 +143,8 @@ return {
 		version = "*", -- Remove if you DON'T want to use the stable version
 	},
 	{
-		-- harpoon2 -- pinned files, scoped per project.
-		--
-		-- Complements the picker rather than duplicating it: the picker is
-		-- *search* (recall a name, type, filter), harpoon is *muscle memory* --
-		-- <leader>2 is the same file all day for the feature you are on. A
-		-- typical set while working a Vue feature: component, composable, api
-		-- client, test. Direct leader+digit, no chording.
+		-- harpoon2 -- pinned files, scoped per project. The picker is *search*;
+		-- harpoon is *muscle memory* -- <leader>2 is the same file all day.
 		"ThePrimeagen/harpoon",
 		branch = "harpoon2",
 		dependencies = { "nvim-lua/plenary.nvim" },

@@ -1,11 +1,6 @@
--- sidekick.nvim -- keeps Claude in a tmux pane (as before) but stops the
--- copy-paste shuttle: it sends the current file, selection, cursor position and
--- LSP diagnostics as context, and keeps a named session per project that
--- survives closing Neovim.
---
--- Deliberately CLI-only. Copilot's Next Edit Suggestions are disabled: they
--- require the Copilot LSP server, which this config does not install, and the
--- NES keymap would otherwise claim <Tab> away from blink.cmp.
+-- sidekick.nvim -- Claude in a tmux pane, sent the current file, selection and
+-- diagnostics as context, with a named session per project. CLI-only: Copilot
+-- NES needs an LSP server this config lacks, and would claim <Tab> from blink.
 return {
 	"folke/sidekick.nvim",
 	dependencies = { "folke/snacks.nvim" },

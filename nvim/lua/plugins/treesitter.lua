@@ -1,11 +1,6 @@
--- nvim-treesitter `main` branch: the 0.12-native rewrite.
---
--- Unlike the old `master` branch, this plugin no longer owns highlighting,
--- folding or indentation -- it only installs parsers + queries. The features
--- themselves come from core `vim.treesitter`, enabled by the FileType autocmd
--- below. `master` is frozen upstream and only maintained for Nvim 0.11.
---
--- Requires the `tree-sitter` CLI (brew install tree-sitter-cli).
+-- nvim-treesitter `main`: the 0.12-native rewrite, which only installs parsers
+-- and queries -- highlighting, folding and indent come from core vim.treesitter
+-- via the FileType autocmd below. Requires the `tree-sitter` CLI.
 return {
 	"nvim-treesitter/nvim-treesitter",
 	branch = "main",
@@ -70,13 +65,9 @@ return {
 					return
 				end
 
-				-- `language.add()` returns false/nil when no parser is installed
-				-- and does NOT raise, so pcall's first value only tells us it
-				-- did not throw -- the second is the one that matters. Checking
-				-- pcall alone lets every parser-less filetype through to
-				-- `start()`, which then asserts: opening a directory hit
-				-- mini.files' `minifiles` buffer and errored on every plugin UI
-				-- buffer thereafter.
+				-- `language.add()` returns false/nil without raising, so pcall's
+				-- second value is the one that matters -- checking only the first
+				-- lets parser-less buffers reach `start()`, which then asserts.
 				local ok, added = pcall(vim.treesitter.language.add, lang)
 				if not ok or not added then
 					return -- no parser for this filetype; leave regex syntax alone

@@ -53,20 +53,15 @@ return {
 				{ section = "startup" },
 			},
 		},
-		-- Disables treesitter, LSP and syntax above a size threshold. Now that
-		-- treesitter runs on every filetype, a 4MB bundle or a big lockfile is
-		-- otherwise parsed on open (measured: ~1.4s for 4MB of JS, and that was
-		-- headless -- no rendering and no LSP attach).
+		-- Drops treesitter, LSP and syntax above a size threshold. Treesitter runs
+		-- on every filetype now, so a 4MB bundle otherwise costs ~1.4s on open.
 		bigfile = { enabled = true },
 		-- git = { enabled = true },
 		-- Renders the file before plugins finish loading.
 		quickfile = { enabled = true },
 		indent = { enabled = true },
-		-- Disabled: image rendering needs the kitty graphics protocol, which the
-		-- current WezTerm build (20240203, the Homebrew stable) does not
-		-- implement, and the converters it relies on (magick, gs, mmdc) are not
-		-- installed either. `:checkhealth snacks` reported five errors for a
-		-- feature that could never render. Re-enable if WezTerm gains support.
+		-- Off: needs the kitty graphics protocol, which the Homebrew WezTerm build
+		-- does not implement, and its converters are not installed either.
 		image = { enabled = false },
 		-- Replaces vim.ui.input; the DAP conditional-breakpoint prompt uses it.
 		input = { enabled = true },

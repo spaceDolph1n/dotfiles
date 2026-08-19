@@ -43,11 +43,7 @@ return {
 			-- refer to the configuration section below
 		},
 	},
-	-- noice.nvim removed: it hooked Neovim's message/cmdline internals, which
-	-- made it the most upgrade-fragile plugin here, and snacks.notifier already
-	-- owns notifications. The native cmdline is back.
-	--
-	-- nvim-origami removed: treesitter now supplies foldexpr and
-	-- snacks.statuscolumn draws the fold column, so it had nothing left to add.
-	-- foldlevel/foldlevelstart live in core/options.lua.
+	-- noice.nvim removed: it hooked Neovim's message/cmdline internals and
+	-- snacks.notifier already owns notifications. nvim-origami removed:
+	-- treesitter supplies foldexpr, snacks.statuscolumn draws the fold column.
 }

@@ -24,6 +24,7 @@ brew "bat"            # cat with syntax highlighting
 brew "eza"            # ls replacement
 brew "fd"             # find replacement
 brew "fzf"            # fuzzy finder
+brew "fzf-tab"        # fzf-powered zsh completion menu
 brew "ripgrep"        # grep replacement; also backs :grep in Neovim
 brew "ast-grep"       # structural search/replace engine for grug-far.nvim
 brew "yazi"           # TUI file manager
