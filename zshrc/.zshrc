@@ -91,9 +91,9 @@ eval "$(zoxide init zsh --cmd cd)"
 # ---------------------------------------------------------------------------
 # Aliases
 # ---------------------------------------------------------------------------
-alias dotfiles="cd ~/.config/dotfiles/ & v"
+alias dotfiles="cd ~/.config/dotfiles/ && v"
 alias scripts='cd ~/.config/scripts'
-alias sb='cd ~/.sb/second-brain/ & v'
+alias sb='cd ~/.sb/second-brain/ && v'
 alias v="nvim"
 
 alias prs="gh dash"
