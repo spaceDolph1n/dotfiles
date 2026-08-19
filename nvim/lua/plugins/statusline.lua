@@ -6,12 +6,9 @@ return {
 		local lualine = require("lualine")
 		local lazy_status = require("lazy.status") -- to configure lazy pending updates count
 
-		-- Outer caps, so this bar ends in pills like the tmux one. Same two glyphs
-		-- and the same leading/trailing space as @catppuccin_status_left_separator
-		-- and _right_separator in tmux.conf, so both bars sit one cell in from the
-		-- edge and round off identically. lualine draws a separator with fg set to
-		-- its own section's background, so these follow the mode colour on their
-		-- own rather than being hardcoded per mode.
+		-- Outer caps, matching the separators in tmux.conf so both bars round off
+		-- identically. lualine sets separator fg from its own section background,
+		-- so they follow the mode colour without being hardcoded per mode.
 		local cap_left = " "
 		local cap_right = " "
 

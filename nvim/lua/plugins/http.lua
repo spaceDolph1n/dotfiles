@@ -1,16 +1,6 @@
--- kulala.nvim -- HTTP client for .http files.
---
--- Requests live in the repo next to the code they exercise, so an endpoint
--- change and its example change in the same commit and show up in the same PR
--- diff. JetBrains .http compatible.
---
--- Requires curl, git and tree-sitter-cli (all in the Brewfile).
---
---   ### Create invoice
---   POST http://localhost:3000/api/invoices
---   Content-Type: application/json
---
---   { "amount": 100, "currency": "EUR" }
+-- kulala.nvim -- HTTP client for .http files, JetBrains compatible. Requests
+-- live next to the code they exercise, so an endpoint and its example change in
+-- the same PR. Requires curl, git and tree-sitter-cli (all in the Brewfile).
 return {
 	"mistweaverco/kulala.nvim",
 	ft = { "http", "rest" },

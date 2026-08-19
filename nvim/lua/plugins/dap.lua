@@ -1,10 +1,6 @@
--- Debugging: nvim-dap wired for TypeScript/JavaScript (Node, Next.js, Vue) and
--- Python (FastAPI).
---
--- Adapters come from Mason:
---   js-debug-adapter -> vscode-js-debug, the same engine VS Code uses
---   debugpy          -> Python; also what neotest-python is already configured
---                       against in plugins/test.lua
+-- nvim-dap for TypeScript/JavaScript (Node, Next.js, Vue) and Python (FastAPI).
+-- Adapters come from Mason: js-debug-adapter (vscode-js-debug, the engine VS
+-- Code uses) and debugpy, which plugins/test.lua also runs neotest against.
 return {
 	{
 		"mfussenegger/nvim-dap",

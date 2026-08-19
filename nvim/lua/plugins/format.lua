@@ -1,20 +1,11 @@
--- Formatting. conform.nvim is the single source of truth; every language
--- server that offers formatting has it disabled in nvim/after/lsp/<name>.lua.
---
--- `{ "prettierd", "prettier" }` means "run prettierd, THEN prettier" unless
--- `stop_after_first` is set -- the config used to double-format every JS/TS
--- file on save. The prettier list is built once and shared below.
---
--- conform resolves a project-local node_modules/.bin/prettier before the Mason
--- one, and prettierd honours the repo's pinned prettier major, so a repo on
--- prettier 2 keeps prettier 2's defaults.
+-- conform.nvim is the single source of truth; LSP formatting is disabled in
+-- nvim/after/lsp/<name>.lua. `stop_after_first` matters -- without it the list
+-- means "prettierd THEN prettier", which double-formats every save.
 local prettier = { "prettierd", "prettier", stop_after_first = true }
 
---- Executable prettier configs get require()d into the prettierd daemon and
---- cached in its Node module registry, which is never invalidated -- edit
---- .prettierrc.js and you keep getting the previous formatting until the daemon
---- restarts. Static configs (.prettierrc.json, package.json#prettier) are
---- re-read correctly, so this only needs to cover the executable ones.
+--- prettierd caches executable configs in its Node registry and never
+--- invalidates them, so edits keep formatting with the old rules until it
+--- restarts. Static configs (.prettierrc.json, package.json) re-read fine.
 local PRETTIER_EXECUTABLE_CONFIGS = {
 	".prettierrc.js",
 	".prettierrc.cjs",

@@ -19,23 +19,51 @@ export MANPAGER="nvim +Man!"
 export GIT_CONFIG_GLOBAL=~/.config/git/.gitconfig
 export STARSHIP_CONFIG=~/.config/starship/starship.toml
 
-# ESLINT_USE_FLAT_CONFIG / ESLINT_CONFIG intentionally NOT exported here.
-#   - A global ESLINT_USE_FLAT_CONFIG breaks whichever repo style it doesn't
-#     match; nvim/lsp/eslint.lua now decides per project root instead.
-#   - ESLINT_CONFIG is not a variable ESLint reads, and it pointed at
-#     ~/.config/eslint/eslint.config.js, which does not exist.
+# ESLINT_USE_FLAT_CONFIG / ESLINT_CONFIG intentionally NOT exported: a global
+# flat-config flag breaks whichever repo it does not match (nvim/lsp/eslint.lua
+# decides per project root), and ESLINT_CONFIG is not a variable ESLint reads.
 
 # ---------------------------------------------------------------------------
 # Oh My Zsh
 # ---------------------------------------------------------------------------
 export ZSH="$HOME/.oh-my-zsh"
 
-# zsh-syntax-highlighting is deliberately NOT in this list -- it must be sourced
-# last of everything that touches ZLE, which happens at the bottom of this file.
-# It used to be in both places, so it was loaded twice.
-plugins=(git zsh-autosuggestions extract sudo history)
+# zsh-autosuggestions and zsh-syntax-highlighting are NOT in this list: both wrap
+# ZLE widgets, so they are sourced by hand below -- after fzf-tab, and
+# syntax-highlighting last of all.
+plugins=(git extract sudo history)
+
+# Homebrew's completions (_gh, _fd, _rg, _mise, ...) are not in the default fpath,
+# so `gh <TAB>` only completed filenames. Must precede oh-my-zsh, which runs
+# compinit. `:h:h` not `:A:h:h` -- bin/brew is a symlink into Homebrew/bin.
+if (( $+commands[brew] )); then
+    fpath=("${commands[brew]:h:h}/share/zsh/site-functions" $fpath)
+fi
 
 source $ZSH/oh-my-zsh.sh
+
+# ---------------------------------------------------------------------------
+# Completion menu -- order matters
+# ---------------------------------------------------------------------------
+# fzf-tab puts the fzf picker on Tab. It hooks the completion system rather than
+# individual commands, so anything with a zsh completion is covered. Loads after
+# compinit (oh-my-zsh runs it) and before plugins that wrap ZLE widgets.
+source "${commands[brew]:h:h}/share/fzf-tab/fzf-tab.zsh"
+source "$ZSH/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+
+# fzf-tab needs zsh's own menu off. The five-colon pattern matches oh-my-zsh's
+# `menu select` exactly -- a plain `:completion:*` is less specific and loses.
+zstyle ':completion:*' menu no
+zstyle ':completion:*:*:*:*:*' menu no
+
+# Group headers only render when descriptions have a format.
+zstyle ':completion:*:descriptions' format '[%d]'
+
+# fzf-tab does not read FZF_DEFAULT_OPTS unless told to.
+zstyle ':fzf-tab:*' use-fzf-default-opts yes
+
+# `cd <TAB>` is where the name alone rarely says enough.
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --icons --color=always $realpath'
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=240'
 
@@ -63,9 +91,9 @@ eval "$(zoxide init zsh --cmd cd)"
 # ---------------------------------------------------------------------------
 # Aliases
 # ---------------------------------------------------------------------------
-alias dotfiles="cd ~/.config/dotfiles/"
+alias dotfiles="cd ~/.config/dotfiles/ & v"
 alias scripts='cd ~/.config/scripts'
-alias sb='cd ~/.sb/second-brain/'
+alias sb='cd ~/.sb/second-brain/ & v'
 alias v="nvim"
 
 alias prs="gh dash"
@@ -98,18 +126,9 @@ cmkc() { cd "$1" && mkdir -p "$2" && cd "$2"; }                # move, create di
 cmkcv() { cd "$1" && mkdir -p "$2" && cd "$2" && v .; }        # ...and open nvim
 mkcv() { mkdir -p "$1" && cd "$1" && v .; }                    # create dir, move inside, open nvim
 
-# These three used `find`, which ignores .gitignore and walks node_modules.
-#
-# The fd invocation is NOT repeated here: these reuse the same FZF_*_COMMAND
-# defined further down, so a file means the same thing to `fv` as it does to
-# Ctrl-T. Written out separately they had already drifted -- the env vars pass
-# --follow and these did not. `${=VAR}` is zsh word-splitting, needed because
-# the variable holds a command plus its arguments. Definition order does not
-# matter: a function body expands when it runs, not when it is defined.
-#
-# Every one of them guards on `&&`. Cancelling fzf prints nothing, and `f`
-# without the guard piped that nothing straight into pbcopy -- so escaping out
-# of the picker silently wiped the clipboard.
+# `${=VAR}` is zsh word-splitting; the FZF_*_COMMAND vars are reused so `fv` and
+# Ctrl-T agree on what a file is. The `&&` guards matter -- without one, escaping
+# out of fzf pipes nothing into pbcopy and wipes the clipboard.
 fcd() { local d; d=$(${=FZF_ALT_C_COMMAND} | fzf) && cd "$d" && ll; }
 f() { local file; file=$(${=FZF_DEFAULT_COMMAND} | fzf) && printf '%s' "$file" | pbcopy; }
 fv() { local file; file=$(${=FZF_DEFAULT_COMMAND} | fzf) && nvim "$file"; }
@@ -121,20 +140,17 @@ fv() { local file; file=$(${=FZF_DEFAULT_COMMAND} | fzf) && nvim "$file"; }
 # installs widgets, otherwise those bindings land in a keymap that is not active.
 bindkey -v
 
-# Esc in NORMAL mode returns to INSERT, so Esc toggles instead of trapping.
-#
-# Why this is needed: the omz `sudo` plugin binds `\e\e` to prepend sudo. From
-# insert, `\e` is a *prefix* of that, so zsh waits KEYTIMEOUT (40 = 400ms) for a
-# second Esc. Fast double-Esc gets sudo; slower than 400ms drops you into vicmd
-# instead. Same keypress, two outcomes, depending on typing speed.
-#
-# This does NOT break the sudo binding: `\e\e` lives in the viins keymap and is
-# resolved there before vicmd is ever entered. Verified with `bindkey -M viins`.
+# Esc toggles back to INSERT instead of trapping. Needed because omz's `sudo`
+# plugin binds `\e\e`, so a lone Esc waits out KEYTIMEOUT (400ms) first. Does not
+# break it -- `\e\e` lives in viins and resolves before vicmd is ever entered.
 bindkey -M vicmd '\e' vi-insert
 
-# fzf: Ctrl-T (files), Ctrl-R (history, immediately overridden by atuin below),
-# Alt-C (cd). FZF_DEFAULT_COMMAND was never actually set despite the old comment
-# claiming fzf used fd.
+# fzf: Ctrl-T (files), Ctrl-R (overridden by atuin below), Alt-C (cd).
+#
+# fzf's Tab widget falls back to this when there is no `**` trigger. Set
+# explicitly because fzf only guesses when it is empty, so re-sourcing a shell
+# that predates fzf-tab would silently keep the old completion.
+(( $+widgets[fzf-tab-complete] )) && fzf_default_completion=fzf-tab-complete
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'

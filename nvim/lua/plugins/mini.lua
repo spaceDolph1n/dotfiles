@@ -33,11 +33,9 @@ return {
 		require("mini.diff").setup()
 		require("mini.files").setup()
 
-		-- Open the entry under the cursor in a split, mirroring the pickers'
-		-- <C-s>/<C-v>/<C-t>. mini.files has no built-in for this: the trick is to
-		-- swap its target window for a freshly made split, then "go in". Cursor on
-		-- a directory just enters it -- splitting there would strand an empty
-		-- window.
+		-- Split-open the entry under the cursor, mirroring the pickers' keys.
+		-- mini.files has no built-in: swap its target window for a fresh split,
+		-- then go in. Directories are just entered -- a split there would be empty.
 		local map_split = function(buf_id, lhs, direction, desc)
 			vim.keymap.set("n", lhs, function()
 				local entry = MiniFiles.get_fs_entry()
@@ -71,17 +69,9 @@ return {
 		-- mini.icons' shim instead, so nvim-web-devicons can be dropped.
 		MiniIcons.mock_nvim_web_devicons()
 
-		-- Two of mini.operators' default prefixes collide with things that
-		-- matter more here:
-		--
-		--   `gr` (replace) shadows Neovim 0.11's native LSP maps -- `grr`
-		--        (references) was overridden outright by "replace line", and
-		--        grn/gra/gri/grt each had to wait out timeoutlen first.
-		--        `cr` is upstream's own suggested alternative.
-		--   `gs` (sort) became a prefix of mini.surround's gsa/gsd/gsr after
-		--        surround moved off `s`, so every sort waited on the ambiguity.
-		--
-		-- `gx` is left alone: mini relocates the native URL-open to `gX`.
+		-- Both defaults are moved off: `gr` shadows Neovim's native LSP maps
+		-- (grr/grn/gra/gri), and `gs` became a prefix of mini.surround's gsa/gsd.
+		-- `gx` is left alone -- mini relocates the native URL-open to `gX`.
 		require("mini.operators").setup({
 			replace = { prefix = "cr" },
 			sort = { prefix = "gz" },

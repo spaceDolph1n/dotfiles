@@ -5,11 +5,8 @@ local keymap = vim.keymap -- for conciseness
 ---------------------
 -- General Keymaps -------------------
 
--- Exit insert mode.
---
--- `jjw` (exit + save) used to exist alongside this. Because `jj` was a prefix
--- of it, every single insert-mode exit blocked for `timeoutlen` (500ms) waiting
--- to see whether a `w` was coming. `<leader>w` already saves.
+-- Exit insert mode. Nothing else may start with `jj` -- a `jjw`-style map makes
+-- every exit wait out timeoutlen (500ms) first. `<leader>w` already saves.
 keymap.set("i", "jj", "<ESC>", { desc = "Exit insert mode with jj" })
 
 -- clear search highlights
@@ -35,12 +32,9 @@ keymap.set("v", "Y", "myY`y")
 keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true })
 keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true })
 
--- Fold with h / l, the one thing lost when nvim-origami was dropped. Treesitter
--- still supplies `foldexpr`; this is only the ergonomics.
---   h  closes the fold when the cursor sits at or before the first non-blank
---   l  opens a closed fold
--- Both fall through to normal motion otherwise, and with any count, so `5h`
--- and `d2l` are untouched.
+-- Fold ergonomics only -- treesitter supplies `foldexpr`. `h` closes a fold from
+-- at or before the first non-blank, `l` opens a closed one; both fall through to
+-- normal motion otherwise and with any count, so `5h` and `d2l` are untouched.
 keymap.set("n", "h", function()
 	if vim.v.count > 0 or vim.fn.foldlevel(".") == 0 then
 		return "h"
@@ -87,11 +81,8 @@ keymap.set("n", "N", "Nzzzv")
 keymap.set("n", "<C-d>", "<C-d>zz")
 keymap.set("n", "<C-u>", "<C-u>zz")
 
--- Copy the current file's path to the system clipboard. `clipboard =
--- "unnamedplus"` is set in core/options.lua, so "+" is the system clipboard.
--- Native equivalents, if you ever need them without the keymap:
---   :let @+ = @%              relative path (the read-only % register)
---   :let @+ = expand('%:p')   absolute path
+-- Copy the current file's path to the system clipboard. Without a keymap:
+-- `:let @+ = @%` for relative, `:let @+ = expand('%:p')` for absolute.
 local function yank_path(modifier, label)
 	return function()
 		local path = vim.fn.expand("%" .. modifier)

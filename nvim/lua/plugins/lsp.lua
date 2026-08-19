@@ -1,11 +1,6 @@
--- Language servers.
---
--- Per-server settings live in `nvim/lsp/<name>.lua` (Neovim 0.12 reads these
--- off the runtimepath automatically -- see :h lsp-config). This file only
--- decides *which* servers exist and makes sure their binaries are installed.
---
--- Diagnostics are configured in core/options.lua, since `vim.diagnostic` is
--- core and should not depend on this spec having loaded.
+-- Which language servers exist and get installed. Per-server settings live in
+-- `nvim/lsp/<name>.lua`, read off the runtimepath (:h lsp-config); diagnostics
+-- are in core/options.lua so they do not depend on this spec loading.
 
 --- Language servers to install and enable.
 local SERVERS = {
@@ -46,11 +41,9 @@ return {
 
 			require("mason-lspconfig").setup({
 				ensure_installed = SERVERS,
-				-- `automatic_enable = true` calls vim.lsp.enable() for *every*
-				-- installed mason package that ships an lsp/ config -- not just
-				-- the ones listed above. That is how `stylua` ended up running
-				-- as `stylua --lsp` on every Lua buffer, as a second formatting
-				-- provider racing conform. Enable explicitly instead.
+				-- `true` enables *every* installed mason package shipping an lsp/
+				-- config, not just SERVERS -- that is how stylua ended up running
+				-- as `stylua --lsp`, racing conform. Enable explicitly instead.
 				automatic_enable = false,
 			})
 

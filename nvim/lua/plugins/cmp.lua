@@ -1,9 +1,5 @@
--- Completion. blink.cmp is still the right call here: the matcher is a Rust
--- binary, it is the fastest of the current options, and Neovim's own
--- `vim.lsp.completion` has no snippet expansion, no fuzzy sorting and no
--- cmdline support -- so it is not yet a like-for-like replacement.
---
--- The Copilot source is gone along with the rest of the AI plugins.
+-- Completion. blink.cmp over native `vim.lsp.completion`, which still has no
+-- snippet expansion, no fuzzy sorting and no cmdline support.
 return {
 	"saghen/blink.cmp",
 	dependencies = { "rafamadriz/friendly-snippets" },

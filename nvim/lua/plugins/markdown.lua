@@ -25,12 +25,9 @@ return {
 		keys = {
 			{ "<leader>kb", "<cmd>Obsidian backlinks<cr>", ft = "markdown", desc = "Backlinks to this note" },
 			{ "<leader>kl", "<cmd>Obsidian links<cr>", ft = "markdown", desc = "Links in this note" },
-			-- Note *creation* commands (link_new, extract_note) are deliberately
-			-- not bound: notes get created and named directly in mini.files, so
-			-- obsidian.nvim's note_id_func never runs and can't impose its
-			-- default timestamp IDs on the kebab-case convention.
-			-- quick_switch/search dropped too -- the snacks pickers (<leader>ff,
-			-- <leader>fg) already cover finding notes.
+			-- Note *creation* is unbound on purpose: notes are made in mini.files,
+			-- so note_id_func never runs and cannot impose timestamp IDs over the
+			-- kebab-case convention. Finding notes is the snacks pickers' job.
 			{
 				"<leader>ki",
 				"<cmd>Obsidian link<cr>",
@@ -60,10 +57,9 @@ return {
 			-- render-markdown.nvim does all the rendering; running obsidian.nvim's
 			-- UI as well double-conceals the same syntax.
 			ui = { enable = false },
-			-- Frontmatter is written on save for any note in the vault, which is
-			-- what gives manually-created notes (mini.files) their header. The
-			-- default builtin only emits id/aliases/tags, so this matches the
-			-- vault's own schema instead and leaves everything else alone.
+			-- Written on save for any vault note, which is what gives files made in
+			-- mini.files a header. Matches the vault schema; the builtin only emits
+			-- id/aliases/tags.
 			frontmatter = {
 				enabled = true,
 				func = function(note)
