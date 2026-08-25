@@ -1,0 +1,14 @@
+# Project config for the dotfiles repo. Global defaults (worktree location,
+# naming, agent, pane layout) come from workmux/config.yaml in this same repo.
+
+# A fresh worktree is a clean checkout, so everything gitignored is missing.
+# These three are the ones present here and worth sharing rather than recreating:
+files:
+  symlink:
+    - .claude       # repo-local Claude settings and hooks
+    - gh-dash       # unversioned on purpose (employer repo names); see .gitignore
+    - tmux/plugins  # TPM checkouts -- large, and identical across worktrees
+
+# DO NOT add `stow` to post_create. Stow rewrites the symlinks in ~/.config to
+# point at whatever directory it runs from, so stowing from a worktree would
+# silently repoint the live config at a throwaway branch.

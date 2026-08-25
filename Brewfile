@@ -7,6 +7,7 @@
 
 tap "felixkratz/formulae"
 tap "nikitabobko/tap"
+tap "raine/workmux"
 
 # ---------------------------------------------------------------------------
 # Shell & core CLI
@@ -64,6 +65,9 @@ brew "yt-dlp"         # pull video transcripts: yt-dlp --skip-download --write-a
 # ---------------------------------------------------------------------------
 brew "tmux"
 brew "sesh"           # tmux session picker (replaced the tmux-sessionx plugin)
+# git worktree + tmux window per task, for parallel agents.
+# Global config is stowed from workmux/; per-repo overrides in .workmux.yaml.
+brew "raine/workmux/workmux"
 brew "btop"
 brew "openssh"
 brew "ykman"                        # YubiKey manager (SSH signing key)
