@@ -1,0 +1,37 @@
+# Global workmux defaults -- stowed to ~/.config/workmux/config.yaml.
+# Per-repo overrides live in that repo's .workmux.yaml; project settings replace
+# these entirely (except hook and file lists, which can opt in with "<global>").
+
+# Keep every worktree under one root instead of scattering `<project>__worktrees`
+# siblings next to each repo -- ~/.config in particular should not collect them.
+worktree_dir: ~/.worktrees/{project}
+
+# Branch names like `DEV-123/thing` become worktree dir `thing`, not `DEV-123-thing`.
+worktree_naming: basename
+
+agent: claude
+
+panes:
+  - command: <agent>
+    focus: true
+  - split: horizontal
+    size: 15
+
+# Colored dots instead of emoji: single-width, and tmux paints them from the
+# kanso palette so they match the status line instead of fighting it.
+# Hollow and muted for `working` -- it is the common, non-actionable state.
+# Only the two states worth reacting to are solid.
+# The dot renders *inside* catppuccin's window pill, so it restores the pill's
+# foreground (#C5C9C7) rather than using #[default], which would also reset the
+# background and strip the fill off inactive tabs. Trailing space separates it
+# from the window name.
+status_icons:
+  working: "#[fg=#8ea4a2]○#[fg=#C5C9C7] "
+  waiting: "#[fg=#E46876]●#[fg=#C5C9C7] "
+  done: "#[fg=#DCA561]●#[fg=#C5C9C7] "
+
+# Do not let workmux rewrite window-status-format. Left on, it copies whatever
+# catppuccin had rendered at that moment into a *per-window* override and appends
+# the icon on the right -- freezing the theme and putting the dot after the number.
+# tmux.conf owns the format instead and places `@workmux_status` before the name.
+status_format: false

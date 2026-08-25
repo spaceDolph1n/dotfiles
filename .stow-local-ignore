@@ -26,3 +26,6 @@ LICENSE.*
 
 # Stowed separately into $HOME, not ~/.config (see README)
 zshrc
+
+# workmux writes a per-repo config here; stow must not link it into ~/.config.
+\.workmux\.yaml
