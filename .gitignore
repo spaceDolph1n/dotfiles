@@ -49,7 +49,7 @@ __pycache__/
 # that cannot be in it. ~/.config/gh-dash still symlinks to gh-dash/, so the
 # tool works exactly as before -- the file is simply unversioned, and has to be
 # rewritten by hand on a new machine.
-/gh-dash/
+/gh-dash
 
 # Local, machine-specific overrides
 local/
@@ -57,4 +57,9 @@ local.*
 *.local
 
 # tmux plugin manager checkouts
-/tmux/plugins/
+/tmux/plugins
+
+# Holds only machine-local Claude settings, already covered by the global
+# ~/.config/git/ignore. Named here so the pattern matches the *symlink* workmux
+# creates in each worktree, which the global rule cannot see into.
+/.claude
