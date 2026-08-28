@@ -136,8 +136,33 @@ dashboard keeps its state:
 | --- | --- |
 | `v` | review the PR in tuicr |
 | `G` | lazygit on that repo |
-| `C` | check the branch out, then lazygit |
+| `C` | check the branch out, then nvim left / dev server right |
 | `d` | pipe the PR diff through diffnav |
+
+`C` runs the checkout **before** creating the tmux window, so the dev server pane can never
+build the branch you were on a moment ago, and a failed checkout (dirty tree) aborts without
+leaving a stray window behind.
+
+**tuicr** (`tuicr/config.toml`) — config keys of note: `appearance` (light/dark/system),
+`theme_dark` / `theme_light`, `diff_view`, `transparent_background`, `comment_types`.
+
+| Where | What |
+| --- | --- |
+| `tuicr/config.toml` | `appearance = "system"`, dark → `kanso-zen` |
+| `tuicr/themes/kanso-zen.toml` | local theme, palette lifted from `kanso.nvim` |
+
+The bundled `dark` theme leaves the chip foregrounds too light, so the mode indicator, the
+message banners and the update badge render light-on-light and are unreadable on this
+terminal — the same failure as gh-dash's `faint`. A local theme fixes it because every
+`*_fg` is pinned explicitly. Kanso ships ports for 14 tools (alacritty, ghostty, kitty,
+wezterm, zellij, yazi…) but **not tmux and not tuicr**, which is why both are hand-written
+here — the tmux theme is a Catppuccin structure carrying Kanso colours.
+
+Audition a bundled theme without editing anything:
+
+```bash
+tuicr --theme tokyo-night-storm pr 6209   # 24 bundled; an invalid name lists them all
+```
 
 ### 7. Neovim
 
@@ -166,7 +191,28 @@ Layout:
 | `nvim/lua/plugins/` | one lazy.nvim spec per concern |
 | `nvim/after/lsp/` | per-server config; `after/` so it wins over nvim-lspconfig |
 
-### 8. tmux
+### 8. Colours — one palette, four tools
+
+**Kansō** (`webhooked/kanso.nvim`, `kanso-zen`) is the palette everything follows. Upstream
+ships ports for 14 tools — alacritty, ghostty, kitty, wezterm, zellij, yazi and so on — but
+**not tmux and not tuicr**, which is why those two are hand-written from the same hexes.
+
+| Tool | How it gets Kansō |
+| --- | --- |
+| **nvim** | the plugin itself, `colorscheme kanso-zen` |
+| **wezterm** | inline in `wezterm/wezterm.lua`, identical to the upstream port |
+| **yazi** | vendored flavours in `yazi/flavors/`, selected in `yazi/theme.toml` |
+| **tuicr** | hand-written `tuicr/themes/kanso-zen.toml` |
+| **tmux** | hand-written — Catppuccin structure carrying Kansō colours |
+
+The wezterm block must keep `force_reverse_video_cursor = true`. Without it the cursor uses
+`cursor_bg`/`cursor_fg` literally, which in this palette is dark-on-dark and near invisible.
+
+The yazi flavours carry no `tmtheme.xml`, so file *previews* keep yazi's default syntax
+highlighting; only the chrome is themed. `theme.toml` holds nothing but `[flavor]` — anything
+else there overrides the flavour rather than extending it.
+
+### 9. tmux
 
 ```bash
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
@@ -176,7 +222,7 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 Prefix is `C-a`. After any edit to `tmux.conf`, reload with **`prefix + R`** —
 otherwise new bindings silently do nothing.
 
-### 9. Daily auto-commit (optional)
+### 10. Daily auto-commit (optional)
 
 `scripts/daily-snapshot` commits and pushes anything uncommitted in this repo and
 in a notes repo at `~/.sb/second-brain`. The repo list is hardcoded at the top of
@@ -201,7 +247,7 @@ Raycast → Extensions → Script Commands if you use Raycast.
 > unset, git never reads `~/.config/git/.gitconfig`, and commits get authored as
 > `user@hostname`. Do not remove those lines.
 
-### 10. Verify
+### 11. Verify
 
 ```bash
 ls -l ~/.config | grep ' -> '        # symlinks resolve
@@ -227,6 +273,9 @@ launchctl list | grep daily-snapshot
 | lazygit diffs look unstyled | The key is `git.pagers` (a **list**), not `paging` — a wrong key is ignored silently |
 | `git dn` opens nothing | diffnav is a TUI; it needs a real terminal, not a pipe into another command |
 | gh-dash `v`/`G` do nothing | They shell out to `tmux new-window`; outside tmux they fall back to running in place |
+| yazi won't start, `at least one of \`url\` or \`mime\`` | The vendored Kansō flavour targets an older yazi — `name =` → `url =`, `[manager]` → `[mgr]` |
+| yazi looks unthemed | `theme.toml` must contain `[flavor]`; the flavour name must match the `flavors/<name>.yazi` dir minus the suffix |
+| tuicr chips unreadable (mode, banners, update badge) | The bundled themes leave `*_fg` unset; use `theme_dark = "kanso-zen"` or try `transparent_background` |
 | Commits authored as `user@hostname` | `GIT_CONFIG_GLOBAL` unset — see step 9 |
 | `.nvmrc` ignored | `idiomatic_version_file_enable_tools` in `mise/config.toml` |
 
