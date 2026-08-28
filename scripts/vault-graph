@@ -1,0 +1,388 @@
+#!/usr/bin/env python3
+"""
+vault-graph -- force-directed graph of the vault, as one self-contained HTML file.
+
+    vault-graph                 write and open it
+    vault-graph -o /path.html   somewhere specific
+    vault-graph --no-open       just write it
+    vault-graph --pushed        only the half that is in git
+
+The Obsidian app is gone and its graph view with it. This is the replacement:
+one file, no dependencies, no toolchain -- the alternative was installing Rust
+to build an 80-star TUI with no macOS binary.
+
+Deliberately NOT written into the vault: it is a generated artifact, and
+daily-snapshot would commit it.
+"""
+
+import html
+import json
+import os
+import re
+import subprocess
+import sys
+
+VAULT = os.environ.get("BRAIN_VAULT", os.path.expanduser("~/.sb/second-brain"))
+SKIP_DIRS = {".git", ".obsidian", "files", "node_modules"}
+LINK_RE = re.compile(r"!?\[\[([^\]]+)\]\]")
+DEFAULT_OUT = os.path.expanduser("~/.local/state/vault-graph.html")
+
+TYPE_COLORS = {
+    "concept": "#7aa2f7", "claim": "#bb9af7", "source": "#e0af68",
+    "reference": "#9ece6a", "bet": "#f7768e", "ticket": "#7dcfff",
+    "ticket-candidate": "#a9b1d6", "people": "#ff9e64", "queue": "#73daca",
+    "inbox": "#8189b3", "synthesis": "#c0caf5",
+}
+
+
+def norm(s):
+    return s.strip().lower()
+
+
+def parse_fm(text):
+    if not text.startswith("---\n"):
+        return {}
+    end = text.find("\n---", 3)
+    if end == -1:
+        return {}
+    fm, key = {}, None
+    for raw in text[4:end].split("\n"):
+        if not raw.strip():
+            continue
+        if re.match(r"^\s+-\s", raw) and key:
+            if not isinstance(fm.get(key), list):
+                fm[key] = []
+            fm[key].append(raw.strip()[1:].strip().strip("\"'"))
+            continue
+        m = re.match(r"^([A-Za-z_][\w-]*):\s*(.*)$", raw)
+        if m:
+            key, val = m.group(1), m.group(2).strip()
+            fm[key] = [] if val == "[]" else val.strip("\"'")
+    return fm
+
+
+def build(pushed_only):
+    roots = ["00 - zettelkasten", "0 - inbox"] + ([] if pushed_only else ["work"])
+    notes = {}
+    for folder in roots:
+        base = os.path.join(VAULT, folder)
+        if not os.path.isdir(base):
+            continue
+        for root, dirs, files in os.walk(base):
+            dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+            for fn in sorted(files):
+                if not fn.endswith(".md") or fn == "index.md":
+                    continue
+                path = os.path.join(root, fn)
+                text = open(path, encoding="utf-8", errors="replace").read()
+                fm = parse_fm(text)
+                nid = fm.get("id") or fn[:-3]
+                notes[nid] = {
+                    "id": nid,
+                    "type": fm.get("type") or "untyped",
+                    "folder": folder,
+                    "aliases": fm.get("aliases") if isinstance(fm.get("aliases"), list) else [],
+                    "targets": [t.split("|")[0].split("#")[0].strip()
+                                for t in LINK_RE.findall(text)],
+                }
+
+    resolver = {}
+    for n in notes.values():
+        resolver.setdefault(norm(n["id"]), n["id"])
+        for a in n["aliases"]:
+            resolver.setdefault(norm(a), n["id"])
+
+    edges, unresolved = set(), {}
+    for n in notes.values():
+        for t in n["targets"]:
+            if not t:
+                continue
+            hit = resolver.get(norm(t))
+            if hit and hit != n["id"]:
+                edges.add((n["id"], hit))
+            elif not hit:
+                unresolved[t] = unresolved.get(t, 0) + 1
+
+    deg = {nid: 0 for nid in notes}
+    for a, b in edges:
+        deg[a] += 1
+        deg[b] += 1
+
+    comm = detect_communities(sorted(notes), sorted(edges))
+    nodes = [{"id": n["id"], "t": n["type"], "f": n["folder"],
+              "d": deg[n["id"]], "c": comm[n["id"]]}
+             for n in notes.values()]
+    return nodes, [{"s": a, "t": b} for a, b in sorted(edges)], unresolved
+
+
+def detect_communities(ids, edge_pairs):
+    """Label propagation. Cheap, dependency-free, and enough to answer 'which
+    notes clump together'. Seeded so the same vault always colours the same."""
+    import collections
+    import random as _random
+    adj = collections.defaultdict(set)
+    for a, b in edge_pairs:
+        adj[a].add(b)
+        adj[b].add(a)
+    lab = {i: i for i in ids}
+    rng = _random.Random(7)
+    order = list(ids)
+    for _ in range(30):
+        rng.shuffle(order)
+        moved = 0
+        for i in order:
+            if not adj[i]:
+                continue
+            counts = collections.Counter(lab[j] for j in adj[i])
+            top = max(counts.values())
+            # Random tie-break, seeded. Breaking ties deterministically with
+            # min() collapses distinct groups into one 139-node blob.
+            pick = rng.choice(sorted(k for k, v in counts.items() if v == top))
+            if pick != lab[i]:
+                lab[i] = pick
+                moved += 1
+        if not moved:
+            break
+    # Renumber biggest-first so colour 0 is always the largest community.
+    sizes = collections.Counter(lab.values())
+    rank = {c: r for r, (c, _) in enumerate(sizes.most_common())}
+    return {i: rank[lab[i]] for i in ids}
+
+
+TEMPLATE = """<!doctype html>
+<meta charset="utf-8"><title>vault graph</title>
+<style>
+  :root { color-scheme: dark; }
+  html,body { margin:0; height:100%; background:#1a1b26; color:#c0caf5;
+              font:13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  canvas { display:block; cursor:grab; }
+  canvas.drag { cursor:grabbing; }
+  #hud { position:fixed; top:12px; left:14px; pointer-events:none; }
+  #hud b { color:#7aa2f7; font-weight:600; }
+  #legend { position:fixed; bottom:12px; left:14px; display:flex; gap:14px; flex-wrap:wrap;
+            max-width:70vw; }
+  #legend span { display:flex; align-items:center; gap:5px; }
+  #legend i { width:9px; height:9px; border-radius:50%; display:inline-block; }
+  #tip { position:fixed; padding:5px 9px; background:#24283b; border:1px solid #414868;
+         border-radius:4px; pointer-events:none; display:none; white-space:nowrap; }
+  #help { position:fixed; top:12px; right:14px; color:#565f89; text-align:right; }
+</style>
+<canvas id="c"></canvas>
+<div id="hud"><b>__N__</b> notes · <b>__E__</b> links · <span id="sel"></span></div>
+<div id="help">drag to pan · scroll to zoom · hover a node<br>click a node to pin its neighbours<br><b>f</b> fit · <b>c</b> colour by cluster · <b>esc</b> unpin</div>
+<div id="legend"></div>
+<div id="tip"></div>
+<script>
+const NODES = __NODES__, EDGES = __EDGES__, COLORS = __COLORS__;
+// Cycled for detected communities. Distinguishable at small size on a dark
+// ground, which rules out most of the pretty palettes.
+const PALETTE = ['#7aa2f7','#f7768e','#9ece6a','#e0af68','#bb9af7','#7dcfff',
+                 '#ff9e64','#73daca','#c0caf5','#f7a8b8','#b4f9f8','#d5a6f0'];
+let mode = 'type';
+const colourOf = n => mode === 'type'
+  ? (COLORS[n.t] || '#565f89')
+  : PALETTE[n.c % PALETTE.length];
+const LEGEND_TYPE = __LEGEND__;
+const cv = document.getElementById('c'), cx = cv.getContext('2d');
+const tip = document.getElementById('tip'), sel = document.getElementById('sel');
+let W, H, dpr;
+function size(){ dpr = devicePixelRatio||1; W = innerWidth; H = innerHeight;
+  cv.width = W*dpr; cv.height = H*dpr; cv.style.width = W+'px'; cv.style.height = H+'px';
+  cx.setTransform(dpr,0,0,dpr,0,0); }
+size(); addEventListener('resize', size);
+
+const idx = new Map(NODES.map((n,i)=>[n.id,i]));
+// Deterministic scatter -- the same vault always opens the same shape.
+let seed = 1;
+const rnd = () => (seed = seed*16807 % 2147483647) / 2147483647;
+NODES.forEach(n => { const a = rnd()*Math.PI*2, r = 60 + rnd()*Math.min(W,H)*0.42;
+  n.x = W/2 + Math.cos(a)*r; n.y = H/2 + Math.sin(a)*r; n.vx = 0; n.vy = 0;
+  n.r = 3 + Math.log2(n.d + 1) * 1.9; });
+const E = EDGES.map(e => [idx.get(e.s), idx.get(e.t)]).filter(([a,b]) => a!=null && b!=null);
+const nbr = new Map();
+E.forEach(([a,b]) => { (nbr.get(a) ?? nbr.set(a,new Set()).get(a)).add(b);
+                       (nbr.get(b) ?? nbr.set(b,new Set()).get(b)).add(a); });
+
+let view = {x:0, y:0, k:1}, pinned = null, hover = null;
+
+// ForceAtlas2 with LinLog attraction. Plain Fruchterman-Reingold spreads
+// evenly by construction -- it produced a uniform disc from a graph whose
+// measured modularity is 0.72. The two changes that reveal communities are
+// degree-scaled repulsion (hubs push harder, so dense groups clear space
+// around themselves) and log attraction (distant groups are not yanked
+// together by a single stray link).
+let k = Math.sqrt(W * H * 2.2 / NODES.length);
+let temp = Math.min(W, H) / 6;
+const COOL = 0.994, MIN_TEMP = 0.3;
+const KR = 0.85, GRAV = 0.035;
+NODES.forEach(n => { n.m = n.d + 1; });
+
+NODES.forEach(n => { const a = rnd()*Math.PI*2, r = Math.sqrt(rnd()) * Math.min(W,H) * 0.75;
+  n.x = W/2 + Math.cos(a)*r; n.y = H/2 + Math.sin(a)*r; });
+
+function step(){
+  if (temp <= MIN_TEMP) return;
+  NODES.forEach(n => { n.vx = 0; n.vy = 0; });
+
+  const CELL = k * 2.5, grid = new Map();
+  NODES.forEach((n,i) => { const key = ((n.x/CELL)|0)+','+((n.y/CELL)|0);
+    (grid.get(key) ?? grid.set(key,[]).get(key)).push(i); });
+  NODES.forEach((n,i) => {
+    const gx = (n.x/CELL)|0, gy = (n.y/CELL)|0;
+    for (let dx=-1; dx<=1; dx++) for (let dy=-1; dy<=1; dy++) {
+      for (const j of grid.get((gx+dx)+','+(gy+dy)) || []) {
+        if (j <= i) continue;
+        const m = NODES[j];
+        let ddx = n.x-m.x, ddy = n.y-m.y;
+        let d = Math.hypot(ddx, ddy);
+        if (d < 0.01) { ddx = rnd()-0.5; ddy = rnd()-0.5; d = 0.01; }
+        if (d > CELL) continue;
+        // Degree-scaled, falls off as 1/d -- this is the cluster-revealing term.
+        const f = KR * k * n.m * m.m / d / d;
+        n.vx += ddx*f; n.vy += ddy*f;
+        m.vx -= ddx*f; m.vy -= ddy*f;
+      }
+    }
+  });
+
+  for (const [a,b] of E) {
+    const p = NODES[a], q = NODES[b];
+    let dx = q.x-p.x, dy = q.y-p.y;
+    const d = Math.hypot(dx,dy) || 0.01;
+    const f = Math.log(1 + d) * 2.4;   // LinLog: sublinear, so groups stay apart
+    dx /= d; dy /= d;
+    p.vx += dx*f; p.vy += dy*f;
+    q.vx -= dx*f; q.vy -= dy*f;
+  }
+
+  // Gravity scaled by degree, not a uniform pull: it stops leaves drifting off
+  // without compressing the core into a disc, which is what the old uniform
+  // centering did.
+  NODES.forEach(n => { const dx = W/2-n.x, dy = H/2-n.y, d = Math.hypot(dx,dy)||1;
+    n.vx += (dx/d) * GRAV * n.m * k * 0.1;
+    n.vy += (dy/d) * GRAV * n.m * k * 0.1; });
+
+  NODES.forEach(n => {
+    const d = Math.hypot(n.vx, n.vy) || 1, lim = Math.min(d, temp);
+    n.x += (n.vx/d)*lim; n.y += (n.vy/d)*lim;
+  });
+  temp *= COOL;
+  if (temp <= MIN_TEMP) fit();
+}
+
+function fit(pad = 60){
+  let x0=1e9, y0=1e9, x1=-1e9, y1=-1e9;
+  NODES.forEach(n => { x0=Math.min(x0,n.x); y0=Math.min(y0,n.y);
+                       x1=Math.max(x1,n.x); y1=Math.max(y1,n.y); });
+  const kx = (W-pad*2)/(x1-x0), ky = (H-pad*2)/(y1-y0);
+  view.k = Math.min(kx, ky, 3);
+  view.x = pad - x0*view.k + (W-pad*2 - (x1-x0)*view.k)/2;
+  view.y = pad - y0*view.k + (H-pad*2 - (y1-y0)*view.k)/2;
+}
+
+function draw(){
+  cx.setTransform(dpr,0,0,dpr,0,0); cx.clearRect(0,0,W,H);
+  cx.translate(view.x, view.y); cx.scale(view.k, view.k);
+  const focus = pinned ?? hover;
+  const lit = focus == null ? null : (nbr.get(focus) ?? new Set());
+  cx.lineWidth = 1/view.k;
+  for (const [a,b] of E) {
+    const on = focus != null && (a === focus || b === focus);
+    cx.strokeStyle = on ? 'rgba(122,162,247,.85)' : (focus != null ? 'rgba(65,72,104,.18)' : 'rgba(65,72,104,.5)');
+    cx.beginPath(); cx.moveTo(NODES[a].x, NODES[a].y); cx.lineTo(NODES[b].x, NODES[b].y); cx.stroke();
+  }
+  NODES.forEach((n,i) => {
+    const on = focus == null || i === focus || lit.has(i);
+    cx.globalAlpha = on ? 1 : 0.18;
+    cx.fillStyle = colourOf(n);
+    cx.beginPath(); cx.arc(n.x, n.y, n.r, 0, 6.2832); cx.fill();
+    if (view.k > 1.7 && on && n.d > 1) {
+      cx.globalAlpha = Math.min((view.k-1.7)*1.4, 1);
+      cx.fillStyle = '#c0caf5'; cx.font = `${11/view.k}px ui-monospace, monospace`;
+      cx.fillText(n.id, n.x + n.r + 3/view.k, n.y + 3/view.k);
+    }
+  });
+  cx.globalAlpha = 1;
+}
+renderLegend();
+(function loop(){ step(); draw(); requestAnimationFrame(loop); })();
+
+const at = (mx,my) => { const x = (mx-view.x)/view.k, y = (my-view.y)/view.k;
+  let best = null, bd = 1e9;
+  NODES.forEach((n,i)=>{ const d = Math.hypot(n.x-x, n.y-y);
+    if (d < n.r + 6 && d < bd) { bd = d; best = i; } });
+  return best; };
+
+let drag = null;
+cv.addEventListener('mousedown', e => { drag = {x:e.clientX, y:e.clientY, vx:view.x, vy:view.y, moved:false};
+  cv.classList.add('drag'); });
+addEventListener('mouseup', e => {
+  if (drag && !drag.moved) { const h = at(e.clientX, e.clientY);
+    pinned = (pinned === h) ? null : h;
+    sel.textContent = pinned == null ? '' : NODES[pinned].id + ' · ' + (nbr.get(pinned)?.size ?? 0) + ' links'; }
+  drag = null; cv.classList.remove('drag'); });
+cv.addEventListener('mousemove', e => {
+  if (drag) { const dx = e.clientX-drag.x, dy = e.clientY-drag.y;
+    if (Math.abs(dx)+Math.abs(dy) > 3) drag.moved = true;
+    view.x = drag.vx+dx; view.y = drag.vy+dy; tip.style.display='none'; return; }
+  hover = at(e.clientX, e.clientY);
+  if (hover == null) { tip.style.display='none'; return; }
+  const n = NODES[hover];
+  tip.textContent = `${n.id}  ·  ${n.t}  ·  ${n.d} links  ·  cluster ${n.c}`;
+  tip.style.display='block'; tip.style.left = (e.clientX+14)+'px'; tip.style.top = (e.clientY+14)+'px';
+});
+function renderLegend(){
+  const box = document.getElementById('legend');
+  if (mode === 'type') { box.innerHTML = LEGEND_TYPE; return; }
+  const sizes = new Map();
+  NODES.forEach(n => sizes.set(n.c, (sizes.get(n.c)||0)+1));
+  box.innerHTML = [...sizes].sort((a,b)=>b[1]-a[1]).slice(0,12)
+    .map(([c,n]) => `<span><i style="background:${PALETTE[c%PALETTE.length]}"></i>`
+       + `cluster ${c} · ${n}</span>`).join('')
+    + `<span style="color:#565f89">${sizes.size} clusters · c to switch back</span>`;
+}
+addEventListener('keydown', e => {
+  if (e.key === 'f') fit();
+  if (e.key === 'c') { mode = mode === 'type' ? 'community' : 'type'; renderLegend(); }
+  if (e.key === 'Escape') { pinned = null; sel.textContent = ''; }
+});
+cv.addEventListener('wheel', e => { e.preventDefault();
+  const f = e.deltaY < 0 ? 1.12 : 1/1.12, k = Math.min(Math.max(view.k*f, 0.15), 9);
+  view.x = e.clientX - (e.clientX-view.x)*(k/view.k);
+  view.y = e.clientY - (e.clientY-view.y)*(k/view.k); view.k = k; }, {passive:false});
+</script>
+"""
+
+
+def main():
+    argv = sys.argv[1:]
+    out = argv[argv.index("-o") + 1] if "-o" in argv else DEFAULT_OUT
+    nodes, edges, unresolved = build("--pushed" in argv)
+
+    used = sorted({n["t"] for n in nodes})
+    legend = "".join(
+        f'<span><i style="background:{TYPE_COLORS.get(t, "#565f89")}"></i>'
+        f'{html.escape(t)}</span>' for t in used)
+
+    page = (TEMPLATE
+            .replace("__NODES__", json.dumps(nodes, separators=(",", ":")))
+            .replace("__EDGES__", json.dumps(edges, separators=(",", ":")))
+            .replace("__COLORS__", json.dumps(TYPE_COLORS, separators=(",", ":")))
+            .replace("__LEGEND__", json.dumps(legend))
+            .replace("__N__", str(len(nodes)))
+            .replace("__E__", str(len(edges))))
+    os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
+    open(out, "w", encoding="utf-8").write(page)
+
+    # No backlog count here on purpose: vault-lint applies the ignore list and
+    # this does not, so printing it would give two different numbers for one
+    # thing. The graph is for looking at; vault-lint owns the reporting.
+    print(f"  {len(nodes)} notes · {len(edges)} links")
+    print(f"  wrote {out}")
+    if "--no-open" not in argv:
+        subprocess.run(["open", out], check=False)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

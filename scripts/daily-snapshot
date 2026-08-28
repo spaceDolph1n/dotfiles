@@ -30,6 +30,15 @@ export GIT_CONFIG_GLOBAL="${GIT_CONFIG_GLOBAL:-$HOME/.config/git/.gitconfig}"
 stamp=$(date '+%Y-%m-%d %H:%M')
 touched=0
 
+# The vault's index.md is generated, and this script pushes within the hour. A
+# stale index is worse than none -- it names notes that have moved or gone. Run
+# it BEFORE the dirty check so a regenerated index is part of the same snapshot.
+# launchd has no PATH additions, hence the absolute path.
+if [[ -x "$HOME/.config/scripts/vault-index" ]]; then
+	"$HOME/.config/scripts/vault-index" >/dev/null 2>&1 ||
+		printf '%s  %-14s vault-index failed (index may be stale)\n' "$stamp" "second-brain"
+fi
+
 for repo in "${REPOS[@]}"; do
 	name=$(basename "$repo")
 

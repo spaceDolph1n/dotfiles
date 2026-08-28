@@ -1,0 +1,62 @@
+# Kanso Zen for tuicr.
+#
+# Palette taken verbatim from webhooked/kanso.nvim (lua/kanso/colors.lua and the
+# extras/wezterm port) so this matches nvim's `kanso-zen` exactly. Kanso ships
+# ports for 14 tools -- alacritty, ghostty, kitty, wezterm, zellij, yazi and so
+# on -- but not tmux and not tuicr, which is why both are hand-written here.
+#
+# Why this file exists: the bundled `dark` theme left the chip foregrounds too
+# light, so the mode indicator, the message banners and the update badge came
+# out light-on-light and unreadable. Every *_fg below is deliberately zenBg0.
+
+panel_bg = "#090E13"              # zenBg0
+bg_highlight = "#22262D"          # zenBg2
+fg_primary = "#C5C9C7"            # fg
+fg_secondary = "#A4A7A4"          # gray2
+fg_dim = "#75797F"                # gray4
+
+diff_add = "#87A987"              # bright green
+diff_add_bg = "#2B3328"           # diffGreen
+diff_del = "#E46876"              # bright red
+diff_del_bg = "#43242B"           # diffRed
+diff_context = "#C5C9C7"
+diff_hunk_header = "#7FB4CA"      # bright blue
+expanded_context_fg = "#5C6066"   # gray5
+
+syntax_add_bg = "#2B3328"
+syntax_del_bg = "#43242B"
+
+file_added = "#87A987"
+file_modified = "#E6C384"         # bright yellow
+file_deleted = "#E46876"
+file_renamed = "#938AA9"          # bright magenta
+
+reviewed = "#87A987"
+pending = "#E6C384"
+
+comment_note = "#7FB4CA"
+comment_suggestion = "#7AA89F"    # bright cyan
+comment_issue = "#E46876"
+comment_praise = "#87A987"
+
+border_focused = "#8EA4A2"        # aqua
+border_unfocused = "#393B44"      # zenBg3
+status_bar_bg = "#1C1E25"         # zenBg1
+cursor_color = "#E6C384"
+cursor_line_bg = "#1C1E25"
+branch_name = "#938AA9"
+help_indicator = "#909398"        # gray3
+
+# The chips. Dark text on a light background is the whole point -- this is the
+# pair the bundled theme got wrong.
+message_info_fg = "#090E13"
+message_info_bg = "#7FB4CA"
+message_warning_fg = "#090E13"
+message_warning_bg = "#E6C384"
+message_error_fg = "#090E13"
+message_error_bg = "#E46876"
+update_badge_fg = "#090E13"
+update_badge_bg = "#E6C384"
+
+mode_fg = "#090E13"
+mode_bg = "#8EA4A2"

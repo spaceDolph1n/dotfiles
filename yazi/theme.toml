@@ -1,0 +1,17 @@
+# Yazi colours — Kanso, matching nvim (kanso-zen) and WezTerm.
+#
+# Flavours are vendored from webhooked/kanso.nvim `extras/yazi/`, which is the
+# upstream port. They carry no tmtheme, so file *previews* still use yazi's
+# default syntax highlighting; only the chrome is themed.
+#
+# Flavour names must match the directory under flavors/ minus the `.yazi`.
+#
+# The upstream ports target an older yazi and do NOT load as shipped. Two edits
+# were needed, and will be needed again if these are ever re-vendored:
+#   [manager]  ->  [mgr]
+#   name = ...  ->  url = ...   (in the [filetype] rules)
+# The first fails silently, the second is a hard TOML parse error on startup.
+
+[flavor]
+dark = "kanso-zen"
+light = "kanso-pearl"

@@ -77,9 +77,36 @@ return {
 					end
 					-- Stamped once, on the first write; never rewritten after.
 					out.created = out.created or os.date("%Y-%m-%d")
+
+					-- `type` is OKF's one required field, and vault-lint flags a
+					-- note without it. Default from the folder, which is right
+					-- nearly always; anything else is a one-word edit. Never
+					-- overwritten, so a corrected type stays corrected.
+					if not out.type then
+						local path = tostring(note.path or "")
+						if path:find("00 %- zettelkasten") then
+							out.type = "concept"
+						elseif path:find("0 %- inbox") then
+							out.type = "inbox"
+						end
+					end
+
 					return out
 				end,
-				sort = { "id", "aliases", "tags", "created", "found-in" },
+				-- `type` is OKF's one required field and belongs with the other
+				-- identity keys. status/stale_after/sources are OKF-optional and
+				-- absent unless the note has something to say with them.
+				sort = {
+					"id",
+					"aliases",
+					"tags",
+					"type",
+					"status",
+					"stale_after",
+					"created",
+					"found-in",
+					"sources",
+				},
 			},
 		},
 	},

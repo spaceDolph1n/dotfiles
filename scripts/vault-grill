@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+#
+# vault-grill -- take the next topic off the research queue and open it as a
+# tmux window with the grilling already waiting.
+#
+#   vault-grill                 next unchecked topic from the queue
+#   vault-grill "some topic"    that topic, whether or not it is queued
+#   vault-grill --list          show the queue and stop
+#   vault-grill --dry-run       print what would happen, open nothing
+#
+# Order matters and it is grill-BEFORE-research on purpose. Researching first
+# means researching the whole surface, because nothing yet says which branch
+# he cares about. One round of questions collapses that first, and if he never
+# opens the window nothing was wasted -- no research has run.
+#
+# Window only, no worktree: the vault is a git repo but not a code repo, and
+# there is nothing here to isolate.
+
+set -euo pipefail
+
+VAULT="${BRAIN_VAULT:-$HOME/.sb/second-brain}"
+QUEUE="$VAULT/0 - inbox/conversations-to-have.md"
+PREFIX="grill-"
+
+die() {
+	printf 'vault-grill: %s\n' "$1" >&2
+	exit 1
+}
+
+[[ -f "$QUEUE" ]] || die "queue not found: $QUEUE"
+
+# Unchecked items only. The `- [ ] ` prefix is the whole state machine.
+next_topic() {
+	sed -n 's/^- \[ \] //p' "$QUEUE" | head -1
+}
+
+slugify() {
+	printf '%s' "$1" | tr '[:upper:]' '[:lower:]' |
+		sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g' | cut -c1-28
+}
+
+case "${1:-}" in
+--list)
+	printf 'queue: %s\n\n' "$QUEUE"
+	grep -E '^- \[' "$QUEUE" || printf '  (empty)\n'
+	exit 0
+	;;
+esac
+
+DRY=0
+[[ "${1:-}" == "--dry-run" ]] && {
+	DRY=1
+	shift
+}
+
+TOPIC="${1:-$(next_topic)}"
+[[ -n "$TOPIC" ]] || {
+	printf 'vault-grill: queue is empty, nothing to do\n'
+	exit 0
+}
+
+SLUG=$(slugify "$TOPIC")
+WINDOW="${PREFIX}${SLUG}"
+
+# Idempotent: pressing this twice must not give two windows on one topic.
+if [[ -n "${TMUX:-}" ]] && tmux list-windows -F '#W' 2>/dev/null | grep -qxF "$WINDOW"; then
+	printf 'vault-grill: window %s already open, selecting it\n' "$WINDOW"
+	[[ $DRY -eq 1 ]] || tmux select-window -t "$WINDOW"
+	exit 0
+fi
+
+PROMPT_FILE=$(mktemp -t vault-grill)
+cat >"$PROMPT_FILE" <<EOF
+Use the research-queue skill.
+
+Topic from the queue: $TOPIC
+
+You are in stage 1 (SCOPE) and stage 2 (GRILL). Do not research the web yet.
+
+Read what the vault already holds on this topic first. Then grill -- in rounds,
+using the grilling skill, starting with what I actually want out of this
+conversation. Each round: the whole settled frontier, every branch, each with a
+recommended answer. Stop and wait between rounds.
+
+Stage 3 only runs on the branches that survive, and nothing reaches the
+zettelkasten until we converge.
+EOF
+
+if [[ $DRY -eq 1 ]]; then
+	printf 'topic:  %s\nwindow: %s\nprompt: %s\n\n' "$TOPIC" "$WINDOW" "$PROMPT_FILE"
+	cat "$PROMPT_FILE"
+	exit 0
+fi
+
+[[ -n "${TMUX:-}" ]] || die "not inside tmux — start a session first"
+
+tmux new-window -d -n "$WINDOW" -c "$VAULT" \
+	"claude \"\$(cat '$PROMPT_FILE')\"; rm -f '$PROMPT_FILE'; exec \$SHELL"
+
+printf 'vault-grill: opened %s — "%s"\n' "$WINDOW" "$TOPIC"

@@ -1,0 +1,14 @@
+# vault-lint ignore list.
+#
+# [links]  wikilink targets that are deliberately never going to be written --
+#          a [[term]] used as vocabulary, not as a promise of a note.
+#          Only add a target AFTER it crosses the wanted-pages threshold and
+#          you have decided against writing it. The threshold does the rest.
+#
+# [files]  vault-relative paths excluded from the scan entirely, for notes that
+#          demonstrate syntax rather than use it.
+
+[files]
+00 - zettelkasten/obsidian-markdown-formatting.md
+
+[links]

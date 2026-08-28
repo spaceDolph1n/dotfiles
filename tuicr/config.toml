@@ -1,0 +1,19 @@
+# tuicr — code review TUI.
+#
+# The default `dark` theme paints backgrounds (mode indicator, notifications,
+# the update banner) without pinning a foreground, so those chips inherit the
+# terminal's default light text and come out light-on-light. Same failure as
+# gh-dash's `faint` vanishing on #090E13 -- a fully specified theme fixes it.
+#
+# themes/kanso-zen.toml is a local port of nvim's kanso-zen, so the reviewer
+# matches the editor. Kanso ships no tuicr port upstream.
+#
+# Bundled: dark, light, ayu-light, ayu-mirage, onedark, github-light,
+# github-dark, github-dark-colorblind, catppuccin-{latte,frappe,macchiato,mocha},
+# gruvbox-{dark,light}, nord-{dark,light}, nord-{dark,light}-high-contrast,
+# solarized-{light,dark}, tokyo-night-{storm,day}, everforest-{dark,light}.
+# Audition one without committing:  tuicr --theme <name> pr <number>
+
+appearance = "system"
+theme_dark = "kanso-zen"
+theme_light = "catppuccin-latte"

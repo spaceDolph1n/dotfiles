@@ -1,0 +1,255 @@
+#!/usr/bin/env python3
+"""
+vault-lint -- read-only health check for the second brain.
+
+    vault-lint                 human-readable report
+    vault-lint --json          machine-readable
+    vault-lint --only orphans,wanted
+    vault-lint --wanted-min 3  raise the wanted-pages threshold
+
+Read-only by design. It never writes to the vault, never touches git, and
+never fails a commit. A broken [[link]] is a backlog entry, not an error --
+consumers must tolerate them, they may represent not-yet-written knowledge.
+
+Deliberately separate from `brain`, which is append-only capture. One reason
+to change per unit.
+
+Ignore list: scripts/vault-lint.ignore (see that file for the format).
+"""
+
+import json
+import os
+import re
+import sys
+from collections import defaultdict
+
+VAULT = os.environ.get("BRAIN_VAULT", os.path.expanduser("~/.sb/second-brain"))
+IGNORE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vault-lint.ignore")
+
+SKIP_DIRS = {".git", ".obsidian", "files", "node_modules"}
+SOFT_LINES, HARD_LINES = 400, 800
+
+# [[target]], [[target|alias]], [[target#heading]], ![[embed]]
+LINK_RE = re.compile(r"!?\[\[([^\]]+)\]\]")
+
+
+def norm(s):
+    """Obsidian resolves links case-insensitively and ignores surrounding space."""
+    return s.strip().lower()
+
+
+def load_ignore():
+    """Sections: [links] permanently-unwritten targets, [files] paths skipped entirely."""
+    out = {"links": set(), "files": set()}
+    if not os.path.exists(IGNORE_FILE):
+        return out
+    section = None
+    for line in open(IGNORE_FILE, encoding="utf-8"):
+        line = line.split("#", 1)[0].strip()
+        if not line:
+            continue
+        if line.startswith("[") and line.endswith("]"):
+            section = line[1:-1]
+        elif section in out:
+            out[section].add(norm(line))
+    return out
+
+
+def parse_frontmatter(text):
+    """Minimal YAML front-matter reader. Only the shapes this vault actually uses:
+    scalars, and block lists under aliases / tags / sources."""
+    if not text.startswith("---\n"):
+        return None
+    end = text.find("\n---", 3)
+    if end == -1:
+        return None
+    fm, key = {}, None
+    for raw in text[4:end].split("\n"):
+        if not raw.strip():
+            continue
+        if re.match(r"^\s+-\s", raw) and key:
+            # A bare `aliases:` sets "" first; the items that follow turn it
+            # into the list it always was.
+            if not isinstance(fm.get(key), list):
+                fm[key] = []
+            fm[key].append(raw.strip()[1:].strip().strip("\"'"))
+            continue
+        m = re.match(r"^([A-Za-z_][\w-]*):\s*(.*)$", raw)
+        if not m:
+            continue
+        key, val = m.group(1), m.group(2).strip()
+        if val in ("", "[]", "~", "null"):
+            fm[key] = [] if val == "[]" else ""
+        else:
+            fm[key] = val.strip("\"'")
+    return fm
+
+
+def collect(ignore_files):
+    notes = []
+    for root, dirs, files in os.walk(VAULT):
+        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+        for fn in files:
+            if not fn.endswith(".md"):
+                continue
+            rel = os.path.relpath(os.path.join(root, fn), VAULT)
+            if norm(rel) in ignore_files:
+                continue
+            # Generated indexes link to everything. Counting them as link
+            # sources would give every note an inbound link and silently
+            # empty the orphan check.
+            if fn == "index.md":
+                continue
+            try:
+                text = open(os.path.join(root, fn), encoding="utf-8", errors="replace").read()
+            except OSError:
+                continue
+            notes.append({
+                "rel": rel,
+                "base": fn[:-3],
+                "fm": parse_frontmatter(text),
+                "lines": text.count("\n") + 1,
+                "links": LINK_RE.findall(text),
+            })
+    return notes
+
+
+def build_resolver(notes):
+    """basename, id and every alias all resolve a wikilink in Obsidian."""
+    resolver = {}
+    for n in notes:
+        resolver.setdefault(norm(n["base"]), n)
+        fm = n["fm"] or {}
+        if isinstance(fm.get("id"), str) and fm["id"]:
+            resolver.setdefault(norm(fm["id"]), n)
+        if isinstance(fm.get("aliases"), list):
+            for a in fm["aliases"]:
+                if a:
+                    resolver.setdefault(norm(a), n)
+    return resolver
+
+
+def slug(s):
+    """Fuzzy key for near-miss detection: alnum only, trailing plural dropped."""
+    k = re.sub(r"[^a-z0-9]", "", norm(s))
+    return k[:-1] if k.endswith("s") and len(k) > 4 else k
+
+
+def analyse(wanted_min):
+    ignore = load_ignore()
+    notes = collect(ignore["files"])
+    resolver = build_resolver(notes)
+
+    inbound = defaultdict(set)   # resolved note rel -> linking rels
+    broken = defaultdict(set)    # unresolved target -> linking rels
+    for n in notes:
+        for raw in n["links"]:
+            target = raw.split("|")[0].split("#")[0].strip()
+            if not target:
+                continue
+            hit = resolver.get(norm(target))
+            if hit is None:
+                if norm(target) not in ignore["links"]:
+                    broken[target].add(n["rel"])
+            elif hit["rel"] != n["rel"]:
+                inbound[hit["rel"]].add(n["rel"])
+
+    # Orphanhood only means something for notes that are supposed to be reached
+    # through the graph. Triage and queues are entry points by design.
+    ENTRY_TYPES = {"inbox", "queue"}
+    orphans = sorted(n["rel"] for n in notes
+                     if not inbound[n["rel"]]
+                     and (n["fm"] or {}).get("type") not in ENTRY_TYPES)
+    wanted = sorted(((t, len(s)) for t, s in broken.items() if len(s) >= wanted_min),
+                    key=lambda x: (-x[1], x[0]))
+
+    orphan_slugs = {slug(os.path.basename(o)[:-3]): o for o in orphans}
+    near = [{"orphan": orphan_slugs[slug(t)], "broken_link": t, "inbound": len(s)}
+            for t, s in broken.items()
+            if slug(t) in orphan_slugs and len(slug(t)) > 3]
+
+    # A source id cited by 2+ notes deserves its own note. Promotion is
+    # detected, not decided.
+    src_cites = defaultdict(set)
+    for n in notes:
+        srcs = (n["fm"] or {}).get("sources")
+        for entry in srcs if isinstance(srcs, list) else []:
+            m = re.search(r"\bid:\s*([\w./-]+)", entry)
+            if m:
+                src_cites[m.group(1)].add(n["rel"])
+    have = {(n["fm"] or {}).get("id") for n in notes if (n["fm"] or {}).get("type") == "source"}
+    source_wanted = sorted(((s, len(v)) for s, v in src_cites.items()
+                            if len(v) >= wanted_min and s not in have),
+                           key=lambda x: (-x[1], x[0]))
+
+    return {
+        "vault": VAULT,
+        "notes": len(notes),
+        "links_resolved": sum(len(v) for v in inbound.values()),
+        "backlog_total": len(broken),
+        "orphans": orphans,
+        "wanted": [{"target": t, "inbound": c} for t, c in wanted],
+        "near_miss": near,
+        "missing_frontmatter": sorted(n["rel"] for n in notes if n["fm"] is None),
+        "id_mismatch": sorted(
+            f"{n['rel']} (id: {n['fm']['id']})" for n in notes
+            if n["fm"] and isinstance(n["fm"].get("id"), str)
+            and n["fm"]["id"] and n["fm"]["id"] != n["base"]),
+        "missing_type": sorted(n["rel"] for n in notes
+                               if n["fm"] is not None and not n["fm"].get("type")),
+        "empty_fields": sorted(
+            f"{n['rel']} ({', '.join(k for k in ('aliases', 'tags') if n['fm'].get(k) == [])})"
+            for n in notes
+            if n["fm"] and any(n["fm"].get(k) == [] for k in ("aliases", "tags"))),
+        "oversized": [{"note": r, "lines": l} for r, l in
+                      sorted(((n["rel"], n["lines"]) for n in notes if n["lines"] > SOFT_LINES),
+                             key=lambda x: -x[1])],
+        "source_wanted": [{"id": s, "cited_by": c} for s, c in source_wanted],
+    }
+
+
+def main():
+    args = sys.argv[1:]
+    wanted_min = int(args[args.index("--wanted-min") + 1]) if "--wanted-min" in args else 2
+    only = set(args[args.index("--only") + 1].split(",")) if "--only" in args else None
+
+    r = analyse(wanted_min)
+    if "--json" in args:
+        print(json.dumps(r, indent=2))
+        return 0
+
+    def section(key, title, rows, note=""):
+        if only and key not in only:
+            return
+        print(f"\n{title}  ({len(rows)}){'  — ' + note if note else ''}")
+        for row in rows[:40] or ["none"]:
+            print(f"  {row}")
+        if len(rows) > 40:
+            print(f"  ... and {len(rows) - 40} more")
+
+    print(f"vault-lint  {r['vault']}")
+    print(f"{r['notes']} notes · {r['links_resolved']} resolved links · "
+          f"{r['backlog_total']} unwritten link targets")
+
+    section("near-miss", "NEAR MISSES — a note and its own inbound link disagree",
+            [f"{n['orphan']}  <->  [[{n['broken_link']}]] ({n['inbound']}x)" for n in r["near_miss"]],
+            "likely typos")
+    section("id-mismatch", "ID != FILENAME — breaks [[links]] silently", r["id_mismatch"])
+    section("missing-frontmatter", "NO FRONTMATTER", r["missing_frontmatter"])
+    section("missing-type", "NO type: FIELD", r["missing_type"])
+    section("orphans", "ORPHANS — nothing links here", r["orphans"])
+    section("wanted", f"WANTED PAGES — unwritten, cited {wanted_min}+ times",
+            [f"{w['inbound']}x  {w['target']}" for w in r["wanted"]],
+            f"{r['backlog_total']} in backlog, rest below threshold")
+    section("source-wanted", f"SOURCES CITED {wanted_min}+ TIMES WITH NO NOTE",
+            [f"{s['cited_by']}x  {s['id']}" for s in r["source_wanted"]])
+    section("empty-fields", "EMPTY aliases:/tags:", r["empty_fields"])
+    section("oversized", f"OVERSIZED — soft {SOFT_LINES}, hard {HARD_LINES}",
+            [f"{o['lines']:>5}  {o['note']}{'  HARD' if o['lines'] > HARD_LINES else ''}"
+             for o in r["oversized"]])
+    print()
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
