@@ -1,0 +1,204 @@
+#!/usr/bin/env python3
+"""
+vault-migrate -- add OKF field `type:` to vault notes, and collapse duplicate tags.
+
+    vault-migrate               dry run: show exactly what would change
+    vault-migrate --apply       write it
+    vault-migrate --tags        also apply the tag collapses (with --apply)
+
+Only `type` is written. `status`, `stale_after` and `sources` are OKF-optional
+and stay ABSENT unless a note has something to say with them -- that is what
+keeps the frontmatter from filling up with fields that mean "normal".
+
+Nothing is guessed. A note whose type is not certain from its folder or its own
+tags is REPORTED, not written, because a fabricated value gets believed.
+
+Idempotent: re-running never changes a note that already has `type`.
+"""
+
+import os
+import re
+import sys
+
+VAULT = os.environ.get("BRAIN_VAULT", os.path.expanduser("~/.sb/second-brain"))
+SKIP_DIRS = {".git", ".obsidian", "files", "node_modules"}
+
+# Written after `tags`, matching the order in nvim/lua/plugins/markdown.lua.
+INSERT_AFTER = ("tags", "aliases", "id")
+
+# Tag collapses. EMPTY ON PURPOSE.
+#
+# The obvious-looking pairs are not duplicates -- checked 2026-08-28:
+#   architecture (hexagonal, DDD, MVC)  vs  architecture/design (Conway, DRY, coupling)
+#   process (shipping, local dev)       vs  process/collaboration (1:1s, pairing)
+#   javascript (fetch, GC, npm)         vs  javascript/typescript (async, ESM, event loop)
+# Different axes, not the same tag spelled twice. Merging them would lose the split.
+# Only add a pair here after reading the notes on both sides.
+TAG_COLLAPSE = {}
+
+
+def read(path):
+    return open(path, encoding="utf-8", errors="replace").read()
+
+
+def split_frontmatter(text):
+    if not text.startswith("---\n"):
+        return None, None, text
+    end = text.find("\n---", 3)
+    if end == -1:
+        return None, None, text
+    return text[:4], text[4:end], text[end:]
+
+
+def fm_get(block, key):
+    """Scalar value, or list items for a block list."""
+    lines = block.split("\n")
+    for i, line in enumerate(lines):
+        m = re.match(rf"^{re.escape(key)}:\s*(.*)$", line)
+        if not m:
+            continue
+        val = m.group(1).strip()
+        if val and val != "[]":
+            return val.strip("\"'")
+        items = []
+        for nxt in lines[i + 1:]:
+            if re.match(r"^\s+-\s", nxt):
+                items.append(nxt.strip()[1:].strip().strip("\"'"))
+            elif nxt.strip():
+                break
+        return items
+    return None
+
+
+def decide_type(rel, block):
+    """Return (type, reason) or (None, why-it-is-uncertain). Never guesses."""
+    tags = fm_get(block, "tags")
+    tags = tags if isinstance(tags, list) else []
+    base = os.path.basename(rel)[:-3]
+    folder = rel.split(os.sep)[0]
+
+    # OKF reserves log.md (and this vault's decisions.md is its sibling): reserved
+    # files carry no type, by spec.
+    if rel in ("log.md", "decisions.md"):
+        return "skip", "OKF reserved file"
+    # Named notes win over their folder: a durable queue that happens to sit in
+    # the inbox is still a queue.
+    if base == "conversations-to-have":
+        return "queue", "known note"
+    if base == "people-and-collaboration":
+        return "people", "known note"
+    if folder == "0 - inbox":
+        return "inbox", "folder"
+    if folder == "work":
+        if re.match(r"^dev-\d", base):
+            return "ticket", "dev-NNNNN filename"
+        if "bet" in tags:
+            return "bet", "tag: bet"
+        if "reference" in tags:
+            return "reference", "tag: reference"
+        if "ticket/candidate" in tags:
+            return "ticket-candidate", "tag: ticket/candidate"
+        return None, "work/ note with no bet/reference/ticket tag"
+    if folder == "00 - zettelkasten":
+        if "reference" in tags:
+            return "reference", "tag: reference"
+        return "concept", "folder (claim vs concept needs your eye — see report)"
+    return None, f"unhandled location: {folder}"
+
+
+def claim_shaped(base):
+    """Heuristic ONLY, for the report. A title that reads as an assertion rather
+    than a topic. Deliberately never written automatically."""
+    verbs = {"is", "are", "not", "can", "does", "dont", "should", "must", "needs",
+             "saves", "hides", "tracks", "offer", "drive", "read", "let", "limit",
+             "calibrate", "grep", "reproduce", "beats", "wins", "costs", "makes"}
+    return len(set(base.split("-")) & verbs) > 0
+
+
+def main():
+    apply = "--apply" in sys.argv
+    do_tags = "--tags" in sys.argv
+
+    written, skipped, uncertain, claims, tag_edits = [], [], [], [], []
+
+    for root, dirs, files in os.walk(VAULT):
+        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+        for fn in sorted(files):
+            if not fn.endswith(".md") or fn == "index.md":
+                continue  # generated catalogues, not notes
+            path = os.path.join(root, fn)
+            rel = os.path.relpath(path, VAULT)
+            text = read(path)
+            head, block, tail = split_frontmatter(text)
+            if block is None:
+                skipped.append(f"{rel} — no frontmatter")
+                continue
+            if fm_get(block, "type") is not None:
+                continue
+
+            new_block = block
+            t, reason = decide_type(rel, block)
+            if t == "skip":
+                continue
+            if t is None:
+                uncertain.append(f"{rel} — {reason}")
+            else:
+                anchor = next((k for k in INSERT_AFTER if re.search(rf"^{k}:", block, re.M)), None)
+                if anchor is None:
+                    uncertain.append(f"{rel} — no id/aliases/tags to anchor after")
+                    continue
+                lines = new_block.split("\n")
+                idx = next(i for i, l in enumerate(lines) if l.startswith(f"{anchor}:"))
+                idx += 1
+                while idx < len(lines) and re.match(r"^\s+-\s", lines[idx]):
+                    idx += 1
+                lines.insert(idx, f"type: {t}")
+                new_block = "\n".join(lines)
+                written.append(f"{rel:<62} type: {t:<16} ({reason})")
+
+            if do_tags:
+                for old, new in TAG_COLLAPSE.items():
+                    pat = rf"^(\s+-\s+){re.escape(old)}\s*$"
+                    if re.search(pat, new_block, re.M):
+                        new_block = re.sub(pat, rf"\g<1>{new}", new_block, flags=re.M)
+                        tag_edits.append(f"{rel}: {old} -> {new}")
+
+            if rel.startswith("00 - zettelkasten") and claim_shaped(fn[:-3]):
+                claims.append(rel)
+
+            if apply and new_block != block:
+                open(path, "w", encoding="utf-8").write(head + new_block + tail)
+
+    def report(title, rows, limit=15):
+        print(f"\n{title}  ({len(rows)})")
+        for r in rows[:limit]:
+            print(f"  {r}")
+        if len(rows) > limit:
+            print(f"  ... and {len(rows) - limit} more")
+
+    print(f"vault-migrate  {VAULT}   [{'APPLIED' if apply else 'DRY RUN'}]")
+    report("WOULD SET type:" if not apply else "SET type:", written, 8)
+
+    counts = {}
+    for w in written:
+        t = w.split("type: ")[1].split()[0]
+        counts[t] = counts.get(t, 0) + 1
+    print("\n  distribution: " + " · ".join(f"{v} {k}" for k, v in sorted(counts.items(), key=lambda x: -x[1])))
+
+    report("UNCERTAIN — left untouched, needs your call", uncertain, 30)
+    report("CLAIM-SHAPED zettels — set to `concept`, but read as assertions", claims, 50)
+    if do_tags:
+        report("TAG COLLAPSES", tag_edits, 20)
+    else:
+        print(f"\nTAG COLLAPSES  (not run — pass --tags)")
+        for o, n in TAG_COLLAPSE.items():
+            print(f"  {o} -> {n}")
+    report("SKIPPED", skipped)
+
+    if not apply:
+        print("\nNothing written. Re-run with --apply (add --tags for the collapses).")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
