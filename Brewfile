@@ -59,6 +59,8 @@ brew "tuicr"
 brew "git-delta"      # diff renderer — [core] pager in git/.gitconfig, and lazygit paging
 brew "diffnav"        # delta plus a GitHub-style file tree; gh-dash's diff pager
 brew "yt-dlp"         # pull video transcripts: yt-dlp --skip-download --write-auto-subs
+brew "poppler"        # pdftotext — extract book/PDF text locally for the vault
+brew "pandoc"         # epub/docx -> markdown, same job for non-PDF books
 
 # ---------------------------------------------------------------------------
 # Terminal / system
