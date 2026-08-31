@@ -37,6 +37,11 @@ return {
 		lazy = false,
 		priority = 1000,
 		config = function()
+			-- Transparent hands the background back to tmux, which is what makes
+			-- window-style dim an inactive nvim pane -- an opaque Normal.bg paints
+			-- over it. Costs nothing visually: zenBg0, float.bg and pmenu.bg are all
+			-- #090E13, the same colour tmux and wezterm already paint.
+			require("kanso").setup({ transparent = true })
 			vim.cmd("colorscheme kanso-zen")
 		end,
 	},
