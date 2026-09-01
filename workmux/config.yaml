@@ -16,13 +16,14 @@ agent: claude
 # every window to the right -- which breaks navigating to tabs by number.
 window_placement: rightmost
 
-# `horizontal` splits side-by-side (as in tmux's own -h), so a shell *under*
-# the agent needs `vertical`. Size is then 15 lines, not 15 columns.
+# `horizontal` splits side-by-side (as in tmux's own -h), which is what we want:
+# the shell sits *beside* the agent, not under it. `vertical` would stack them.
+# No `size` -- the units are cells, not percent, so a fixed column count would be
+# wrong on every monitor except the one it was tuned on. Omitting it gives 50/50.
 panes:
   - command: <agent>
     focus: true
-  - split: vertical
-    size: 15
+  - split: horizontal
 
 # Colored dots instead of emoji: single-width, and tmux paints them from the
 # kanso palette so they match the status line instead of fighting it.
