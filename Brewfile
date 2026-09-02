@@ -82,8 +82,8 @@ cask "wezterm"
 cask "aerospace"
 cask "1password"
 cask "1password-cli"
-cask "hiddenbar"
 cask "homerow"
+cask "jordanbaird-ice" # Ice, menu bar manager
 cask "notion-calendar"
 cask "notion-mail"
 cask "obsidian"       # backs the ~/.sb/second-brain obsidian.nvim workspace
