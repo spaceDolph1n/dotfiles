@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+#
+# Pick any workmux worktree, from anywhere, and open its tmux window.
+#
+# `workmux open` is repo-scoped -- it errors with "Not in a git repository"
+# outside a repo, and there is no `project:handle` form for it (only send,
+# capture, status, wait and run take that). So this picks a worktree directory
+# globally and runs `workmux open` from inside it: a worktree is part of its
+# repo, so the handle resolves from there.
+#
+# Source is the glob of `worktree_dir: ~/.worktrees/{project}` in
+# workmux/config.yaml, which is where every worktree workmux creates lands. A
+# worktree placed outside that root is not listed -- reach those via `prefix + O`.
+#
+# Bound to `prefix + W` (see tmux.conf); `worktrees` in any shell, since
+# ~/.config/scripts is on PATH.
+# Opening is idempotent: `workmux open` switches to an existing window rather
+# than making a second one.
+
+set -euo pipefail
+
+WORKTREE_ROOT="${WORKMUX_WORKTREE_ROOT:-$HOME/.worktrees}"
+
+# "label<TAB>path" per worktree. The label carries the project, because handles
+# alone repeat across projects and `dev-20745-...` says nothing about which repo.
+list_worktrees() {
+	local dir project
+	for dir in "$WORKTREE_ROOT"/*/*/; do
+		[[ -d "$dir" ]] || continue
+		dir="${dir%/}"
+		project="${dir%/*}"
+		printf '  %s / %s\t%s\n' "${project##*/}" "${dir##*/}" "$dir"
+	done
+}
+
+candidates=$(list_worktrees)
+[[ -n "$candidates" ]] || {
+	echo "No worktrees under $WORKTREE_ROOT" >&2
+	read -rsn1 -p "Press any key..."
+	exit 0
+}
+
+# Preview leans on git rather than `workmux status`, which is scoped to worktrees
+# that currently have a tracked agent and so goes blank for the idle ones.
+selected=$(
+	printf '%s\n' "$candidates" |
+		fzf --prompt='  worktree  ' \
+			--border-label=' workmux → window ' \
+			--height=100% --reverse \
+			--delimiter='\t' --with-nth=1 --accept-nth=2 \
+			--preview 'git -C {2} log --oneline --decorate -12 --color=always 2>/dev/null;
+			           echo; git -C {2} status -s 2>/dev/null | head -20' \
+			--preview-window=right:60%
+) || exit 0
+
+[[ -n "$selected" && -d "$selected" ]] || exit 0
+
+cd "$selected"
+exec workmux open "${selected##*/}"

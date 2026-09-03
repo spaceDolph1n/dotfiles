@@ -1,0 +1,263 @@
+#!/usr/bin/env bash
+#
+# vault-book -- turn a book I own into vault notes, one note per idea.
+#
+#   vault-book path/to/book.pdf         extract, split, open the window
+#   vault-book --title "AI Engineering" path/to/book.epub
+#   vault-book                          resume the book that still has parts left
+#   vault-book --list                   books in flight, with progress
+#   vault-book --done <slug>            wipe the extraction, book is finished
+#   vault-book --dry-run ...            print what would happen, open nothing
+#
+# Extraction is local and cheap; the judgement is not. This script does the
+# mechanical half -- text out of the file, split into parts, a ledger that
+# survives across sittings -- and hands the rest to the book-to-notes skill.
+#
+# The extraction is scratch, not vault. It lives outside the repo and is wiped
+# on --done: re-extracting is one command, and every note it produced carries
+# its own `found-in:` chapter reference, so nothing here is worth keeping.
+
+set -euo pipefail
+
+VAULT="${BRAIN_VAULT:-$HOME/.sb/second-brain}"
+WORK="${BRAIN_EXTRACTIONS:-$HOME/.sb/extractions}"
+PREFIX="book-"
+
+# Chapter headings, by what the extractor gives us. pdftotext yields prose, so
+# match the word; pandoc yields markdown, where the word usually survives inside
+# the heading -- O'Reilly epubs emit `# [Chapter 3. ]{.label}Evaluation`.
+RE_TEXT='^[[:space:]]*[Cc]?[A-Z]*[Cc]hapter[[:space:]]+([0-9]+|[IVXLC]+)([[:space:]]|$|[.:])'
+RE_MD='^#{1,2}[^#]*[Cc]hapter[[:space:]]*([0-9]+|[IVXLC]+)([[:space:]]|$|[.:])'
+
+# Falling back to every H1/H2 splits a book into its sections, not its chapters --
+# 206 parts where 10 were wanted. Only worth it when the chapter word is absent.
+RE_MD_FALLBACK='^#{1,2}[[:space:]]+'
+MIN_PARTS=3
+
+die() {
+	printf 'vault-book: %s\n' "$1" >&2
+	exit 1
+}
+
+slugify() {
+	printf '%s' "$1" | tr '[:upper:]' '[:lower:]' |
+		sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g' | cut -c1-40
+}
+
+# Parts still unchecked, per ledger. The `- [ ] ` prefix is the whole state machine.
+remaining() {
+	grep -c '^- \[ \] ' "$1/LEDGER.md" 2>/dev/null || true
+}
+
+total_parts() {
+	grep -c '^- \[' "$1/LEDGER.md" 2>/dev/null || true
+}
+
+list_books() {
+	printf 'extractions: %s\n\n' "$WORK"
+	local found=0 dir slug left all
+	for dir in "$WORK"/*/; do
+		[[ -f "$dir/LEDGER.md" ]] || continue
+		found=1
+		slug=$(basename "$dir")
+		left=$(remaining "${dir%/}")
+		all=$(total_parts "${dir%/}")
+		printf '  %-40s %s/%s parts left\n' "$slug" "${left:-0}" "${all:-0}"
+	done
+	[[ $found -eq 1 ]] || printf '  (none in flight)\n'
+}
+
+# The book with unread parts, oldest first. Resuming should never need the slug.
+next_book() {
+	local dir
+	for dir in "$WORK"/*/; do
+		[[ -f "$dir/LEDGER.md" ]] || continue
+		[[ $(remaining "${dir%/}") -gt 0 ]] || continue
+		basename "$dir"
+		return 0
+	done
+	return 1
+}
+
+# Split on chapter headings into parts/NNN-slug.txt. Everything before the first
+# heading is front matter, kept because prefaces state the book's own thesis.
+split_parts() {
+	local src=$1 out=$2 re=$3
+	mkdir -p "$out"
+	rm -f "$out"/*.txt
+	awk -v re="$re" -v out="$out" '
+		function slug(s) {
+			s = tolower(s)
+			gsub(/[^a-z0-9]+/, "-", s)
+			sub(/^-+/, "", s)
+			sub(/-+$/, "", s)
+			return substr(s, 1, 40)
+		}
+		BEGIN { n = 0; file = out "/000-front-matter.txt" }
+		$0 ~ re {
+			n++
+			t = slug($0)
+			if (t == "") t = "part"
+			file = sprintf("%s/%03d-%s.txt", out, n, t)
+		}
+		{ print > file }
+		END { print n }
+	' "$src"
+}
+
+write_ledger() {
+	local dir=$1 title=$2 src=$3
+	{
+		printf '# %s\n\n' "$title"
+		printf 'source: %s\n' "$src"
+		printf 'extracted: %s\n\n' "$(date +%Y-%m-%d)"
+		printf 'One line per part. A box gets flipped once that part has produced its\n'
+		printf 'notes and they are in the vault -- reading it is not what closes it.\n\n'
+		local f
+		for f in "$dir"/parts/*.txt; do
+			printf -- '- [ ] %s\n' "$(basename "$f" .txt)"
+		done
+	} >"$dir/LEDGER.md"
+}
+
+DRY=0
+TITLE=""
+SRC=""
+SLUG=""
+
+while [[ $# -gt 0 ]]; do
+	case "$1" in
+	--list)
+		list_books
+		exit 0
+		;;
+	--done)
+		shift
+		[[ -n "${1:-}" ]] || die "--done needs a slug (see --list)"
+		TARGET="$WORK/$1"
+		[[ -d "$TARGET" && -f "$TARGET/LEDGER.md" ]] || die "no extraction at $TARGET"
+		printf 'vault-book: removing %s\n' "$TARGET"
+		rm -rf "$TARGET"
+		exit 0
+		;;
+	--dry-run)
+		DRY=1
+		shift
+		;;
+	--title)
+		shift
+		TITLE="${1:-}"
+		[[ -n "$TITLE" ]] || die "--title needs a value"
+		shift
+		;;
+	-h | --help)
+		sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
+		exit 0
+		;;
+	-*)
+		die "unknown flag: $1"
+		;;
+	*)
+		SRC="$1"
+		shift
+		;;
+	esac
+done
+
+# No file given: resume whatever is still open.
+if [[ -z "$SRC" ]]; then
+	SLUG=$(next_book) || die "nothing in flight — give me a book file (see --list)"
+	DIR="$WORK/$SLUG"
+	TITLE=$(sed -n '1s/^# //p' "$DIR/LEDGER.md")
+else
+	[[ -f "$SRC" ]] || die "not a file: $SRC"
+	SRC=$(cd "$(dirname "$SRC")" && printf '%s/%s' "$PWD" "$(basename "$SRC")")
+	[[ -n "$TITLE" ]] || TITLE=$(basename "${SRC%.*}")
+	SLUG=$(slugify "$TITLE")
+	DIR="$WORK/$SLUG"
+
+	if [[ -f "$DIR/LEDGER.md" ]]; then
+		printf 'vault-book: %s already extracted, resuming\n' "$SLUG"
+	elif [[ $DRY -eq 1 ]]; then
+		printf 'would extract %s -> %s\n' "$SRC" "$DIR"
+	else
+		mkdir -p "$DIR"
+		case "${SRC##*.}" in
+		pdf)
+			command -v pdftotext >/dev/null || die "pdftotext not found (brew install poppler)"
+			pdftotext "$SRC" "$DIR/book.txt"
+			RE="$RE_TEXT"
+			BODY="$DIR/book.txt"
+			;;
+		epub | docx | mobi | html)
+			command -v pandoc >/dev/null || die "pandoc not found (brew install pandoc)"
+			pandoc "$SRC" -t markdown --wrap=none -o "$DIR/book.md"
+			RE="$RE_MD"
+			FALLBACK="$RE_MD_FALLBACK"
+			BODY="$DIR/book.md"
+			;;
+		txt | md)
+			cp "$SRC" "$DIR/book.txt"
+			RE="$RE_TEXT"
+			BODY="$DIR/book.txt"
+			;;
+		*)
+			die "don't know how to extract .${SRC##*.}"
+			;;
+		esac
+
+		N=$(split_parts "$BODY" "$DIR/parts" "$RE")
+
+		# Too few chapters usually means the book names them some other way.
+		# Retry on plain headings, which over-splits but beats one giant part.
+		if [[ "${N:-0}" -lt $MIN_PARTS && -n "${FALLBACK:-}" ]]; then
+			printf 'vault-book: %s chapter headings matched — falling back to plain headings\n' "$N"
+			N=$(split_parts "$BODY" "$DIR/parts" "$FALLBACK")
+		fi
+
+		# A regex that matches nothing leaves one giant front-matter file. Say so
+		# rather than handing the agent a book pretending to be a chapter.
+		if [[ "${N:-0}" -eq 0 ]]; then
+			printf 'vault-book: no chapter headings matched — the whole book is one part.\n'
+			printf '            Check %s and re-split by hand if that is wrong.\n' "$DIR/parts"
+		fi
+		write_ledger "$DIR" "$TITLE" "$SRC"
+		printf 'vault-book: %s — %s parts in %s\n' "$SLUG" "$(total_parts "$DIR")" "$DIR"
+	fi
+fi
+
+WINDOW="${PREFIX}${SLUG}"
+
+if [[ -n "${TMUX:-}" ]] && tmux list-windows -F '#W' 2>/dev/null | grep -qxF "$WINDOW"; then
+	printf 'vault-book: window %s already open, selecting it\n' "$WINDOW"
+	[[ $DRY -eq 1 ]] || tmux select-window -t "$WINDOW"
+	exit 0
+fi
+
+PROMPT_FILE=$(mktemp -t vault-book)
+cat >"$PROMPT_FILE" <<EOF
+Use the book-to-notes skill.
+
+Book:   $TITLE
+Ledger: $DIR/LEDGER.md
+Parts:  $DIR/parts/
+
+Work the next unchecked part in the ledger. Propose concept notes, wait for my
+yes, then write them. One note per idea, not one note per chapter, and nothing
+lands that I have not approved.
+
+Stop at the end of the part and wait. A book is many sittings.
+EOF
+
+if [[ $DRY -eq 1 ]]; then
+	printf '\ntitle:  %s\nslug:   %s\nwindow: %s\nprompt: %s\n\n' "$TITLE" "$SLUG" "$WINDOW" "$PROMPT_FILE"
+	cat "$PROMPT_FILE"
+	exit 0
+fi
+
+[[ -n "${TMUX:-}" ]] || die "not inside tmux — start a session first"
+
+tmux new-window -d -n "$WINDOW" -c "$VAULT" \
+	"claude \"\$(cat '$PROMPT_FILE')\"; rm -f '$PROMPT_FILE'; exec \$SHELL"
+
+printf 'vault-book: opened %s — "%s"\n' "$WINDOW" "$TITLE"
