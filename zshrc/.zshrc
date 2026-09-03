@@ -40,6 +40,19 @@ if (( $+commands[brew] )); then
     fpath=("${commands[brew]:h:h}/share/zsh/site-functions" $fpath)
 fi
 
+# workmux ships a zsh completion (with dynamic worktree-handle completion) but
+# its brew formula installs only the binary, so `_workmux` was never on fpath
+# and `workmux <TAB>` fell back to filenames. Regenerate into oh-my-zsh's
+# completion cache -- already on fpath -- whenever the binary is newer than it.
+if (( $+commands[workmux] )); then
+    () {
+        local dump="$ZSH/cache/completions/_workmux"
+        if [[ ! -s $dump || $commands[workmux] -nt $dump ]]; then
+            mkdir -p "${dump:h}" && workmux completions zsh >| "$dump"
+        fi
+    }
+fi
+
 source $ZSH/oh-my-zsh.sh
 
 # ---------------------------------------------------------------------------
@@ -132,6 +145,9 @@ mkcv() { mkdir -p "$1" && cd "$1" && v .; }                    # create dir, mov
 fcd() { local d; d=$(${=FZF_ALT_C_COMMAND} | fzf) && cd "$d" && ll; }
 f() { local file; file=$(${=FZF_DEFAULT_COMMAND} | fzf) && printf '%s' "$file" | pbcopy; }
 fv() { local file; file=$(${=FZF_DEFAULT_COMMAND} | fzf) && nvim "$file"; }
+
+alias kill-dev='pkill -f registerWebDevServer'
+dev() { pkill -f registerWebDevServer; npm run dev; }
 
 # ---------------------------------------------------------------------------
 # Keybindings -- order matters

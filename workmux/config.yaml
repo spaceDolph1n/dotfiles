@@ -16,6 +16,11 @@ agent: claude
 # every window to the right -- which breaks navigating to tabs by number.
 window_placement: rightmost
 
+# No `wm-` on tmux window names. The worktree handle is already unique and the
+# prefix only ate width in the status line; workmux finds its own windows by
+# stored id, not by matching the name.
+window_prefix: ""
+
 # `horizontal` splits side-by-side (as in tmux's own -h), which is what we want:
 # the shell sits *beside* the agent, not under it. `vertical` would stack them.
 # No `size` -- the units are cells, not percent, so a fixed column count would be
@@ -43,3 +48,4 @@ status_icons:
 # the icon on the right -- freezing the theme and putting the dot after the number.
 # tmux.conf owns the format instead and places `@workmux_status` before the name.
 status_format: false
+nerdfont: true
