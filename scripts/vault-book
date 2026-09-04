@@ -24,8 +24,8 @@ WORK="${BRAIN_EXTRACTIONS:-$HOME/.sb/extractions}"
 PREFIX="book-"
 
 # Chapter headings, by what the extractor gives us. pdftotext yields prose, so
-# match the word; pandoc yields markdown, where the word usually survives inside
-# the heading -- O'Reilly epubs emit `# [Chapter 3. ]{.label}Evaluation`.
+# match the word; anydoc and pandoc yield markdown, where the word survives in
+# the heading itself -- `# Chapter 3. Evaluation`.
 RE_TEXT='^[[:space:]]*[Cc]?[A-Z]*[Cc]hapter[[:space:]]+([0-9]+|[IVXLC]+)([[:space:]]|$|[.:])'
 RE_MD='^#{1,2}[^#]*[Cc]hapter[[:space:]]*([0-9]+|[IVXLC]+)([[:space:]]|$|[.:])'
 
@@ -37,6 +37,19 @@ MIN_PARTS=3
 die() {
 	printf 'vault-book: %s\n' "$1" >&2
 	exit 1
+}
+
+# anydoc is installed through mise, so a bare `anydoc` resolves only where
+# `mise activate` has run -- not in a script called from a tool shell. The shim
+# needs no activation.
+anydoc_bin() {
+	if command -v anydoc >/dev/null; then
+		printf 'anydoc'
+	elif [[ -x "$HOME/.local/share/mise/shims/anydoc" ]]; then
+		printf '%s' "$HOME/.local/share/mise/shims/anydoc"
+	else
+		die "anydoc not found (mise use -g npm:@firecrawl/anydoc@latest)"
+	fi
 }
 
 slugify() {
@@ -189,7 +202,16 @@ else
 			RE="$RE_TEXT"
 			BODY="$DIR/book.txt"
 			;;
-		epub | docx | mobi | html)
+		epub | docx)
+			# anydoc over pandoc: same chapter headings, ~23% less Markdown,
+			# and none of pandoc's `{.label}` attribute spans.
+			"$(anydoc_bin)" "$SRC" -o "$DIR/book.md" ||
+				die "anydoc could not convert $SRC"
+			RE="$RE_MD"
+			FALLBACK="$RE_MD_FALLBACK"
+			BODY="$DIR/book.md"
+			;;
+		mobi | html)
 			command -v pandoc >/dev/null || die "pandoc not found (brew install pandoc)"
 			pandoc "$SRC" -t markdown --wrap=none -o "$DIR/book.md"
 			RE="$RE_MD"

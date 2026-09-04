@@ -3,6 +3,7 @@
 
 [tools]
 node = "lts"
+"npm:@firecrawl/anydoc" = "latest"
 "npm:czg" = "latest"
 python = "3.13"
 
