@@ -1,16 +1,16 @@
-# sesh — tmux SESSION manager.
+# Project registry. NOT a sesh config any more — sesh itself is uninstalled and
+# `prefix + o` is gone; one session with projects as numbered windows beat two
+# sessions I had to pick between.
 #
-#   prefix + o   this picker (project -> its own session)
-#   prefix + O   project -> a WINDOW in the current session, if you would rather
-#                keep one session and number projects as windows.
-#                See scripts/tmux-project-window.
+# The file keeps sesh's schema and name because scripts/tmux-project-window
+# parses it: every [[session]] contributes its path, name, icon and
+# startup_command to `prefix + O`, and every [[wildcard]] its startup_command.
+# Delete an entry and that project drops to a zoxide path with a bare shell.
 #
-# Sessions are created on demand; nothing is restored at startup. `startup_command`
-# only runs when the session is CREATED, never on reconnect.
+#   prefix + O   project -> a WINDOW in the current session, reused if it exists
 #
-# Entries here show under the `^g` (config) filter. Anything else still appears
-# via zoxide (`^x`) — this file is only for projects worth a fixed name, alias
-# and layout.
+# Entries here are the curated projects. Anything else still reaches the picker
+# through zoxide — this file is only for the ones worth a fixed name and layout.
 
 [default_session]
 preview_command = "eza --tree --level=1 --icons --git --no-user --color=always {}"

@@ -21,14 +21,16 @@ window_placement: rightmost
 # stored id, not by matching the name.
 window_prefix: ""
 
-# `horizontal` splits side-by-side (as in tmux's own -h), which is what we want:
-# the shell sits *beside* the agent, not under it. `vertical` would stack them.
+# The shell is the first pane and the agent splits off it, which is what puts the
+# agent on the right: `split: horizontal` is tmux's own -h, side-by-side, and the
+# new pane lands to the right of the one it split. `vertical` would stack them.
 # No `size` -- the units are cells, not percent, so a fixed column count would be
 # wrong on every monitor except the one it was tuned on. Omitting it gives 50/50.
 panes:
+  - {} # left: no command, so the default shell
   - command: <agent>
+    split: horizontal
     focus: true
-  - split: horizontal
 
 # Colored dots instead of emoji: single-width, and tmux paints them from the
 # kanso palette so they match the status line instead of fighting it.
@@ -49,3 +51,16 @@ status_icons:
 # tmux.conf owns the format instead and places `@workmux_status` before the name.
 status_format: false
 nerdfont: true
+
+# Top edge, with tmux's own status bar moved to the bottom. On the left it cost
+# 25-50 columns out of every window for a list that duplicates the window names;
+# across the top it is three rows and the two stop competing -- the status bar
+# says which tab, the sidebar says which agent.
+# `layout` is a left-sidebar option and does nothing here; `item_width` is the
+# horizontal equivalent. Set explicitly so a stray `v` cannot leave the sidebar
+# in a shape I did not choose.
+sidebar:
+  position: top
+  height: 3
+  horizontal:
+    item_width: 24

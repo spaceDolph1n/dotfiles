@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 #
-# Pick any workmux worktree, from anywhere, and open its tmux window.
+# Pick any workmux worktree, from anywhere, with two ways to land in it:
+#
+#   enter      take over the tmux window you are on -- this pane cds into the
+#              worktree, the agent opens in a split to its right. Falls back to
+#              the alt-enter behaviour when the pane is not a shell, which it
+#              usually is not.
+#   alt-enter  go to its own workmux window, leaving the picker up on top of it
+#              -- esc dismisses it, or pick again from there
 #
 # `workmux open` is repo-scoped -- it errors with "Not in a git repository"
 # outside a repo, and there is no `project:handle` form for it (only send,
@@ -20,6 +27,41 @@
 set -euo pipefail
 
 WORKTREE_ROOT="${WORKMUX_WORKTREE_ROOT:-$HOME/.worktrees}"
+WORKMUX_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/workmux/config.yaml"
+
+# The popup vanishes the instant this script exits, so a message is only
+# readable if it waits for a key first.
+die() {
+	printf '%s\n' "$1" >&2
+	read -rsn1 -p "Press any key..."
+	exit 1
+}
+
+# Read the agent out of workmux's own config rather than spelling it out here, so
+# the split this script opens cannot name a different agent than `workmux open`
+# would start.
+agent_command() {
+	local agent
+	agent=$(sed -n 's/^agent:[[:space:]]*//p' "$WORKMUX_CONFIG" 2>/dev/null | head -1)
+	printf '%s' "${agent:-claude}"
+}
+
+# alt-enter re-runs this script in this mode from inside fzf. Keeping the picker
+# alive is what rules out the `exec workmux open` this used to end in.
+if [[ "${1:-}" == "--open-window" ]]; then
+	target="$2"
+	cd "$target"
+	if ! workmux open "${target##*/}" >/dev/null 2>&1; then
+		# execute-silent has no terminal, so the status line is the only place a
+		# failure can still be seen from the popup.
+		tmux display-message "worktrees: workmux open ${target##*/} failed"
+		exit 0
+	fi
+	# workmux selects the window it opened, which is the point. The popup is a
+	# client overlay rather than part of a window, so the picker survives the
+	# switch and ends up floating over the worktree.
+	exit 0
+fi
 
 # "label<TAB>path" per worktree. The label carries the project, because handles
 # alone repeat across projects and `dev-20745-...` says nothing about which repo.
@@ -34,19 +76,17 @@ list_worktrees() {
 }
 
 candidates=$(list_worktrees)
-[[ -n "$candidates" ]] || {
-	echo "No worktrees under $WORKTREE_ROOT" >&2
-	read -rsn1 -p "Press any key..."
-	exit 0
-}
+[[ -n "$candidates" ]] || die "No worktrees under $WORKTREE_ROOT"
 
 # Preview leans on git rather than `workmux status`, which is scoped to worktrees
 # that currently have a tracked agent and so goes blank for the idle ones.
 selected=$(
 	printf '%s\n' "$candidates" |
 		fzf --prompt='  worktree  ' \
-			--border-label=' workmux → window ' \
+			--border-label=' workmux → worktree ' \
+			--header='  ⏎ open   ⌥⏎ own window, keep picker' \
 			--height=100% --reverse \
+			--bind "alt-enter:execute-silent('$0' --open-window {2})" \
 			--delimiter='\t' --with-nth=1 --accept-nth=2 \
 			--preview 'git -C {2} log --oneline --decorate -12 --color=always 2>/dev/null;
 			           echo; git -C {2} status -s 2>/dev/null | head -20' \
@@ -55,5 +95,35 @@ selected=$(
 
 [[ -n "$selected" && -d "$selected" ]] || exit 0
 
-cd "$selected"
-exec workmux open "${selected##*/}"
+# A pane's cwd is fixed when it spawns, so taking over this window means typing
+# into the shell that is already there. TMUX_PANE is empty inside a popup, where
+# display-message resolves the pane the popup is covering -- and it is resolved
+# here rather than up front so that "this window" means the one you are on when
+# you press enter, even if an earlier alt-enter moved you.
+pane="${TMUX_PANE:-$(tmux display-message -p '#{pane_id}' 2>/dev/null || true)}"
+[[ -n "$pane" ]] || die "Not in tmux, so there is no window to take over. Use alt-enter."
+
+# send-keys reaches whatever is running in that pane, so this only works over a
+# shell: in nvim the cd would land in the buffer, in an agent in its prompt.
+# This used to die there and tell me to use alt-enter, but the pane I am on is
+# almost always an agent or nvim -- so enter almost always refused and I opened a
+# throwaway window just to get a shell to pick from. Fall through to the
+# own-window path instead, which needs no shell at all.
+running=$(tmux display-message -p -t "$pane" '#{pane_current_command}')
+case "$running" in
+zsh | bash | fish | sh) ;;
+*)
+	exec "$0" --open-window "$selected"
+	;;
+esac
+
+# The same shape workmux gives a new window: shell on the left, agent split off
+# to the right and focused, which is where split-window leaves the cursor. The
+# agent registers itself for status tracking through the hook in ~/.claude, so it
+# still shows up in the dashboard and sidebar.
+tmux split-window -h -t "$pane" -c "$selected" "$(agent_command)" ||
+	exec "$0" --open-window "$selected"
+
+# C-u first: without it the cd is appended to anything half-typed at that prompt
+# and the shell runs the two glued together.
+tmux send-keys -t "$pane" C-u "cd ${selected@Q}" C-m

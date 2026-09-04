@@ -58,6 +58,12 @@ brew "tuicr"
 #   lazygit, `d` pipes the diff through diffnav.
 brew "git-delta"      # diff renderer — [core] pager in git/.gitconfig, and lazygit paging
 brew "diffnav"        # delta plus a GitHub-style file tree; gh-dash's diff pager
+# Review-first diff viewer for what an agent just wrote -- split view, a file
+# sidebar, `e` to open the selected file in nvim. Bound to `prefix + D` in tmux.
+# The reason it is here and not just diffnav: notes. `c` leaves one on a hunk and
+# the agent reads it back with `hunk session review`, replying inline. Local
+# sidecar only -- comments that go on a PR are still tuicr's job.
+brew "hunk"
 brew "yt-dlp"         # pull video transcripts: yt-dlp --skip-download --write-auto-subs
 brew "poppler"        # pdftotext — extract book/PDF text locally for the vault
 brew "pandoc"         # epub/docx -> markdown, same job for non-PDF books
@@ -66,7 +72,6 @@ brew "pandoc"         # epub/docx -> markdown, same job for non-PDF books
 # Terminal / system
 # ---------------------------------------------------------------------------
 brew "tmux"
-brew "sesh"           # tmux session picker (replaced the tmux-sessionx plugin)
 # git worktree + tmux window per task, for parallel agents.
 # Global config is stowed from workmux/; per-repo overrides in .workmux.yaml.
 brew "raine/workmux/workmux"
