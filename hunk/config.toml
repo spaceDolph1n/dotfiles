@@ -1,0 +1,129 @@
+# hunk -- review-first diff viewer. Stowed to ~/.config/hunk/config.toml, which
+# is the path hunk looks for ($XDG_CONFIG_HOME/hunk, else ~/.config/hunk).
+#
+# Bound to `prefix + D` in tmux, which opens `hunk diff --watch` on the current
+# pane's tree. Review keys worth remembering: `,`/`.` file, `[`/`]` hunk,
+# `{`/`}` annotated hunk, `c` leave a note, `a` toggle agent notes, `e` open the
+# selected file in $EDITOR, `t` theme picker, `?` everything else.
+
+theme = "kanso-zen"
+
+# `[themes.<id>]` rather than `[custom_theme]`: same keys, but it takes a name,
+# shows up in the `t` picker, and leaves room for a second theme later.
+#
+# View preferences below this line are written by hunk itself when you accept its
+# "save view changes?" prompt on quit. It edits this file in place, and the file
+# is a symlink into the dotfiles repo -- so answering yes commits a diff.
+mode = "split"
+line_numbers = true
+wrap_lines = true
+hunk_headers = false
+menu_bar = true
+agent_notes = true
+copy_decorations = false
+cursor_line = "row"
+
+# Base is kanagawa-wave, not kanagawa-dragon: kanso is a kanagawa derivative
+# either way, but dragon IS the desaturated variant, and layering kanso's own
+# muted palette over it produced grey soup. Wave carries the colour; the
+# overrides below pull it toward kanso.
+#
+# Values are lifted from kanso.nvim's own palette (lua/kanso/colors.lua) and its
+# zen theme mapping (lua/kanso/themes.lua), so hunk, nvim, tmux and wezterm are
+# all reading the same numbers.
+[themes.kanso-zen]
+base = "kanagawa-wave"
+label = "Kanso Zen"
+
+# Surfaces: zenBg0 is the same #090E13 tmux paints for the active pane, so a
+# zoomed hunk pane is continuous with the terminal behind it.
+background = "#090E13" # zenBg0
+panel = "#1C1E25"      # zenBg1 -- file sidebar, dialogs
+panelAlt = "#22262D"   # zenBg2
+border = "#393B44"     # zenBg3
+accent = "#8ea4a2"     # aqua, the same colour as tmux's thm_cyan
+accentMuted = "#5C6066" # gray5
+text = "#C5C9C7"       # fg
+# gray5, NOT gray4. gray4 is what kanso paints comments, and hunk spends `muted`
+# on the file sidebar -- so twenty unselected filenames sat in the exact grey of
+# every comment beside them, permanently. Measured: 843 chars of #75797f on one
+# screen, most of it the file list. Dropping muted a step lets the list recede
+# and leaves comments the only thing wearing gray4.
+muted = "#5C6066"
+
+# Row tints are kanso's own diff palette. `moved` has no kanso equivalent, so it
+# borrows the change/text tints -- moved code is neither an add nor a delete.
+addedBg = "#2B3328"        # diffGreen
+removedBg = "#43242B"      # diffRed
+movedAddedBg = "#252535"   # diffBlue
+movedRemovedBg = "#49443C" # diffYellow
+contextBg = "#090E13"
+contextContentBg = "#1C1E25"
+
+# Word-level highlights have to read as louder than the row tint they sit in.
+# kanso ships no such pair, so these are its row tint lifted a third of the way
+# toward its git sign colour -- #2B3328 -> #76946A and #43242B -> #C34043.
+addedContentBg = "#44533E"
+removedContentBg = "#6E2D33"
+
+addedSignColor = "#76946A"   # gitGreen
+removedSignColor = "#C34043" # gitRed
+
+lineNumberBg = "#090E13"
+lineNumberFg = "#5C6066" # gray5
+selectedHunk = "#22262D" # zenBg2, the cursor_line row
+
+badgeAdded = "#76946A"
+badgeRemoved = "#C34043"
+badgeNeutral = "#909398" # gray3
+
+# File states reuse the git colours tmux and lazygit already use, so a modified
+# file is the same amber in every tool.
+fileNew = "#76946A"
+fileDeleted = "#C34043"
+fileRenamed = "#7FB4CA"   # blue
+fileModified = "#DCA561"  # gitYellow
+fileUntracked = "#75797f" # gray4
+
+# Notes are violet -- the one hue kanso does not spend on diff or git state, so
+# a note never reads as a change.
+noteBorder = "#8992a7"          # violet2
+noteBackground = "#1C1E25"
+noteTitleBackground = "#22262D"
+noteTitleText = "#C5C9C7"
+
+# Exact Shiki/TextMate scopes, mapped from kanso's `syn` table.
+#
+# Only the scopes that carry kanso's character are listed. The first version of
+# this file also set `variable`, `punctuation`, `keyword.operator` and
+# `variable.parameter` to two greys, faithfully copying kanso.nvim -- and those
+# four scopes cover most of the tokens on a screen, so the whole diff read as
+# light grey. They are gone: the base paints them now, and the colour below
+# lands on the words that actually distinguish one thing from another.
+[themes.kanso-zen.syntax_scopes]
+"comment" = "#75797f"
+"punctuation.definition.comment" = "#75797f"
+"string" = "#8a9a7b"
+"string.quoted" = "#8a9a7b"
+"string.template" = "#8a9a7b"
+"string.regexp" = "#c4746e"
+"constant.numeric" = "#a292a3"
+"constant.language" = "#b6927b"
+"constant.character" = "#b6927b"
+"keyword" = "#8992a7"
+"keyword.control" = "#8992a7"
+"storage.type" = "#8992a7"
+"storage.modifier" = "#8992a7"
+"entity.name.function" = "#8ba4b0"
+"support.function" = "#8ba4b0"
+"entity.name.type" = "#8ea4a2"
+"support.type" = "#8ea4a2"
+"support.class" = "#8ea4a2"
+
+# `nextAnnotatedFile` / `previousAnnotatedFile` ship with no keys at all, and
+# "jump to the next file carrying a note" is the whole review loop once notes are
+# in play. `<` and `>` are the shifted `,`/`.` that move between plain files --
+# the same relationship `{`/`}` have to `[`/`]`. Both were free.
+[keybindings]
+"hunk.review.nextAnnotatedFile" = ">"
+"hunk.review.previousAnnotatedFile" = "<"
