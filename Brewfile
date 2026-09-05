@@ -89,8 +89,10 @@ cask "1password"
 cask "1password-cli"
 cask "homerow"
 cask "jordanbaird-ice" # Ice, menu bar manager
+cask "notion"
 cask "notion-calendar"
 cask "notion-mail"
+cask "slack"
 cask "obsidian"       # backs the ~/.sb/second-brain obsidian.nvim workspace
 cask "raycast"
 cask "spotify"
