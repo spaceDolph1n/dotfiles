@@ -6,6 +6,7 @@ node = "lts"
 "npm:@firecrawl/anydoc" = "latest"
 "npm:czg" = "latest"
 python = "3.13"
+rust = "latest"
 
 [settings]
 # Read `.nvmrc` / `.node-version` the way fnm's `--use-on-cd` did.

@@ -6,6 +6,10 @@ export LANG=en_US.UTF-8
 
 export PATH=/opt/homebrew/bin:$PATH
 export PATH=$PATH:$HOME/.local/bin
+# `cargo install` drops binaries here and mise's rust shim does not cover them.
+# Only shoin lives here so far -- anything with a brew formula still goes in the
+# Brewfile, so this stays the exception rather than a second package manager.
+export PATH=$PATH:$HOME/.cargo/bin
 
 export SCRIPTS="$HOME/.config/scripts"
 export PATH="$PATH:$SCRIPTS"
