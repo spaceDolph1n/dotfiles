@@ -52,7 +52,7 @@ return {
 			-- Removed deprecated 'completion' block.
 			-- obsidian-ls (built-in LSP) now handles completion automatically via blink.cmp
 			picker = {
-				name = "snacks.pick",
+				name = "snacks.picker",
 			},
 			-- render-markdown.nvim does all the rendering; running obsidian.nvim's
 			-- UI as well double-conceals the same syntax.
