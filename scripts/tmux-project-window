@@ -1,18 +1,30 @@
 #!/usr/bin/env bash
 #
-# Pick a project and open it as a WINDOW in the current tmux session.
+# Pick anywhere worth being and open it as a WINDOW in this tmux session:
+# a curated project, a directory zoxide remembers, or a workmux worktree.
 #
-# This is the window-oriented counterpart to sesh: sesh switches between
-# *sessions*, whereas this keeps one session and gives each project its own
-# numbered window -- dotfiles #1, web #2, and so on.
+# Three sources, two open-actions. A project ends in `tmux new-window`; a
+# worktree needs `workmux open`, which is what gives it an agent pane and the
+# status hooks behind the sidebar. Which one runs is decided by whether the path
+# sits under $WORKTREE_ROOT -- no third field to carry, no way for the two to
+# drift apart.
 #
-# If a window for that project already exists it is selected rather than
-# duplicated, so pressing the key repeatedly is idempotent.
+# This used to be projects only, and worktrees lived behind their own key. But
+# zoxide never learns a worktree -- you reach one through `workmux open`, which
+# spawns panes there rather than cd-ing a shell into it -- so the picker I
+# reached for first could never show me most of what I actually open. The old
+# note here said two open-actions in one picker was the wrong shape. It read
+# well and it cost me a key press every time.
+#
+# `prefix + W` (scripts/worktrees) stays as the worktree-only fast path, with
+# its own alt-enter behaviour.
+#
+# If a window for the target already exists it is selected rather than
+# duplicated, so pressing the key repeatedly is idempotent -- `workmux open`
+# does the same for worktrees.
 #
 # Projects declared in sesh.toml contribute both their path AND their
-# `startup_command`, so `prefix + O` and `prefix + o` land you in the same
-# layout -- the difference is only window vs session. Paths that come from
-# zoxide just open a shell.
+# `startup_command`; paths that come from zoxide just open a shell.
 #
 # Bound to `prefix + O` (see tmux.conf), run inside a popup so fzf has a real
 # terminal.
@@ -20,6 +32,7 @@
 set -euo pipefail
 
 SESH_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/sesh/sesh.toml"
+WORKTREE_ROOT="${WORKMUX_WORKTREE_ROOT:-$HOME/.worktrees}"
 
 # Emit "path<TAB>startup_command<TAB>name<TAB>icon" for each [[session]] in
 # sesh.toml. Comment lines are skipped, so the commented examples never leak in.
@@ -74,36 +87,77 @@ sesh_wildcards() {
 	' "$SESH_CONFIG"
 }
 
-# Candidate list: "label<TAB>path". Curated sesh entries show their name and icon
-# so the picker reads like the sesh one; zoxide paths fall back to the basename.
+# Candidate list: "label<TAB>path". Curated sesh entries show their name and
+# icon so the picker reads like the sesh one used to.
+#
+# Order matters, because the dedupe below keeps the FIRST label seen for a path
+# and zoxide knows some worktrees already: run zoxide last or a worktree shows up
+# as a bare `ab-12345-some-task` with no project on it.
 list_candidates() {
 	sesh_entries | sed "s|~|$HOME|" | awk -F'\t' '{
 		label = $3 != "" ? $3 : $1
 		if ($4 != "") { label = $4 label }
 		print label "\t" $1
 	}'
+	list_worktrees
+	# Last two segments, not the basename: zoxide is full of `git`, `plugins`,
+	# `.claude` and `tpm`, and two rows reading `git` cannot be told apart.
 	zoxide query -l 2>/dev/null | awk -F'\t' '{
 		n = split($1, parts, "/")
-		print "  " parts[n] "\t" $1
+		label = n > 1 ? parts[n-1] "/" parts[n] : parts[n]
+		print "  " label "\t" $1
 	}' || true
+}
+
+# Same glob and label as scripts/worktrees: the handle alone repeats across
+# projects, and `ab-12345-...` does not say which repo it belongs to.
+list_worktrees() {
+	local dir project
+	for dir in "$WORKTREE_ROOT"/*/*/; do
+		[[ -d "$dir" ]] || continue
+		dir="${dir%/}"
+		project="${dir%/*}"
+		printf '  %s / %s\t%s\n' "${project##*/}" "${dir##*/}" "$dir"
+	done
 }
 
 # fzf shows only the label (field 1); field 2 carries the path through invisibly,
 # which is why --with-nth/--accept-nth split on the tab.
+#
+# The preview branches on the same test the open-action does. A worktree exists
+# to hold work in progress, so its commits and dirty files are the useful view;
+# a project is a place, so its tree is.
 selected=$(
 	list_candidates |
 		awk -F'\t' '!seen[$2]++' |
 		fzf --prompt='  window  ' \
-			--border-label=' project → new window ' \
+			--border-label=' project or worktree → window ' \
 			--height=100% --reverse \
 			--delimiter='\t' --with-nth=1 --accept-nth=2 \
-			--preview 'eza --tree --level=1 --icons --git --no-user --color=always {2} 2>/dev/null || ls -la {2}' \
+			--preview "case {2} in
+			             $WORKTREE_ROOT/*)
+			               git -C {2} log --oneline --decorate -12 --color=always 2>/dev/null
+			               echo; git -C {2} status -s 2>/dev/null | head -20 ;;
+			             *)
+			               eza --tree --level=1 --icons --git --no-user --color=always {2} 2>/dev/null || ls -la {2} ;;
+			           esac" \
 			--preview-window=right:55%
 ) || exit 0
 
 [[ -n "$selected" && -d "$selected" ]] || exit 0
 
 name=$(basename "$selected")
+
+# Worktrees take the other open-action. `workmux open` is repo-scoped and has no
+# `project:handle` form, so run it from inside the worktree -- a worktree is part
+# of its repo, so the handle resolves from there. It is idempotent too: an open
+# window is switched to rather than duplicated.
+if [[ "$selected" == "$WORKTREE_ROOT"/* ]]; then
+	cd "$selected"
+	workmux open "$name" >/dev/null 2>&1 ||
+		tmux display-message "tmux-project-window: workmux open $name failed"
+	exit 0
+fi
 
 # Reuse an existing window for this project instead of opening a second one.
 if tmux list-windows -F '#W' | grep -qxF "$name"; then

@@ -84,7 +84,7 @@ selected=$(
 	printf '%s\n' "$candidates" |
 		fzf --prompt='  worktree  ' \
 			--border-label=' workmux → worktree ' \
-			--header='  ⏎ open   ⌥⏎ own window, keep picker' \
+			--header='  ⏎ open   ⌥⏎ own window' \
 			--height=100% --reverse \
 			--bind "alt-enter:execute-silent('$0' --open-window {2})" \
 			--delimiter='\t' --with-nth=1 --accept-nth=2 \
