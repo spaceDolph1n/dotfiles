@@ -1,0 +1,116 @@
+[mgr]
+marker_copied = { fg = "<<term.10>>", bg = "<<term.10>>" }
+marker_cut = { fg = "<<term.9>>", bg = "<<term.9>>" }
+marker_marked = { fg = "<<term.13>>", bg = "<<term.13>>" }
+marker_selected = { fg = "<<syn.constant>>", bg = "<<syn.constant>>" }
+
+cwd = { fg = "<<term.11>>" }
+hovered = { reversed = true }
+preview_hovered = { reversed = true }
+
+find_keyword = { fg = "<<syn.constant>>", bg = "<<ui.bg>>" }
+find_position = {}
+
+tab_active = { reversed = true }
+tab_inactive = {}
+tab_width = 1
+
+count_copied = { fg = "<<ui.bg>>", bg = "<<term.10>>" }
+count_cut = { fg = "<<ui.bg>>", bg = "<<term.9>>" }
+count_selected = { fg = "<<ui.bg>>", bg = "<<term.11>>" }
+
+border_symbol = "│"
+border_style = { fg = "<<term.15>>" }
+
+
+[mode]
+normal_main = { fg = "<<ui.bg>>", bg = "<<syn.fun>>" }
+normal_alt = { fg = "<<syn.fun>>", bg = "<<ui.bg>>" }
+select_main = { fg = "<<ui.bg>>", bg = "<<syn.keyword>>" }
+select_alt = { fg = "<<syn.keyword>>", bg = "<<ui.bg>>" }
+unset_main = { fg = "<<ui.bg>>", bg = "<<term.11>>" }
+unset_alt = { fg = "<<term.11>>", bg = "<<ui.bg>>" }
+
+
+[status]
+sep_left = { open = "", close = "" }
+sep_right = { open = "", close = "" }
+overall = { fg = "<<term.15>>", bg = "<<ui.bg>>" }
+
+progress_label = { fg = "<<syn.fun>>", bg = "<<ui.bg>>", bold = true }
+progress_normal = { fg = "<<ui.bg>>", bg = "<<ui.bg>>" }
+progress_error = { fg = "<<ui.bg>>", bg = "<<ui.bg>>" }
+
+perm_type = { fg = "<<term.10>>" }
+perm_read = { fg = "<<term.11>>" }
+perm_write = { fg = "<<term.9>>" }
+perm_exec = { fg = "<<term.14>>" }
+perm_sep = { fg = "<<term.13>>" }
+
+
+[pick]
+border = { fg = "<<term.12>>" }
+active = { fg = "<<term.13>>", bold = true }
+inactive = {}
+
+[input]
+border = { fg = "<<term.12>>" }
+title = {}
+value = {}
+selected = { reversed = true }
+
+[completion]
+border = { fg = "<<term.12>>" }
+active = { reversed = true }
+inactive = {}
+
+[tasks]
+border = { fg = "<<term.12>>" }
+title = {}
+hovered = { fg = "<<term.13>>" }
+
+[which]
+cols = 2
+separator = " - "
+separator_style = { fg = "<<term.7>>" }
+mask = { bg = "<<ui.bg>>" }
+rest = { fg = "<<term.7>>" }
+cand = { fg = "<<syn.type>>" }
+desc = { fg = "<<term.15>>" }
+
+[help]
+on = { fg = "<<term.14>>" }
+run = { fg = "<<term.13>>" }
+desc = {}
+hovered = { reversed = true, bold = true }
+footer = { fg = "<<ui.bg>>", bg = "<<term.15>>" }
+
+[notify]
+title_info = { fg = "<<term.10>>" }
+title_warn = { fg = "<<term.11>>" }
+title_error = { fg = "<<term.9>>" }
+
+[filetype]
+rules = [
+    # images
+    { mime = "image/*", fg = "<<term.11>>" },
+
+    # media
+    { mime = "{audio,video}/*", fg = "<<term.13>>" },
+
+    # archives
+    { mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "<<term.9>>" },
+
+    # documents
+    { mime = "application/{pdf,doc,rtf,vnd.*}", fg = "<<syn.number>>" },
+
+    # broken links
+    { url = "*", is = "orphan", fg = "<<term.9>>" },
+
+    # executables
+    { url = "*", is = "exec", fg = "<<term.14>>" },
+
+    # fallback
+    { url = "*", fg = "<<term.15>>" },
+    { url = "*/", fg = "<<syn.fun>>" },
+]

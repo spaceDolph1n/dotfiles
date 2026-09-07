@@ -148,15 +148,13 @@ leaving a stray window behind.
 
 | Where | What |
 | --- | --- |
-| `tuicr/config.toml` | `appearance = "system"`, dark → `kanso-zen` |
-| `tuicr/themes/kanso-zen.toml` | local theme, palette lifted from `kanso.nvim` |
+| `tuicr/config.toml` | `appearance = "system"`, dark → the active theme |
+| `tuicr/themes/*.toml` | **generated** by `scripts/theme`, one per theme |
 
 The bundled `dark` theme leaves the chip foregrounds too light, so the mode indicator, the
 message banners and the update badge render light-on-light and are unreadable on this
-terminal — the same failure as gh-dash's `faint`. A local theme fixes it because every
-`*_fg` is pinned explicitly. Kanso ships ports for 14 tools (alacritty, ghostty, kitty,
-wezterm, zellij, yazi…) but **not tmux and not tuicr**, which is why both are hand-written
-here — the tmux theme is a Catppuccin structure carrying Kanso colours.
+terminal — the same failure as gh-dash's `faint`. A generated theme fixes it because every
+`*_fg` is pinned explicitly. See section 8.
 
 Audition a bundled theme without editing anything:
 
@@ -191,19 +189,46 @@ Layout:
 | `nvim/lua/plugins/` | one lazy.nvim spec per concern |
 | `nvim/after/lsp/` | per-server config; `after/` so it wins over nvim-lspconfig |
 
-### 8. Colours — one palette, four tools
+### 8. Colours — one palette, every tool
 
-**Kansō** (`webhooked/kanso.nvim`, `kanso-zen`) is the palette everything follows. Upstream
-ships ports for 14 tools — alacritty, ghostty, kitty, wezterm, zellij, yazi and so on — but
-**not tmux and not tuicr**, which is why those two are hand-written from the same hexes.
+`scripts/theme` is the switch. One command repaints the whole terminal:
 
-| Tool | How it gets Kansō |
+```sh
+theme                    # print the active theme
+theme kanagawa-dragon    # switch everything
+theme --check            # render without writing; non-zero on a problem
+scripts/theme.test.sh    # 23 assertions
+```
+
+**Palettes are never transcribed.** `scripts/theme-palette <theme>` reads the palette out of
+the nvim plugin already on disk, so this and the editor cannot disagree. Both theme plugins
+are `enabled = true` with `lazy = true` on the inactive one, pinned by `lazy-lock.json`.
+
+**Surfaces are `*.tmpl` files.** Each renders to the same path without the suffix, with
+`<<role>>` interpolated. `<<kanso:role>>` names a specific theme, for files holding every
+theme at once; `<<theme>>` is the active theme's name. A template path containing `{theme}`
+renders once per theme — which is how tuicr and yazi get a file each. `<<>>` was chosen
+because `$`, `{}`, `{{}}` and `#{}` are already spoken by starship, gh-dash and tmux.
+
+| Surface | How it switches |
 | --- | --- |
-| **nvim** | the plugin itself, `colorscheme kanso-zen` |
-| **wezterm** | inline in `wezterm/wezterm.lua`, identical to the upstream port |
-| **yazi** | vendored flavours in `yazi/flavors/`, selected in `yazi/theme.toml` |
-| **tuicr** | hand-written `tuicr/themes/kanso-zen.toml` |
-| **tmux** | hand-written — Catppuccin structure carrying Kansō colours |
+| **wezterm** | generated; the only ANSI definition on this machine — tmux, starship, fzf and eza all resolve colour names through it |
+| **tmux** | generated `tmux/theme.conf`, sourced after tpm |
+| **workmux** | generated; the agent-status dots |
+| **nvim** | generated `nvim/lua/active-theme.lua`, read by `theme.lua` |
+| **hunk** | both themes resident in `config.toml`; `theme` flips |
+| **tuicr** | a file per theme; `theme_dark` flips |
+| **yazi** | a flavour per theme; `[flavor] dark` flips |
+| **lazygit**, **starship**, **gh-dash**, `[delta]`, `scripts/vault-graph` | generated inline |
+
+The role contract is the **intersection** of what both themes emit — kanso ships 82 roles and
+dragon 75. Anything outside it is aliased or derived in `theme-palette`, and a template naming
+a role no palette has aborts the whole run before a single file is written. Two of the derived
+values reproduce colours that were hand-tuned here first, which is what the tests assert.
+
+**Nothing hand-edits generated output.** Change the `.tmpl`, run `theme`. hunk is the one to
+watch: it rewrites `config.toml` when you accept "save view changes?" on quit, so answer *no*
+and put the preference in the template instead.
 
 The wezterm block must keep `force_reverse_video_cursor = true`. Without it the cursor uses
 `cursor_bg`/`cursor_fg` literally, which in this palette is dark-on-dark and near invisible.

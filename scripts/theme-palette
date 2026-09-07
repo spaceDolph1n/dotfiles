@@ -1,0 +1,199 @@
+#!/usr/bin/env python3
+"""Emit one theme's palette as flat, role-keyed JSON on stdout.
+
+    theme-palette kanso
+    theme-palette kanagawa-dragon
+
+The palette is never transcribed: it is read out of the nvim plugin already on
+disk, so this and nvim can't disagree. `term` is the exception -- it comes from
+each theme's own upstream wezterm extra, because a theme's `theme.term` and its
+wezterm port disagree (kanso's differ on ansi-cyan and bright-black, and
+wezterm.lua already follows the port).
+"""
+
+import json
+import os
+import re
+import subprocess
+import sys
+
+LAZY = os.path.expanduser("~/.local/share/nvim/lazy")
+
+THEMES = {
+    "kanso": {
+        "plugin": "kanso.nvim",
+        "module": "kanso.colors",
+        "variant": "zen",
+        "wezterm": "extras/wezterm/kanso-zen.lua",
+    },
+    "kanagawa-dragon": {
+        "plugin": "kanagawa.nvim",
+        "module": "kanagawa.colors",
+        "variant": "dragon",
+        "wezterm": "extras/wezterm/kanagawa-dragon.lua",
+    },
+}
+
+# The contract: roles BOTH themes emit. kanso ships 82 and dragon 75, so
+# anything outside this intersection has to be derived below or it breaks the
+# moment you switch.
+ROLES = [
+    "diag.error", "diag.hint", "diag.info", "diag.ok", "diag.warning",
+    "diff.add", "diff.change", "diff.delete", "diff.text",
+    "syn.comment", "syn.constant", "syn.deprecated", "syn.fun",
+    "syn.identifier", "syn.keyword", "syn.number", "syn.operator",
+    "syn.parameter", "syn.preproc", "syn.punct", "syn.regex",
+    "syn.special1", "syn.special2", "syn.special3", "syn.statement",
+    "syn.string", "syn.type",
+    "ui.bg", "ui.bg_dim", "ui.bg_m1", "ui.bg_m2", "ui.bg_m3",
+    "ui.bg_p1", "ui.bg_p2", "ui.bg_search", "ui.bg_visual",
+    "ui.fg", "ui.fg_dim", "ui.fg_reverse",
+    "ui.float.bg", "ui.float.bg_border", "ui.float.fg", "ui.float.fg_border",
+    "ui.nontext", "ui.special", "ui.whitespace",
+    "ui.pmenu.bg", "ui.pmenu.bg_sbar", "ui.pmenu.bg_sel", "ui.pmenu.bg_thumb",
+    "ui.pmenu.fg",
+    "vcs.added", "vcs.changed", "vcs.removed",
+]
+
+# `syn.variable` and `ui.pmenu.fg_sel` are deliberately absent: both themes use a
+# sentinel there meaning "inherit", and they disagree on its case -- kanso writes
+# "NONE", dragon writes "none". Validate on "starts with #", never on the word.
+
+# Roles one theme has and the other does not, aliased onto a shared role. The
+# semantics, not the look, decide the alias -- untracked files are non-content,
+# which is what nontext means.
+ALIASES = {
+    "vcs.untracked": "ui.nontext",
+    "ui.cursor_fg": "ui.bg",
+    "ui.cursor_bg": "ui.fg",
+    "ui.indent_line": "ui.whitespace",
+    "ui.active_indent_line": "ui.bg_p2",
+}
+
+# Colours no theme states, needed by surfaces that show more than nvim does.
+# The two *_content_bg are a row tint lifted exactly a third of the way toward
+# the git sign colour, so a word-level highlight reads louder than the row it
+# sits in. A third, not 0.33 -- the rounding differs, and a third is what
+# reproduces the values hand-tuned in hunk/config.toml.
+DERIVED = {
+    "diff.add_content": ("mix", "diff.add", "vcs.added", 1 / 3),
+    "diff.delete_content": ("mix", "diff.delete", "vcs.removed", 1 / 3),
+    "note.bg": ("alias", "ui.bg_p1"),
+    "note.title_bg": ("alias", "ui.bg_p2"),
+    # Violet is the one hue neither theme spends on diff or git state, so a note
+    # never reads as a change.
+    "note.border": ("alias", "syn.keyword"),
+    # tmux tints inactive panes with this. `ui.bg_dim` cannot be used: kanso's is
+    # LIGHTER than its bg and dragon's is darker, so it means opposite things.
+    # 0.175 is the weight that reproduces the #0d1218 Tiago picked off the ladder
+    # documented in tmux/tmux.conf.
+    "ui.bg_inactive": ("mix", "ui.bg", "ui.bg_p2", 0.175),
+    # One surface step above bg_p2, for panel borders. Neither theme states it,
+    # and `ui.bg_visual` cannot stand in: kanso's is grey but dragon's is blue
+    # (#223249), which would paint hunk's borders the wrong hue entirely.
+    "ui.border": ("mix", "ui.bg_p2", "ui.fg_dim", 0.2),
+}
+
+
+def die(message):
+    sys.stderr.write(f"theme-palette: {message}\n")
+    raise SystemExit(1)
+
+
+def flatten(table, prefix=""):
+    flat = {}
+    for key, value in table.items():
+        if isinstance(value, dict):
+            flat.update(flatten(value, f"{prefix}{key}."))
+        else:
+            flat[f"{prefix}{key}"] = value
+    return flat
+
+
+def nvim_palette(spec):
+    """Require the plugin's palette module in a clean nvim and dump it."""
+    lua_root = os.path.join(LAZY, spec["plugin"], "lua")
+    if not os.path.isdir(lua_root):
+        die(f"{spec['plugin']} is not installed under {LAZY}")
+    script = (
+        f"lua package.path=package.path..';{lua_root}/?.lua;{lua_root}/?/init.lua';"
+        f"local p=require('{spec['module']}').setup({{theme='{spec['variant']}'}});"
+        "io.stdout:write(vim.json.encode(p.theme))"
+    )
+    result = subprocess.run(
+        ["nvim", "--headless", "--clean", "-c", script, "-c", "qa!"],
+        capture_output=True, text=True,
+    )
+    try:
+        return flatten(json.loads(result.stdout))
+    except (json.JSONDecodeError, ValueError):
+        die(f"could not read {spec['module']}: {result.stderr.strip()[:200]}")
+
+
+def wezterm_term(spec):
+    """The 16 ANSI slots from the theme's own wezterm extra: ansi then brights."""
+    path = os.path.join(LAZY, spec["plugin"], spec["wezterm"])
+    try:
+        with open(path) as handle:
+            source = handle.read()
+    except OSError:
+        die(f"no wezterm extra at {path}")
+
+    slots = []
+    for group in ("ansi", "brights"):
+        match = re.search(rf"\b{group}\s*=\s*\{{(.*?)\}}", source, re.DOTALL)
+        if not match:
+            die(f"no `{group}` table in {path}")
+        found = re.findall(r'"(#[0-9a-fA-F]{6})"', match.group(1))
+        if len(found) != 8:
+            die(f"`{group}` in {path} has {len(found)} colours, expected 8")
+        slots.extend(found)
+    return {f"term.{index}": value for index, value in enumerate(slots)}
+
+
+def mix(a, b, weight):
+    """Blend two hex colours; weight is how far to move from a toward b."""
+    pair = [tuple(int(h.lstrip("#")[i:i + 2], 16) for i in (0, 2, 4)) for h in (a, b)]
+    blended = (round(x + (y - x) * weight) for x, y in zip(*pair))
+    return "#" + "".join(f"{channel:02X}" for channel in blended)
+
+
+def build(name):
+    spec = THEMES[name]
+    raw = nvim_palette(spec)
+
+    palette = {}
+    for role in ROLES:
+        value = raw.get(role)
+        if not isinstance(value, str) or not value.startswith("#"):
+            die(f"{name} has no colour for `{role}` (got {value!r})")
+        palette[role] = value
+
+    for role, source in ALIASES.items():
+        value = raw.get(role)
+        palette[role] = value if isinstance(value, str) and value.startswith("#") else palette[source]
+
+    for role, recipe in DERIVED.items():
+        if recipe[0] == "alias":
+            palette[role] = palette[recipe[1]]
+        else:
+            palette[role] = mix(palette[recipe[1]], palette[recipe[2]], recipe[3])
+
+    palette.update(wezterm_term(spec))
+    # Upstream mixes cases within one palette (kanso has #C5C9C7 next to
+    # #c4746e), so normalise -- otherwise generated output is inconsistent and
+    # byte-comparison against it is noise.
+    return {role: value.lower() for role, value in palette.items()}
+
+
+def main(argv):
+    if len(argv) != 2:
+        die(f"usage: theme-palette <{'|'.join(THEMES)}>")
+    if argv[1] not in THEMES:
+        die(f"unknown theme {argv[1]!r}; known: {', '.join(THEMES)}")
+    json.dump(build(argv[1]), sys.stdout, indent=2, sort_keys=True)
+    sys.stdout.write("\n")
+
+
+if __name__ == "__main__":
+    main(sys.argv)

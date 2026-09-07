@@ -1,0 +1,62 @@
+# Kanso Zen for tuicr.
+#
+# Palette taken verbatim from webhooked/kanso.nvim (lua/kanso/colors.lua and the
+# extras/wezterm port) so this matches nvim's `kanso-zen` exactly. Kanso ships
+# ports for 14 tools -- alacritty, ghostty, kitty, wezterm, zellij, yazi and so
+# on -- but not tmux and not tuicr, which is why both are hand-written here.
+#
+# Why this file exists: the bundled `dark` theme left the chip foregrounds too
+# light, so the mode indicator, the message banners and the update badge came
+# out light-on-light and unreadable. Every *_fg below is deliberately zenBg0.
+
+panel_bg = "<<ui.bg>>"              # zenBg0
+bg_highlight = "<<ui.bg_p2>>"          # zenBg2
+fg_primary = "<<ui.fg>>"            # fg
+fg_secondary = "<<ui.fg_dim>>"          # gray2
+fg_dim = "<<vcs.untracked>>"                # gray4
+
+diff_add = "<<term.10>>"              # bright green
+diff_add_bg = "<<diff.add>>"           # diffGreen
+diff_del = "<<term.9>>"              # bright red
+diff_del_bg = "<<diff.delete>>"           # diffRed
+diff_context = "<<ui.fg>>"
+diff_hunk_header = "<<term.12>>"      # bright blue
+expanded_context_fg = "<<ui.nontext>>"   # gray5
+
+syntax_add_bg = "<<diff.add>>"
+syntax_del_bg = "<<diff.delete>>"
+
+file_added = "<<term.10>>"
+file_modified = "<<term.11>>"         # bright yellow
+file_deleted = "<<term.9>>"
+file_renamed = "<<term.13>>"          # bright magenta
+
+reviewed = "<<term.10>>"
+pending = "<<term.11>>"
+
+comment_note = "<<term.12>>"
+comment_suggestion = "<<term.14>>"    # bright cyan
+comment_issue = "<<term.9>>"
+comment_praise = "<<term.10>>"
+
+border_focused = "<<syn.type>>"        # aqua
+border_unfocused = "<<ui.bg_visual>>"      # zenBg3
+status_bar_bg = "<<ui.bg_p1>>"         # zenBg1
+cursor_color = "<<term.11>>"
+cursor_line_bg = "<<ui.bg_p1>>"
+branch_name = "<<term.13>>"
+help_indicator = "<<syn.punct>>"        # gray3
+
+# The chips. Dark text on a light background is the whole point -- this is the
+# pair the bundled theme got wrong.
+message_info_fg = "<<ui.bg>>"
+message_info_bg = "<<term.12>>"
+message_warning_fg = "<<ui.bg>>"
+message_warning_bg = "<<term.11>>"
+message_error_fg = "<<ui.bg>>"
+message_error_bg = "<<term.9>>"
+update_badge_fg = "<<ui.bg>>"
+update_badge_bg = "<<term.11>>"
+
+mode_fg = "<<ui.bg>>"
+mode_bg = "<<syn.type>>"

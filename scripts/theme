@@ -1,0 +1,210 @@
+#!/usr/bin/env python3
+"""Switch the whole terminal's theme from one palette.
+
+    theme                  print the active theme
+    theme kanso            switch, regenerate every surface, reload what can reload
+    theme --check          render everything without writing; exit non-zero on a problem
+    theme --preview        print the tmux status segments as plain text
+
+Every `*.tmpl` in the repo is a surface: it is rendered to the same path without
+the suffix. `<<role>>` interpolates a palette role -- chosen because `$`, `{}`,
+`{{}}` and `#{}` are all already spoken by starship, gh-dash and tmux.
+
+Three forms, because some tools hold every theme at once and switch by name:
+
+    <<ui.bg>>                 the active theme's role
+    <<kanso:ui.bg>>           a named theme's role, for files holding both
+    <<theme>>                 the active theme's name, not a colour
+
+A template whose path contains `{theme}` is rendered once per theme, each with
+that theme's palette -- which is how tuicr and yazi end up with a file each.
+
+Nothing is written until everything renders. `os.replace` is atomic per file, so
+writing as we went would leave a failure halfway with some surfaces switched.
+"""
+
+import json
+import os
+import re
+import subprocess
+import sys
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ACTIVE = os.path.join(REPO, "theme", "active")
+PALETTE = os.path.join(REPO, "scripts", "theme-palette")
+ROLE = re.compile(r"<<([a-z0-9_.:-]+)>>")
+
+# Restarted by hand, in the order it is worth doing them.
+NEEDS_RESTART = ["wezterm", "nvim", "lazygit", "hunk", "tuicr", "yazi", "starship", "gh-dash"]
+
+
+def die(message):
+    sys.stderr.write(f"theme: {message}\n")
+    raise SystemExit(1)
+
+
+def active_theme():
+    try:
+        with open(ACTIVE) as handle:
+            return handle.read().strip()
+    except OSError:
+        die(f"no active theme recorded at {ACTIVE}")
+
+
+def known_themes():
+    result = subprocess.run([PALETTE], capture_output=True, text=True)
+    match = re.search(r"usage: theme-palette <(.+)>", result.stderr)
+    return match.group(1).split("|") if match else []
+
+
+def palette(name):
+    result = subprocess.run([PALETTE, name], capture_output=True, text=True)
+    if result.returncode != 0:
+        die(result.stderr.strip() or f"could not build the {name} palette")
+    return json.loads(result.stdout)
+
+
+def templates():
+    """Every *.tmpl in the repo, .git aside. Absent surfaces simply aren't found."""
+    found = []
+    for root, dirs, files in os.walk(REPO):
+        dirs[:] = [d for d in dirs if d != ".git"]
+        found.extend(os.path.join(root, f) for f in files if f.endswith(".tmpl"))
+    return sorted(found)
+
+
+def resolve(token, active, palettes):
+    """One <<...>> token to its value, or None if it names nothing."""
+    if token == "theme":
+        return active
+    theme, _, role = token.rpartition(":")
+    if theme:
+        return palettes.get(theme, {}).get(role)
+    return palettes[active].get(role)
+
+
+def render(path, active, palettes):
+    with open(path) as handle:
+        source = handle.read()
+
+    unknown = sorted({t for t in ROLE.findall(source) if resolve(t, active, palettes) is None})
+    if unknown:
+        rel = os.path.relpath(path, REPO)
+        die(f"{rel} references unknown role(s): {', '.join(unknown)}")
+
+    return ROLE.sub(lambda m: resolve(m.group(1), active, palettes), source)
+
+
+def outputs(path, active, themes):
+    """Template path to the (output, theme) pairs it produces."""
+    target = path[: -len(".tmpl")]
+    if "{theme}" not in target:
+        return [(target, active)]
+    return [(target.replace("{theme}", t), t) for t in themes]
+
+
+STATUS_SEGMENTS = [
+    ("status-left", False),
+    ("status-right", False),
+    ("window-status-format", True),
+    ("window-status-current-format", True),
+]
+
+
+def preview_status():
+    """Show the tmux status line as text, with the #[...] escapes taken out.
+
+    Colour is the one thing this cannot show, but spacing and glyphs are exactly
+    what goes wrong in a status line, and those it shows precisely. Expanded by a
+    live server when there is one, so `#W` and `%H:%M` read as real values.
+    """
+    live = subprocess.run(["tmux", "has-session"], capture_output=True).returncode == 0
+    for name, is_window in STATUS_SEGMENTS:
+        show = "show-window-options" if is_window else "show-options"
+        raw = subprocess.run(["tmux", show, "-gv", name],
+                             capture_output=True, text=True).stdout.strip()
+        if not raw:
+            continue
+        text = raw
+        if live:
+            text = subprocess.run(["tmux", "display-message", "-p", raw],
+                                  capture_output=True, text=True).stdout.rstrip("\n")
+        print(f"  {name:30} |{re.sub(r'#\[[^]]*\]', '', text)}|")
+    if not live:
+        print("  (no tmux server, so these are unexpanded formats)")
+
+
+def reload_tmux():
+    """tmux is the only surface that can take a new theme without restarting.
+
+    tmux exits 0 from `source-file` even when it aborted partway on a bad line,
+    so the exit code is not evidence -- a stray word in the config once left the
+    window formats stale while this reported success. Treat any stderr as failure.
+    """
+    if subprocess.run(["tmux", "has-session"], capture_output=True).returncode != 0:
+        return "tmux not running"
+    conf = os.path.join(REPO, "tmux", "tmux.conf")
+    result = subprocess.run(["tmux", "source-file", conf], capture_output=True, text=True)
+    problem = result.stderr.strip()
+    if result.returncode != 0 or problem:
+        return f"tmux reload FAILED: {problem or 'exit ' + str(result.returncode)}"
+    return "tmux reloaded"
+
+
+def main(argv):
+    args = argv[1:]
+    check_only = "--check" in args
+    preview = "--preview" in args
+    args = [a for a in args if a not in ("--check", "--preview")]
+
+    if preview:
+        preview_status()
+        if not args:
+            return
+
+    if len(args) > 1:
+        die("usage: theme [--check] [<theme>]")
+
+    if not args and not check_only:
+        print(active_theme())
+        return
+
+    name = args[0] if args else active_theme()
+    if name not in known_themes():
+        die(f"unknown theme {name!r}; known: {', '.join(known_themes())}")
+
+    themes = known_themes()
+    palettes = {t: palette(t) for t in themes}
+    surfaces = templates()
+    if not surfaces:
+        die("no *.tmpl surfaces found")
+
+    rendered = {}
+    for path in surfaces:
+        for target, theme in outputs(path, name, themes):
+            rendered[target] = render(path, theme, palettes)
+
+    if check_only:
+        print(f"{len(rendered)} surface(s) render cleanly against {name}")
+        return
+
+    for target, content in rendered.items():
+        # `{theme}` can name a directory, not just a file -- yazi wants one
+        # flavour folder per theme.
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        temp = f"{target}.theme-tmp"
+        with open(temp, "w") as handle:
+            handle.write(content)
+        os.replace(temp, target)
+
+    os.makedirs(os.path.dirname(ACTIVE), exist_ok=True)
+    with open(ACTIVE, "w") as handle:
+        handle.write(f"{name}\n")
+
+    print(f"{name}: {len(rendered)} surface(s) written")
+    print(reload_tmux())
+    print(f"restart to pick it up: {', '.join(NEEDS_RESTART)}")
+
+
+if __name__ == "__main__":
+    main(sys.argv)

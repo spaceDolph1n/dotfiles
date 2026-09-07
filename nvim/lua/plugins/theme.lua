@@ -1,10 +1,19 @@
+-- `scripts/theme` owns which theme is active; this file owns how each one is
+-- configured. Both plugins stay installed so the generator can read either
+-- palette off disk -- `lazy` keeps the inactive one from loading.
+local active = require("active-theme")
+
 return {
 	{
 		-- lotus, dragon, wave
 		"rebelot/kanagawa.nvim",
-		enabled = false,
+		enabled = true,
+		lazy = active ~= "kanagawa-dragon",
 		config = function()
 			require("kanagawa").setup({
+				-- Same reason as kanso below: tmux dims an inactive pane by tinting
+				-- cells that use the default background, so nvim must not paint its own.
+				transparent = true,
 				commentStyle = { italic = true },
 				colors = {
 					theme = {
@@ -34,7 +43,7 @@ return {
 		-- zen, ink, mist, pearl
 		"webhooked/kanso.nvim",
 		enabled = true,
-		lazy = false,
+		lazy = active ~= "kanso",
 		priority = 1000,
 		config = function()
 			-- Transparent hands the background back to tmux, which is what makes
