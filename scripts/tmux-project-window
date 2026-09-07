@@ -154,8 +154,16 @@ name=$(basename "$selected")
 # window is switched to rather than duplicated.
 if [[ "$selected" == "$WORKTREE_ROOT"/* ]]; then
 	cd "$selected"
-	workmux open "$name" >/dev/null 2>&1 ||
-		tmux display-message "tmux-project-window: workmux open $name failed"
+	# --parent-session for the same reason scripts/worktrees passes it: a popup
+	# has no TMUX_PANE, so workmux cannot choose between live sessions itself.
+	parent_args=()
+	parent=$(tmux display-message -p '#{session_name}' 2>/dev/null || true)
+	if [[ -n "$parent" ]]; then
+		parent_args=(--parent-session "$parent")
+	fi
+	if ! err=$(workmux open "$name" "${parent_args[@]}" 2>&1 >/dev/null); then
+		tmux display-message "tmux-project-window: ${err:-workmux open $name failed}"
+	fi
 	exit 0
 fi
 

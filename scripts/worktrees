@@ -51,10 +51,19 @@ agent_command() {
 if [[ "${1:-}" == "--open-window" ]]; then
 	target="$2"
 	cd "$target"
-	if ! workmux open "${target##*/}" >/dev/null 2>&1; then
+	# TMUX_PANE is unset inside display-popup, so workmux cannot work out which
+	# session to place the window in and refuses once more than one exists. The
+	# popup's own client is attached to the session we want.
+	parent_args=()
+	parent=$(tmux display-message -p '#{session_name}' 2>/dev/null || true)
+	if [[ -n "$parent" ]]; then
+		parent_args=(--parent-session "$parent")
+	fi
+	if ! err=$(workmux open "${target##*/}" "${parent_args[@]}" 2>&1 >/dev/null); then
 		# execute-silent has no terminal, so the status line is the only place a
-		# failure can still be seen from the popup.
-		tmux display-message "worktrees: workmux open ${target##*/} failed"
+		# failure can still be seen from the popup. Carry workmux's own text --
+		# swallowing it is what made this a popup-only mystery.
+		tmux display-message "worktrees: ${err:-workmux open ${target##*/} failed}"
 		exit 0
 	fi
 	# workmux selects the window it opened, which is the point. The popup is a
