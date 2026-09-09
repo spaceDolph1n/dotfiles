@@ -2,10 +2,9 @@
 #
 # Tests for the theme generator. Run: scripts/theme.test.sh
 #
-# The extractor reads the real nvim plugins, because the whole point is that the
-# palette is not transcribed -- a fixture here would test the fixture. What is
-# asserted is the contract: every role present in BOTH themes, never "NONE", and
-# `term` matching each theme's own upstream wezterm port rather than theme.term.
+# The extractor reads the real nvim plugins on purpose: a fixture would test the
+# fixture. Asserted here is the contract -- every role in both themes, never a
+# sentinel, and `term` from each theme's wezterm port rather than `theme.term`.
 
 set -uo pipefail
 
@@ -153,6 +152,56 @@ check_role_named "$out"
 ok "the abort names the missing role" $?
 
 "$THEME" "$was" >/dev/null 2>&1
+
+# --- file modes ------------------------------------------------------------------
+
+printf '\nregeneration preserves file modes\n'
+
+# scripts/vault-graph is a program, not a config. `os.replace` renames a fresh
+# 0644 temp over the target, which once dropped its executable bit and shipped
+# that in a commit.
+"$THEME" "$(cat "$DIR/../theme/active")" >/dev/null 2>&1
+[[ -x "$DIR/vault-graph" ]]
+ok "scripts/vault-graph is still executable" $?
+
+# --- key drift ------------------------------------------------------------------
+
+printf '\nkeys still match what each tool accepts\n'
+
+# lazygit, hunk and workmux all ignore an unknown theme key silently, so a rename
+# upstream reverts that surface to defaults with nothing to show for it. Only
+# lazygit can be asked what it accepts; the other two are regression guards.
+
+drift="$(python3 - <<'PYEOF'
+import re, subprocess
+src = open("lazygit/config.yml").read()
+block = src[src.index("  theme:"):src.index("customCommands:")]
+mine = set(re.findall(r"^    ([a-zA-Z]+):", block, re.M))
+dump = subprocess.run(["lazygit", "--config"], capture_output=True, text=True).stdout
+theirs_block = dump[dump.index("    theme:"):dump.index("    commitLength:")]
+theirs = set(re.findall(r"^        ([a-zA-Z]+):", theirs_block, re.M))
+out = []
+if mine - theirs: out.append("unknown to lazygit: " + ",".join(sorted(mine - theirs)))
+if theirs - mine: out.append("not pinned: " + ",".join(sorted(theirs - mine)))
+print("; ".join(out))
+PYEOF
+)"
+check "lazygit theme keys match its own --config dump" "" "$drift"
+
+# The 15 documented workmux fields. Hardcoded on purpose: workmux offers no way
+# to ask, so this catches a template edit dropping one, not an upstream rename.
+missing="$(python3 - <<'PYEOF'
+import re
+want = {"current_row_bg","highlight_row_bg","current_worktree_fg","dimmed","text",
+        "border","help_border","help_muted","header","keycap","info","success",
+        "warning","danger","accent"}
+src = open("workmux/config.yaml").read()
+block = src[src.index("theme:"):src.index("sidebar:")]
+have = set(re.findall(r"^    ([a-z_]+):", block, re.M))
+print(",".join(sorted(want - have)) or "")
+PYEOF
+)"
+check "workmux theme carries all 15 documented fields" "" "$missing"
 
 # --- result ------------------------------------------------------------------
 

@@ -35,7 +35,10 @@ PALETTE = os.path.join(REPO, "scripts", "theme-palette")
 ROLE = re.compile(r"<<([a-z0-9_.:-]+)>>")
 
 # Restarted by hand, in the order it is worth doing them.
-NEEDS_RESTART = ["wezterm", "nvim", "lazygit", "hunk", "tuicr", "yazi", "starship", "gh-dash"]
+# Files with a live inode-based watcher, written in place rather than renamed.
+WATCHED_IN_PLACE = {"wezterm.lua"}
+
+NEEDS_RESTART = ["nvim", "lazygit", "hunk", "tuicr", "yazi", "starship", "gh-dash"]
 
 
 def die(message):
@@ -192,10 +195,25 @@ def main(argv):
         # `{theme}` can name a directory, not just a file -- yazi wants one
         # flavour folder per theme.
         os.makedirs(os.path.dirname(target), exist_ok=True)
+        if os.path.basename(target) in WATCHED_IN_PLACE:
+            # wezterm watches by inode and `os.replace` swaps the file for a new
+            # one, leaving its watch on the old unlinked inode. Truncate-and-write
+            # keeps the inode so its own hot-reload still fires. A torn write here
+            # is a lua syntax error, which wezterm ignores in favour of the last
+            # good config -- recoverable by re-running.
+            with open(target, "w") as handle:
+                handle.write(content)
+            continue
+        # os.replace renames a fresh 0644 temp over the target, which silently
+        # drops the executable bit -- scripts/vault-graph is a program, not a
+        # config. Carry the existing mode across.
+        mode = os.stat(target).st_mode if os.path.exists(target) else None
         temp = f"{target}.theme-tmp"
         with open(temp, "w") as handle:
             handle.write(content)
         os.replace(temp, target)
+        if mode is not None:
+            os.chmod(target, mode)
 
     os.makedirs(os.path.dirname(ACTIVE), exist_ok=True)
     with open(ACTIVE, "w") as handle:

@@ -55,9 +55,8 @@ ROLES = [
     "vcs.added", "vcs.changed", "vcs.removed",
 ]
 
-# `syn.variable` and `ui.pmenu.fg_sel` are deliberately absent: both themes use a
-# sentinel there meaning "inherit", and they disagree on its case -- kanso writes
-# "NONE", dragon writes "none". Validate on "starts with #", never on the word.
+# `syn.variable` and `ui.pmenu.fg_sel` are absent on purpose: both themes put an
+# "inherit" sentinel there and disagree on its case. Validate on "starts with #".
 
 # Roles one theme has and the other does not, aliased onto a shared role. The
 # semantics, not the look, decide the alias -- untracked files are non-content,
@@ -70,10 +69,8 @@ ALIASES = {
     "ui.active_indent_line": "ui.bg_p2",
 }
 
-# Colours no theme states, needed by surfaces that show more than nvim does.
-# The two *_content_bg are a row tint lifted exactly a third of the way toward
-# the git sign colour, so a word-level highlight reads louder than the row it
-# sits in. A third, not 0.33 -- the rounding differs, and a third is what
+# Colours no theme states. The *_content_bg pair is a row tint lifted a third of
+# the way toward the git sign colour -- exactly a third, not 0.33, which is what
 # reproduces the values hand-tuned in hunk/config.toml.
 DERIVED = {
     "diff.add_content": ("mix", "diff.add", "vcs.added", 1 / 3),
@@ -83,10 +80,8 @@ DERIVED = {
     # Violet is the one hue neither theme spends on diff or git state, so a note
     # never reads as a change.
     "note.border": ("alias", "syn.keyword"),
-    # tmux tints inactive panes with this. `ui.bg_dim` cannot be used: kanso's is
-    # LIGHTER than its bg and dragon's is darker, so it means opposite things.
-    # 0.175 is the weight that reproduces the #0d1218 Tiago picked off the ladder
-    # documented in tmux/tmux.conf.
+    # `ui.bg_dim` cannot serve: kanso's is lighter than its bg, dragon's darker.
+    # 0.175 is the weight that reproduces the #0d1218 already in tmux.conf.
     "ui.bg_inactive": ("mix", "ui.bg", "ui.bg_p2", 0.175),
     # One surface step above bg_p2, for panel borders. Neither theme states it,
     # and `ui.bg_visual` cannot stand in: kanso's is grey but dragon's is blue
