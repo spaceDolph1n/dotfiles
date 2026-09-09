@@ -6,21 +6,51 @@ return {
 		local lualine = require("lualine")
 		local lazy_status = require("lazy.status") -- to configure lazy pending updates count
 
-		-- Outer caps, matching the separators in tmux.conf so both bars round off
-		-- identically. lualine sets separator fg from its own section background,
-		-- so they follow the mode colour without being hardcoded per mode.
-		local cap_left = " "
-		local cap_right = " "
+		-- Flat, matching tmux/theme.conf. The backgrounds are `ui.bg` rather than
+		-- NONE: kanagawa paints `StatusLine` at #0d0c0c even under
+		-- `transparent = true`, so transparent sections left that darker bar
+		-- showing between and around them.
+		local palette = {
+			bg = "#090e13",
+			text = "#c5c9c7",
+			dim = "#a4a7a4",
+			faint = "#5c6066",
+		}
+
+		-- One accent per mode, from the roles the tmux bar spends. Only the mode
+		-- word takes it, so the bar reads as text rather than blocks.
+		local modes = {
+			normal = "#8ea4a2",
+			insert = "#76946a",
+			visual = "#8992a7",
+			replace = "#c34043",
+			command = "#dca561",
+			inactive = "#5c6066",
+		}
+
+		local function section(accent)
+			return {
+				a = { fg = accent, bg = palette.bg, gui = "bold" },
+				b = { fg = palette.dim, bg = palette.bg },
+				c = { fg = palette.faint, bg = palette.bg },
+			}
+		end
+
+		local theme = {}
+		for mode, accent in pairs(modes) do
+			theme[mode] = section(accent)
+		end
 
 		lualine.setup({
 			options = {
-				section_separators = { left = "", right = "" },
+				theme = theme,
+				section_separators = "",
 				component_separators = "",
 			},
 			sections = {
-				-- a, b, y and z are lualine's own defaults, spelled out only so the
-				-- caps have a first and last component to attach to.
-				lualine_a = { { "mode", separator = { left = cap_left }, right_padding = 2 } },
+				-- Spelled out because lualine's defaults reintroduce separators.
+				-- Padding replaces the cap that used to hold the edge.
+				lualine_a = { { "mode", padding = { left = 1, right = 2 } } },
 				lualine_b = { "branch", "diff", "diagnostics" },
 				lualine_c = {
 					{
@@ -39,7 +69,7 @@ return {
 					{ "filetype" },
 				},
 				lualine_y = { "progress" },
-				lualine_z = { { "location", separator = { right = cap_right }, left_padding = 2 } },
+				lualine_z = { { "location", padding = { left = 2, right = 1 } } },
 			},
 		})
 	end,

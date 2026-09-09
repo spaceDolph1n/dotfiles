@@ -1,10 +1,8 @@
 # ---------------------------------------------------------------------------
 # Diff rendering
 # ---------------------------------------------------------------------------
-# hunk is the pager: `hunk pager` detects diffs and passes everything else
-# through, which is what diffnav could never do. diffnav wraps delta with a
-# GitHub-style file tree and is what gh-dash and `git dn` use -- a full TUI
-# and is wrong for piping into other commands.
+# `hunk pager` detects diffs and passes everything else through, which is why it
+# can be `core.pager` and diffnav cannot. diffnav stays for `git dn` and gh-dash.
 [core]
   pager = hunk pager
 

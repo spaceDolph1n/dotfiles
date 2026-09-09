@@ -38,7 +38,7 @@ label = "Kanso Zen"
 # Surfaces: `background` is the same colour tmux paints for the active pane, so a
 # zoomed hunk pane is continuous with the terminal behind it.
 background = "#090e13" # the darkest surface
-panel = "#1c1e25"      # one step up -- file sidebar, dialogs
+panel = "#090e13"      # the diff surface too, not just the sidebar
 panelAlt = "#22262d"   # two steps up
 border = "#3c4045"     # panel borders
 accent = "#8ea4a2"     # the aqua tmux uses for the active pane border
@@ -57,7 +57,7 @@ removedBg = "#43242b"      # removed row tint
 movedAddedBg = "#252535"   # moved-added tint
 movedRemovedBg = "#49443c" # moved-removed tint
 contextBg = "#090e13"
-contextContentBg = "#1c1e25"
+contextContentBg = "#090e13"
 
 # Word-level highlights have to read as louder than the row tint they sit in.
 # kanso ships no such pair, so these are its row tint lifted a third of the way
@@ -124,36 +124,26 @@ noteTitleText = "#c5c9c7"
 # in play. `<` and `>` are the shifted `,`/`.` that move between plain files --
 # the same relationship `{`/`}` have to `[`/`]`. Both were free.
 [themes.kanagawa-dragon]
+# Same roles as above; see the kanso block for the reasoning.
 base = "kanagawa-dragon"
 label = "Kanagawa Dragon"
 
-# Surfaces: `background` is the same colour tmux paints for the active pane, so a
-# zoomed hunk pane is continuous with the terminal behind it.
 background = "#181616" # the darkest surface
-panel = "#282727"      # one step up -- file sidebar, dialogs
+panel = "#181616"      # the diff surface too, not just the sidebar
 panelAlt = "#393836"   # two steps up
 border = "#565349"     # panel borders
 accent = "#8ea4a2"     # the aqua tmux uses for the active pane border
 accentMuted = "#625e5a" # dimmest text
 text = "#c5c9c5"       # body text
-# A step dimmer than the comment grey, deliberately. hunk spends `muted` on the
-# file sidebar, so with the two equal, twenty unselected filenames sat in the
-# exact grey of every comment beside them. Measured: 843 chars of comment-grey on
-# one screen, most of it the file list.
 muted = "#625e5a"
 
-# Row tints are kanso's own diff palette. `moved` has no kanso equivalent, so it
-# borrows the change/text tints -- moved code is neither an add nor a delete.
 addedBg = "#2b3328"        # added row tint
 removedBg = "#43242b"      # removed row tint
 movedAddedBg = "#252535"   # moved-added tint
 movedRemovedBg = "#49443c" # moved-removed tint
 contextBg = "#181616"
-contextContentBg = "#282727"
+contextContentBg = "#181616"
 
-# Word-level highlights have to read as louder than the row tint they sit in.
-# kanso ships no such pair, so these are its row tint lifted a third of the way
-# toward its git sign colour; `scripts/theme-palette` computes both.
 addedContentBg = "#44533e"
 removedContentBg = "#6e2d33"
 
@@ -168,29 +158,17 @@ badgeAdded = "#76946a"
 badgeRemoved = "#c34043"
 badgeNeutral = "#9e9b93" # neutral badge
 
-# File states reuse the git colours tmux and lazygit already use, so a modified
-# file is the same amber in every tool.
 fileNew = "#76946a"
 fileDeleted = "#c34043"
 fileRenamed = "#7fb4ca"   # renamed
 fileModified = "#dca561"  # modified
 fileUntracked = "#625e5a" # untracked
 
-# Notes are violet -- the one hue kanso does not spend on diff or git state, so
-# a note never reads as a change.
 noteBorder = "#8992a7"          # violet -- not a diff or git hue
 noteBackground = "#282727"
 noteTitleBackground = "#393836"
 noteTitleText = "#c5c9c5"
 
-# Exact Shiki/TextMate scopes, mapped from kanso's `syn` table.
-#
-# Only the scopes that carry kanso's character are listed. The first version of
-# this file also set `variable`, `punctuation`, `keyword.operator` and
-# `variable.parameter` to two greys, faithfully copying kanso.nvim -- and those
-# four scopes cover most of the tokens on a screen, so the whole diff read as
-# light grey. They are gone: the base paints them now, and the colour below
-# lands on the words that actually distinguish one thing from another.
 [themes.kanagawa-dragon.syntax_scopes]
 "comment" = "#737c73"
 "punctuation.definition.comment" = "#737c73"
@@ -211,10 +189,6 @@ noteTitleText = "#c5c9c5"
 "support.type" = "#8ea4a2"
 "support.class" = "#8ea4a2"
 
-# `nextAnnotatedFile` / `previousAnnotatedFile` ship with no keys at all, and
-# "jump to the next file carrying a note" is the whole review loop once notes are
-# in play. `<` and `>` are the shifted `,`/`.` that move between plain files --
-# the same relationship `{`/`}` have to `[`/`]`. Both were free.
 [keybindings]
 "hunk.review.nextAnnotatedFile" = ">"
 "hunk.review.previousAnnotatedFile" = "<"

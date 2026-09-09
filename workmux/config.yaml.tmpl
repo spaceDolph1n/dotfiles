@@ -32,25 +32,16 @@ panes:
     split: horizontal
     focus: true
 
-# Colored dots instead of emoji: single-width, and painted from the same palette
-# as the status line.
+# Single-width dots, painted from the status line's palette. None resets the
+# foreground after itself: that made every window carrying a dot render its name
+# in full fg. tmux/theme.conf sets the name colour after the dot instead.
 #
-# The dot does NOT reset the foreground after itself. It used to, so that the
-# window name following it would come back to catppuccin's pill colour -- but the
-# pill is gone, and the reset made every window carrying a dot render its name in
-# full fg, losing the dim/active distinction. tmux/theme.conf now sets the name
-# colour after the dot instead.
-# Half-filled and muted for `working` -- it is the common, non-actionable state,
-# but a hollow ring had too little ink to spot. The two states worth reacting to
-# are solid. Amber belongs to `done`: the current window is signalled by text
-# strength rather than a colour, which leaves the accent free here.
-# The dot renders *inside* catppuccin's window pill, so it restores the pill's
-# foreground (<<term.15>>) rather than using #[default], which would also reset the
-# background and strip the fill off inactive tabs. Trailing space separates it
-# from the window name.
+# One glyph for all three states; colour alone separates them. `working` recedes
+# because aqua is the chrome colour, not because its dot is smaller. Amber
+# is free for `done` because the current window is marked by text strength.
 status_icons:
-  working: "#[fg=<<syn.type>>]◐ "
-  waiting: "#[fg=<<diag.error>>]● "
+  working: "#[fg=<<syn.type>>]● "
+  waiting: "#[fg=<<term.9>>]● "
   done: "#[fg=<<vcs.changed>>]● "
   sleeping: "#[fg=<<ui.nontext>>]󰒲 "
 
@@ -71,19 +62,12 @@ nerdfont: true
 #
 # `layout` is deliberately NOT set: unset leaves the default (tiles) and keeps
 # `v` free to toggle compact/tiles at runtime, which is how I compare them.
-# Dashboard colours. `theme.custom` is the documented shape -- a flat colour map
-# under `theme:` parses without complaint and does nothing, because workmux
-# ignores a malformed theme silently. Field names are from the docs, not the
-# binary, whose serde run is truncated: 15 fields, not the 11 it appears to hold.
+
+# `theme.custom` is the documented shape: a flat map under `theme:` parses and
+# does nothing, because workmux ignores a malformed theme silently. All 15 fields
+# are listed -- the binary's serde run shows only 11.
 #
-# Without this workmux paints catppuccin: #cdd6f4 text, #6c7086 dim, #28303e row
-# background -- which is what clashed with the status line.
-#
-# The mapping is the status line's own levels: `ui.fg` for the current row and
-# `ui.nontext` for every other, which is 3.78:1 apart. `ui.fg_dim` was tried for
-# the others and is only 1.45:1 from the current row -- the same too-close pair
-# that failed on the tmux tabs. Stale rows take `dimmed` plus workmux's own dim
-# attribute on top. Aqua for chrome, amber warning, green success, red danger.
+# `ui.fg_dim` for non-current rows was rejected at 1.45:1; `ui.nontext` is 3.78:1.
 theme:
   custom:
     current_row_bg: "<<ui.bg_p2>>"
@@ -96,10 +80,10 @@ theme:
     help_muted: "<<ui.nontext>>"
     header: "<<syn.type>>"
     keycap: "<<syn.type>>"
-    info: "<<diag.info>>"
+    info: "<<syn.type>>"
     success: "<<vcs.added>>"
     warning: "<<vcs.changed>>"
-    danger: "<<diag.error>>"
+    danger: "<<term.9>>"
     accent: "<<syn.type>>"
 
 sidebar:

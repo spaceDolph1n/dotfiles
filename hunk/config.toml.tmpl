@@ -38,7 +38,7 @@ label = "Kanso Zen"
 # Surfaces: `background` is the same colour tmux paints for the active pane, so a
 # zoomed hunk pane is continuous with the terminal behind it.
 background = "<<kanso:ui.bg>>" # the darkest surface
-panel = "<<kanso:ui.bg_p1>>"      # one step up -- file sidebar, dialogs
+panel = "<<kanso:ui.bg>>"      # the diff surface too, not just the sidebar
 panelAlt = "<<kanso:ui.bg_p2>>"   # two steps up
 border = "<<kanso:ui.border>>"     # panel borders
 accent = "<<kanso:syn.type>>"     # the aqua tmux uses for the active pane border
@@ -57,7 +57,7 @@ removedBg = "<<kanso:diff.delete>>"      # removed row tint
 movedAddedBg = "<<kanso:diff.change>>"   # moved-added tint
 movedRemovedBg = "<<kanso:diff.text>>" # moved-removed tint
 contextBg = "<<kanso:ui.bg>>"
-contextContentBg = "<<kanso:ui.bg_p1>>"
+contextContentBg = "<<kanso:ui.bg>>"
 
 # Word-level highlights have to read as louder than the row tint they sit in.
 # kanso ships no such pair, so these are its row tint lifted a third of the way
@@ -124,36 +124,26 @@ noteTitleText = "<<kanso:ui.fg>>"
 # in play. `<` and `>` are the shifted `,`/`.` that move between plain files --
 # the same relationship `{`/`}` have to `[`/`]`. Both were free.
 [themes.kanagawa-dragon]
+# Same roles as above; see the kanso block for the reasoning.
 base = "kanagawa-dragon"
 label = "Kanagawa Dragon"
 
-# Surfaces: `background` is the same colour tmux paints for the active pane, so a
-# zoomed hunk pane is continuous with the terminal behind it.
 background = "<<kanagawa-dragon:ui.bg>>" # the darkest surface
-panel = "<<kanagawa-dragon:ui.bg_p1>>"      # one step up -- file sidebar, dialogs
+panel = "<<kanagawa-dragon:ui.bg>>"      # the diff surface too, not just the sidebar
 panelAlt = "<<kanagawa-dragon:ui.bg_p2>>"   # two steps up
 border = "<<kanagawa-dragon:ui.border>>"     # panel borders
 accent = "<<kanagawa-dragon:syn.type>>"     # the aqua tmux uses for the active pane border
 accentMuted = "<<kanagawa-dragon:ui.nontext>>" # dimmest text
 text = "<<kanagawa-dragon:ui.fg>>"       # body text
-# A step dimmer than the comment grey, deliberately. hunk spends `muted` on the
-# file sidebar, so with the two equal, twenty unselected filenames sat in the
-# exact grey of every comment beside them. Measured: 843 chars of comment-grey on
-# one screen, most of it the file list.
 muted = "<<kanagawa-dragon:ui.nontext>>"
 
-# Row tints are kanso's own diff palette. `moved` has no kanso equivalent, so it
-# borrows the change/text tints -- moved code is neither an add nor a delete.
 addedBg = "<<kanagawa-dragon:diff.add>>"        # added row tint
 removedBg = "<<kanagawa-dragon:diff.delete>>"      # removed row tint
 movedAddedBg = "<<kanagawa-dragon:diff.change>>"   # moved-added tint
 movedRemovedBg = "<<kanagawa-dragon:diff.text>>" # moved-removed tint
 contextBg = "<<kanagawa-dragon:ui.bg>>"
-contextContentBg = "<<kanagawa-dragon:ui.bg_p1>>"
+contextContentBg = "<<kanagawa-dragon:ui.bg>>"
 
-# Word-level highlights have to read as louder than the row tint they sit in.
-# kanso ships no such pair, so these are its row tint lifted a third of the way
-# toward its git sign colour; `scripts/theme-palette` computes both.
 addedContentBg = "<<kanagawa-dragon:diff.add_content>>"
 removedContentBg = "<<kanagawa-dragon:diff.delete_content>>"
 
@@ -168,29 +158,17 @@ badgeAdded = "<<kanagawa-dragon:vcs.added>>"
 badgeRemoved = "<<kanagawa-dragon:vcs.removed>>"
 badgeNeutral = "<<kanagawa-dragon:syn.punct>>" # neutral badge
 
-# File states reuse the git colours tmux and lazygit already use, so a modified
-# file is the same amber in every tool.
 fileNew = "<<kanagawa-dragon:vcs.added>>"
 fileDeleted = "<<kanagawa-dragon:vcs.removed>>"
 fileRenamed = "<<kanagawa-dragon:term.12>>"   # renamed
 fileModified = "<<kanagawa-dragon:vcs.changed>>"  # modified
 fileUntracked = "<<kanagawa-dragon:vcs.untracked>>" # untracked
 
-# Notes are violet -- the one hue kanso does not spend on diff or git state, so
-# a note never reads as a change.
 noteBorder = "<<kanagawa-dragon:note.border>>"          # violet -- not a diff or git hue
 noteBackground = "<<kanagawa-dragon:note.bg>>"
 noteTitleBackground = "<<kanagawa-dragon:note.title_bg>>"
 noteTitleText = "<<kanagawa-dragon:ui.fg>>"
 
-# Exact Shiki/TextMate scopes, mapped from kanso's `syn` table.
-#
-# Only the scopes that carry kanso's character are listed. The first version of
-# this file also set `variable`, `punctuation`, `keyword.operator` and
-# `variable.parameter` to two greys, faithfully copying kanso.nvim -- and those
-# four scopes cover most of the tokens on a screen, so the whole diff read as
-# light grey. They are gone: the base paints them now, and the colour below
-# lands on the words that actually distinguish one thing from another.
 [themes.kanagawa-dragon.syntax_scopes]
 "comment" = "<<kanagawa-dragon:syn.comment>>"
 "punctuation.definition.comment" = "<<kanagawa-dragon:syn.comment>>"
@@ -211,10 +189,6 @@ noteTitleText = "<<kanagawa-dragon:ui.fg>>"
 "support.type" = "<<kanagawa-dragon:syn.type>>"
 "support.class" = "<<kanagawa-dragon:syn.type>>"
 
-# `nextAnnotatedFile` / `previousAnnotatedFile` ship with no keys at all, and
-# "jump to the next file carrying a note" is the whole review loop once notes are
-# in play. `<` and `>` are the shifted `,`/`.` that move between plain files --
-# the same relationship `{`/`}` have to `[`/`]`. Both were free.
 [keybindings]
 "hunk.review.nextAnnotatedFile" = ">"
 "hunk.review.previousAnnotatedFile" = "<"
