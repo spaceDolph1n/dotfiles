@@ -59,9 +59,19 @@ mise use -g python@latest
 mise ls
 ```
 
+CLIs that ship as npm packages go through mise too — **never `npm install -g`**:
+
 ```bash
-npm install -g czg   # commit tooling, used by lazygit's `C` binding
+mise use -g "npm:czg@latest"             # commit tooling, lazygit's `C` binding
+mise use -g "npm:@openai/codex@latest"   # Codex CLI, used by the codex consult
 ```
+
+> **Which manager?** Decide by what the thing *ships as*, not by preference:
+> language runtimes and npm-delivered CLIs → **mise** (tracked in `mise/config.toml`);
+> compiled binaries and apps → **brew** (tracked in `Brewfile`). Keep `npm -g`,
+> `pnpm -g` and `bun -g` empty. An `npm -g` install binds to whichever Node is
+> active and silently breaks when that changes — and nothing declares it, so a new
+> machine never gets it back.
 
 > `.nvmrc` / `.node-version` support is **off by default** in mise. It is enabled
 > via `idiomatic_version_file_enable_tools` in `mise/config.toml` — without that,
@@ -303,5 +313,6 @@ launchctl list | grep daily-snapshot
 | tuicr chips unreadable (mode, banners, update badge) | The bundled themes leave `*_fg` unset; use `theme_dark = "kanso-zen"` or try `transparent_background` |
 | Commits authored as `user@hostname` | `GIT_CONFIG_GLOBAL` unset — see step 9 |
 | `.nvmrc` ignored | `idiomatic_version_file_enable_tools` in `mise/config.toml` |
+| `mise ERROR No version is set for shim: <tool>` | Orphaned shim — the tool isn't in `mise/config.toml`. `mise which <tool>` confirms it; re-add with `mise use -g`. `mise doctor` will **not** catch this |
 
 ---
