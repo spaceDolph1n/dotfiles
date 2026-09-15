@@ -150,7 +150,7 @@ fcd() { local d; d=$(${=FZF_ALT_C_COMMAND} | fzf) && cd "$d" && ll; }
 f() { local file; file=$(${=FZF_DEFAULT_COMMAND} | fzf) && printf '%s' "$file" | pbcopy; }
 fv() { local file; file=$(${=FZF_DEFAULT_COMMAND} | fzf) && nvim "$file"; }
 
-alias kill-dev='pkill -f registerWebDevServer'
+kill-dev() { pkill -f registerWebDevServer || true; }
 dev() { pkill -f registerWebDevServer; npm run dev; }
 
 # ---------------------------------------------------------------------------
