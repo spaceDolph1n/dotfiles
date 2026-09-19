@@ -15,5 +15,5 @@
 # Audition one without committing:  tuicr --theme <name> pr <number>
 
 appearance = "system"
-theme_dark = "kanso"
+theme_dark = "rose-pine"
 theme_light = "catppuccin-latte"

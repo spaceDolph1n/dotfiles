@@ -207,7 +207,7 @@ Layout:
 theme                    # print the active theme
 theme kanagawa-dragon    # switch everything
 theme --check            # render without writing; non-zero on a problem
-scripts/theme.test.sh    # 23 assertions
+scripts/theme.test.sh    # 32 assertions
 ```
 
 **Palettes are never transcribed.** `scripts/theme-palette <theme>` reads the palette out of

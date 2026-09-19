@@ -41,7 +41,7 @@ background = "<<kanso:ui.bg>>" # the darkest surface
 panel = "<<kanso:ui.bg>>"      # the diff surface too, not just the sidebar
 panelAlt = "<<kanso:ui.bg_p2>>"   # two steps up
 border = "<<kanso:ui.border>>"     # panel borders
-accent = "<<kanso:syn.type>>"     # the aqua tmux uses for the active pane border
+accent = "<<kanso:syn.type>>"     # the colour tmux uses for the active pane border
 accentMuted = "<<kanso:ui.nontext>>" # dimmest text
 text = "<<kanso:ui.fg>>"       # body text
 # A step dimmer than the comment grey, deliberately. hunk spends `muted` on the
@@ -132,7 +132,7 @@ background = "<<kanagawa-dragon:ui.bg>>" # the darkest surface
 panel = "<<kanagawa-dragon:ui.bg>>"      # the diff surface too, not just the sidebar
 panelAlt = "<<kanagawa-dragon:ui.bg_p2>>"   # two steps up
 border = "<<kanagawa-dragon:ui.border>>"     # panel borders
-accent = "<<kanagawa-dragon:syn.type>>"     # the aqua tmux uses for the active pane border
+accent = "<<kanagawa-dragon:syn.type>>"     # the colour tmux uses for the active pane border
 accentMuted = "<<kanagawa-dragon:ui.nontext>>" # dimmest text
 text = "<<kanagawa-dragon:ui.fg>>"       # body text
 muted = "<<kanagawa-dragon:ui.nontext>>"
@@ -188,6 +188,76 @@ noteTitleText = "<<kanagawa-dragon:ui.fg>>"
 "entity.name.type" = "<<kanagawa-dragon:syn.type>>"
 "support.type" = "<<kanagawa-dragon:syn.type>>"
 "support.class" = "<<kanagawa-dragon:syn.type>>"
+
+[themes.rose-pine]
+# Same roles again; see the kanso block for the reasoning. The base is Shiki's
+# own rose-pine, which is the palette this theme is derived from -- no
+# substitution needed, unlike kanso borrowing kanagawa-wave.
+base = "rose-pine"
+label = "Rosé Pine"
+
+background = "<<rose-pine:ui.bg>>" # the darkest surface
+panel = "<<rose-pine:ui.bg>>"      # the diff surface too, not just the sidebar
+panelAlt = "<<rose-pine:ui.bg_p2>>"   # two steps up
+border = "<<rose-pine:ui.border>>"     # panel borders
+accent = "<<rose-pine:syn.type>>"     # the colour tmux uses for the active pane border
+accentMuted = "<<rose-pine:ui.nontext>>" # dimmest text
+text = "<<rose-pine:ui.fg>>"       # body text
+muted = "<<rose-pine:ui.nontext>>"
+
+addedBg = "<<rose-pine:diff.add>>"        # added row tint
+removedBg = "<<rose-pine:diff.delete>>"      # removed row tint
+movedAddedBg = "<<rose-pine:diff.change>>"   # moved-added tint
+movedRemovedBg = "<<rose-pine:diff.text>>" # moved-removed tint
+contextBg = "<<rose-pine:ui.bg>>"
+contextContentBg = "<<rose-pine:ui.bg>>"
+
+addedContentBg = "<<rose-pine:diff.add_content>>"
+removedContentBg = "<<rose-pine:diff.delete_content>>"
+
+addedSignColor = "<<rose-pine:vcs.added>>"   # added sign
+removedSignColor = "<<rose-pine:vcs.removed>>" # removed sign
+
+lineNumberBg = "<<rose-pine:ui.bg>>"
+lineNumberFg = "<<rose-pine:ui.nontext>>" # dimmest text
+selectedHunk = "<<rose-pine:ui.bg_p2>>" # two steps up, the cursor_line row
+
+badgeAdded = "<<rose-pine:vcs.added>>"
+badgeRemoved = "<<rose-pine:vcs.removed>>"
+badgeNeutral = "<<rose-pine:syn.punct>>" # neutral badge
+
+fileNew = "<<rose-pine:vcs.added>>"
+fileDeleted = "<<rose-pine:vcs.removed>>"
+fileRenamed = "<<rose-pine:term.12>>"   # renamed
+fileModified = "<<rose-pine:vcs.changed>>"  # modified
+fileUntracked = "<<rose-pine:vcs.untracked>>" # untracked
+
+# Pine, not violet: rose-pine spends iris on diagnostics and links, and pine on
+# nothing the diff or git state uses. Same requirement, different hue.
+noteBorder = "<<rose-pine:note.border>>"
+noteBackground = "<<rose-pine:note.bg>>"
+noteTitleBackground = "<<rose-pine:note.title_bg>>"
+noteTitleText = "<<rose-pine:ui.fg>>"
+
+[themes.rose-pine.syntax_scopes]
+"comment" = "<<rose-pine:syn.comment>>"
+"punctuation.definition.comment" = "<<rose-pine:syn.comment>>"
+"string" = "<<rose-pine:syn.string>>"
+"string.quoted" = "<<rose-pine:syn.string>>"
+"string.template" = "<<rose-pine:syn.string>>"
+"string.regexp" = "<<rose-pine:syn.regex>>"
+"constant.numeric" = "<<rose-pine:syn.number>>"
+"constant.language" = "<<rose-pine:syn.constant>>"
+"constant.character" = "<<rose-pine:syn.constant>>"
+"keyword" = "<<rose-pine:syn.keyword>>"
+"keyword.control" = "<<rose-pine:syn.keyword>>"
+"storage.type" = "<<rose-pine:syn.keyword>>"
+"storage.modifier" = "<<rose-pine:syn.keyword>>"
+"entity.name.function" = "<<rose-pine:syn.fun>>"
+"support.function" = "<<rose-pine:syn.fun>>"
+"entity.name.type" = "<<rose-pine:syn.type>>"
+"support.type" = "<<rose-pine:syn.type>>"
+"support.class" = "<<rose-pine:syn.type>>"
 
 [keybindings]
 "hunk.review.nextAnnotatedFile" = ">"

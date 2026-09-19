@@ -1,0 +1,63 @@
+# Kanso Zen for tuicr.
+#
+# Palette taken verbatim from webhooked/kanso.nvim (lua/kanso/colors.lua and the
+# extras/wezterm port) so this matches nvim's `kanso-zen` exactly. Kanso ships
+# ports for 14 tools -- alacritty, ghostty, kitty, wezterm, zellij, yazi and so
+# on -- but not tmux and not tuicr, which is why both are hand-written here.
+#
+# Why this file exists: the bundled `dark` theme left the chip foregrounds too
+# light, so the mode indicator, the message banners and the update badge came
+# out light-on-light and unreadable. Every *_fg below is deliberately the
+# background colour.
+
+panel_bg = "#090b10"
+bg_highlight = "#26233a"
+fg_primary = "#e0def4"
+fg_secondary = "#908caa"
+fg_dim = "#908caa"
+
+diff_add = "#31748f"              # bright green
+diff_add_bg = "#263238"           # diffGreen
+diff_del = "#eb6f92"              # bright red
+diff_del_bg = "#361f2a"           # diffRed
+diff_context = "#e0def4"
+diff_hunk_header = "#9ccfd8"      # bright blue
+expanded_context_fg = "#6e6a86"
+
+syntax_add_bg = "#263238"
+syntax_del_bg = "#361f2a"
+
+file_added = "#31748f"
+file_modified = "#f6c177"         # bright yellow
+file_deleted = "#eb6f92"
+file_renamed = "#c4a7e7"          # bright magenta
+
+reviewed = "#31748f"
+pending = "#f6c177"
+
+comment_note = "#9ccfd8"
+comment_suggestion = "#ebbcba"    # bright cyan
+comment_issue = "#eb6f92"
+comment_praise = "#31748f"
+
+border_focused = "#9ccfd8"
+border_unfocused = "#403d52"
+status_bar_bg = "#1f1d2e"
+cursor_color = "#f6c177"
+cursor_line_bg = "#1f1d2e"
+branch_name = "#c4a7e7"
+help_indicator = "#908caa"
+
+# The chips. Dark text on a light background is the whole point -- this is the
+# pair the bundled theme got wrong.
+message_info_fg = "#090b10"
+message_info_bg = "#9ccfd8"
+message_warning_fg = "#090b10"
+message_warning_bg = "#f6c177"
+message_error_fg = "#090b10"
+message_error_bg = "#eb6f92"
+update_badge_fg = "#090b10"
+update_badge_bg = "#f6c177"
+
+mode_fg = "#090b10"
+mode_bg = "#9ccfd8"

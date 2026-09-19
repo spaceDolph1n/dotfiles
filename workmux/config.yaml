@@ -37,13 +37,13 @@ panes:
 # in full fg. tmux/theme.conf sets the name colour after the dot instead.
 #
 # One glyph for all three states; colour alone separates them. `working` recedes
-# because aqua is the chrome colour, not because its dot is smaller. Amber
+# because that is the chrome colour, not because its dot is smaller. Amber
 # is free for `done` because the current window is marked by text strength.
 status_icons:
-  working: "#[fg=#8ea4a2]● "
-  waiting: "#[fg=#e46876]● "
-  done: "#[fg=#dca561]● "
-  sleeping: "#[fg=#5c6066]󰒲 "
+  working: "#[fg=#9ccfd8]● "
+  waiting: "#[fg=#eb6f92]● "
+  done: "#[fg=#ebbcba]● "
+  sleeping: "#[fg=#6e6a86]󰒲 "
 
 # Do not let workmux rewrite window-status-format. Left on, it copies whatever
 # catppuccin had rendered at that moment into a *per-window* override and appends
@@ -70,21 +70,21 @@ nerdfont: true
 # `ui.fg_dim` for non-current rows was rejected at 1.45:1; `ui.nontext` is 3.78:1.
 theme:
   custom:
-    current_row_bg: "#22262d"
-    highlight_row_bg: "#1c1e25"
-    current_worktree_fg: "#c5c9c7"
-    text: "#5c6066"
-    dimmed: "#5c6066"
-    border: "#3c4045"
-    help_border: "#22262d"
-    help_muted: "#5c6066"
-    header: "#8ea4a2"
-    keycap: "#8ea4a2"
-    info: "#8ea4a2"
-    success: "#76946a"
-    warning: "#dca561"
-    danger: "#e46876"
-    accent: "#8ea4a2"
+    current_row_bg: "#26233a"
+    highlight_row_bg: "#1f1d2e"
+    current_worktree_fg: "#e0def4"
+    text: "#6e6a86"
+    dimmed: "#6e6a86"
+    border: "#3b3850"
+    help_border: "#26233a"
+    help_muted: "#6e6a86"
+    header: "#9ccfd8"
+    keycap: "#9ccfd8"
+    info: "#9ccfd8"
+    success: "#9ccfd8"
+    warning: "#ebbcba"
+    danger: "#eb6f92"
+    accent: "#9ccfd8"
 
 sidebar:
   position: left

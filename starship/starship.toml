@@ -16,7 +16,7 @@ command_timeout= 1000
 vicmd_symbol = "[N](bold yellow)"
 # vicmd_symbol = "[➜](yellow)"        # colour-only — the old one
 success_symbol = '[➜](bold green)'
-error_symbol = '[✗](#c34043)'
+error_symbol = '[✗](#eb6f92)'
 
 [git_branch]
 format = '[$symbol$branch (:$remote_branch)]($style)'

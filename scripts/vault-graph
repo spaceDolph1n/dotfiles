@@ -28,10 +28,10 @@ LINK_RE = re.compile(r"!?\[\[([^\]]+)\]\]")
 DEFAULT_OUT = os.path.expanduser("~/.local/state/vault-graph.html")
 
 TYPE_COLORS = {
-    "concept": "#7fb4ca", "claim": "#938aa9", "source": "#e6c384",
-    "reference": "#87a987", "bet": "#e46876", "ticket": "#7aa89f",
-    "ticket-candidate": "#a4a7a4", "people": "#dca561", "queue": "#8ea4a2",
-    "inbox": "#5c6066", "synthesis": "#c5c9c7",
+    "concept": "#9ccfd8", "claim": "#c4a7e7", "source": "#f6c177",
+    "reference": "#31748f", "bet": "#eb6f92", "ticket": "#ebbcba",
+    "ticket-candidate": "#908caa", "people": "#f6c177", "queue": "#ebbcba",
+    "inbox": "#6e6a86", "synthesis": "#e0def4",
 }
 
 
@@ -153,19 +153,19 @@ TEMPLATE = """<!doctype html>
 <meta charset="utf-8"><title>vault graph</title>
 <style>
   :root { color-scheme: dark; }
-  html,body { margin:0; height:100%; background:#090e13; color:#c5c9c7;
+  html,body { margin:0; height:100%; background:#090b10; color:#e0def4;
               font:13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
   canvas { display:block; cursor:grab; }
   canvas.drag { cursor:grabbing; }
   #hud { position:fixed; top:12px; left:14px; pointer-events:none; }
-  #hud b { color:#7fb4ca; font-weight:600; }
+  #hud b { color:#9ccfd8; font-weight:600; }
   #legend { position:fixed; bottom:12px; left:14px; display:flex; gap:14px; flex-wrap:wrap;
             max-width:70vw; }
   #legend span { display:flex; align-items:center; gap:5px; }
   #legend i { width:9px; height:9px; border-radius:50%; display:inline-block; }
-  #tip { position:fixed; padding:5px 9px; background:#1c1e25; border:1px solid #22262d;
+  #tip { position:fixed; padding:5px 9px; background:#1f1d2e; border:1px solid #26233a;
          border-radius:4px; pointer-events:none; display:none; white-space:nowrap; }
-  #help { position:fixed; top:12px; right:14px; color:#5c6066; text-align:right; }
+  #help { position:fixed; top:12px; right:14px; color:#6e6a86; text-align:right; }
 </style>
 <canvas id="c"></canvas>
 <div id="hud"><b>__N__</b> notes · <b>__E__</b> links · <span id="sel"></span></div>
@@ -176,11 +176,11 @@ TEMPLATE = """<!doctype html>
 const NODES = __NODES__, EDGES = __EDGES__, COLORS = __COLORS__;
 // Cycled for detected communities. Distinguishable at small size on a dark
 // ground, which rules out most of the pretty palettes.
-const PALETTE = ['#7fb4ca','#e46876','#87a987','#e6c384','#938aa9','#7aa89f',
-                 '#dca561','#8ea4a2','#c5c9c7','#a292a3','#8ba4b0','#c4b28a'];
+const PALETTE = ['#9ccfd8','#eb6f92','#31748f','#f6c177','#c4a7e7','#ebbcba',
+                 '#f6c177','#ebbcba','#e0def4','#c4a7e7','#9ccfd8','#f6c177'];
 let mode = 'type';
 const colourOf = n => mode === 'type'
-  ? (COLORS[n.t] || '#5c6066')
+  ? (COLORS[n.t] || '#6e6a86')
   : PALETTE[n.c % PALETTE.length];
 const LEGEND_TYPE = __LEGEND__;
 const cv = document.getElementById('c'), cx = cv.getContext('2d');
@@ -298,7 +298,7 @@ function draw(){
     cx.beginPath(); cx.arc(n.x, n.y, n.r, 0, 6.2832); cx.fill();
     if (view.k > 1.7 && on && n.d > 1) {
       cx.globalAlpha = Math.min((view.k-1.7)*1.4, 1);
-      cx.fillStyle = '#c5c9c7'; cx.font = `${11/view.k}px ui-monospace, monospace`;
+      cx.fillStyle = '#e0def4'; cx.font = `${11/view.k}px ui-monospace, monospace`;
       cx.fillText(n.id, n.x + n.r + 3/view.k, n.y + 3/view.k);
     }
   });
@@ -339,7 +339,7 @@ function renderLegend(){
   box.innerHTML = [...sizes].sort((a,b)=>b[1]-a[1]).slice(0,12)
     .map(([c,n]) => `<span><i style="background:${PALETTE[c%PALETTE.length]}"></i>`
        + `cluster ${c} · ${n}</span>`).join('')
-    + `<span style="color:#5c6066">${sizes.size} clusters · c to switch back</span>`;
+    + `<span style="color:#6e6a86">${sizes.size} clusters · c to switch back</span>`;
 }
 addEventListener('keydown', e => {
   if (e.key === 'f') fit();
@@ -361,7 +361,7 @@ def main():
 
     used = sorted({n["t"] for n in nodes})
     legend = "".join(
-        f'<span><i style="background:{TYPE_COLORS.get(t, "#5c6066")}"></i>'
+        f'<span><i style="background:{TYPE_COLORS.get(t, "#6e6a86")}"></i>'
         f'{html.escape(t)}</span>' for t in used)
 
     page = (TEMPLATE

@@ -11,21 +11,21 @@ return {
 		-- `transparent = true`, so transparent sections left that darker bar
 		-- showing between and around them.
 		local palette = {
-			bg = "#090e13",
-			text = "#c5c9c7",
-			dim = "#a4a7a4",
-			faint = "#5c6066",
+			bg = "#090b10",
+			text = "#e0def4",
+			dim = "#908caa",
+			faint = "#6e6a86",
 		}
 
 		-- One accent per mode, from the roles the tmux bar spends. Only the mode
 		-- word takes it, so the bar reads as text rather than blocks.
 		local modes = {
-			normal = "#8ea4a2",
-			insert = "#76946a",
-			visual = "#8992a7",
-			replace = "#c34043",
-			command = "#dca561",
-			inactive = "#5c6066",
+			normal = "#9ccfd8",
+			insert = "#9ccfd8",
+			visual = "#31748f",
+			replace = "#eb6f92",
+			command = "#ebbcba",
+			inactive = "#6e6a86",
 		}
 
 		local function section(accent)
@@ -62,7 +62,7 @@ return {
 					{
 						lazy_status.updates,
 						cond = lazy_status.has_updates,
-						color = { fg = "#dca561" },
+						color = { fg = "#f6c177" },
 					},
 					{ "encoding" },
 					{ "fileformat" },

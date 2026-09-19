@@ -10,7 +10,7 @@ set -uo pipefail
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PALETTE="$DIR/theme-palette"
-THEMES=(kanso kanagawa-dragon)
+THEMES=(kanso kanagawa-dragon rose-pine)
 pass=0
 fail=0
 

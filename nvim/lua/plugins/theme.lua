@@ -57,9 +57,21 @@ return {
 	-- normal, moon, dawn
 	{
 		"rose-pine/neovim",
-		enabled = false,
+		enabled = true,
 		name = "rose-pine",
+		lazy = active ~= "rose-pine",
+		priority = 1000,
 		config = function()
+			-- Transparent for the same reason as the two above: tmux dims an
+			-- inactive pane by tinting cells that use the default background.
+			--
+			-- `base` is overridden away from rose-pine's own #191724 because this
+			-- variant is the near-black one. scripts/theme-palette applies the same
+			-- override, so nvim and every generated surface agree.
+			require("rose-pine").setup({
+				styles = { transparency = true, italic = false },
+				palette = { main = { base = "#090b10" } },
+			})
 			vim.cmd("colorscheme rose-pine")
 		end,
 	},

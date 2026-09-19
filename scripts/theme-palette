@@ -19,20 +19,121 @@ import sys
 
 LAZY = os.path.expanduser("~/.local/share/nvim/lazy")
 
+# rose-pine names colours, not roles, so the roles kanagawa states directly have
+# to be assembled. Every line is rose-pine's own highlight for that role
+# (lua/rose-pine.lua) or its semantic group (lua/rose-pine/config.lua) -- read
+# off the plugin, not chosen here, so nvim and the generated surfaces agree.
+#
+# A tuple is a blend, which is how rose-pine draws its diff rows: `blend = 20`
+# over the background. A config file needs the literal that produces.
+ROSE_PINE = {
+    "diag.error": "love",
+    "diag.hint": "iris",
+    "diag.info": "foam",
+    "diag.ok": "leaf",
+    "diag.warning": "gold",
+
+    "diff.add": ("mix", "base", "foam", 0.20),
+    "diff.change": ("mix", "base", "rose", 0.20),
+    "diff.delete": ("mix", "base", "love", 0.20),
+    "diff.text": ("mix", "base", "rose", 0.40),
+
+    "syn.comment": "subtle",
+    "syn.constant": "gold",
+    "syn.deprecated": "muted",
+    "syn.fun": "rose",
+    "syn.identifier": "text",
+    "syn.keyword": "pine",
+    "syn.number": "gold",
+    "syn.operator": "subtle",
+    "syn.parameter": "text",
+    "syn.preproc": "iris",
+    "syn.punct": "subtle",
+    "syn.regex": "rose",
+    "syn.special1": "foam",
+    "syn.special2": "rose",
+    "syn.special3": "iris",
+    "syn.statement": "pine",
+    "syn.string": "gold",
+    "syn.type": "foam",
+
+    # rose-pine stacks exactly three surfaces: base, surface (floats and panels),
+    # overlay (the cursor line). There is nothing below base -- and with base at
+    # near-black there is no room for one -- so the darker steps are base itself.
+    # No template references them; inventing a colour to fill them would be worse
+    # than saying so.
+    "ui.bg": "base",
+    "ui.bg_dim": "base",
+    "ui.bg_m1": "base",
+    "ui.bg_m2": "base",
+    "ui.bg_m3": "base",
+    "ui.bg_p1": "surface",
+    "ui.bg_p2": "overlay",
+    "ui.bg_search": ("mix", "base", "gold", 0.20),
+    # highlight_med, not an iris blend: this is what the kitty port uses for
+    # `selection_background`, and a terminal selection has to match the terminal.
+    "ui.bg_visual": "highlight_med",
+    "ui.fg": "text",
+    "ui.fg_dim": "subtle",
+    "ui.fg_reverse": "base",
+    "ui.float.bg": "surface",
+    "ui.float.bg_border": "surface",
+    "ui.float.fg": "text",
+    "ui.float.fg_border": "muted",
+    "ui.nontext": "muted",
+    "ui.special": "foam",
+    "ui.whitespace": "muted",
+    "ui.pmenu.bg": "surface",
+    "ui.pmenu.bg_sbar": "surface",
+    "ui.pmenu.bg_sel": "overlay",
+    "ui.pmenu.bg_thumb": "muted",
+    "ui.pmenu.fg": "subtle",
+
+    "vcs.added": "foam",
+    "vcs.changed": "rose",
+    "vcs.removed": "love",
+    "vcs.untracked": "subtle",
+}
+
+# `expr` is the Lua that yields the theme's colour table in a clean nvim. Two
+# shapes exist: kanagawa derivatives return a nested `theme` tree already keyed
+# by role, and rose-pine returns one flat table of 19 named colours. A theme with
+# `roles` is the flat kind and gets assembled below; without it, the tree already
+# is the palette.
 THEMES = {
     "kanso": {
         "plugin": "kanso.nvim",
-        "module": "kanso.colors",
-        "variant": "zen",
+        "expr": "require('kanso.colors').setup({theme='zen'}).theme",
         "wezterm": "extras/wezterm/kanso-zen.lua",
     },
     "kanagawa-dragon": {
         "plugin": "kanagawa.nvim",
-        "module": "kanagawa.colors",
-        "variant": "dragon",
+        "expr": "require('kanagawa.colors').setup({theme='dragon'}).theme",
         "wezterm": "extras/wezterm/kanagawa-dragon.lua",
     },
+    "rose-pine": {
+        "plugin": "rose-pine",
+        "expr": "require('rose-pine.palette')",
+        "roles": ROSE_PINE,
+        # The one colour that is not upstream's. rose-pine's own base is #191724,
+        # a washed plum; this variant is the near-black one. nvim applies the
+        # same override in its `setup()` call, and that pair is the only place
+        # the editor and the generated surfaces could disagree.
+        "overrides": {"base": "#090b10"},
+        # rose-pine/neovim ships no `extras/` directory, so the 16 slots come
+        # from the upstream rose-pine/kitty port instead -- the same role the
+        # wezterm extra plays for the other two. Normal and bright are identical
+        # above slot 8 except for black, which is upstream's choice, not a
+        # transcription slip.
+        "term": [
+            "#26233a", "#eb6f92", "#31748f", "#f6c177",
+            "#9ccfd8", "#c4a7e7", "#ebbcba", "#e0def4",
+            "#6e6a86", "#eb6f92", "#31748f", "#f6c177",
+            "#9ccfd8", "#c4a7e7", "#ebbcba", "#e0def4",
+        ],
+    },
 }
+
 
 # The contract: roles BOTH themes emit. kanso ships 82 and dragon 75, so
 # anything outside this intersection has to be derived below or it breaks the
@@ -106,14 +207,14 @@ def flatten(table, prefix=""):
 
 
 def nvim_palette(spec):
-    """Require the plugin's palette module in a clean nvim and dump it."""
+    """Evaluate the theme's Lua in a clean nvim and dump the table it yields."""
     lua_root = os.path.join(LAZY, spec["plugin"], "lua")
     if not os.path.isdir(lua_root):
         die(f"{spec['plugin']} is not installed under {LAZY}")
     script = (
         f"lua package.path=package.path..';{lua_root}/?.lua;{lua_root}/?/init.lua';"
-        f"local p=require('{spec['module']}').setup({{theme='{spec['variant']}'}});"
-        "io.stdout:write(vim.json.encode(p.theme))"
+        f"local p={spec['expr']};"
+        "io.stdout:write(vim.json.encode(p))"
     )
     result = subprocess.run(
         ["nvim", "--headless", "--clean", "-c", script, "-c", "qa!"],
@@ -122,7 +223,22 @@ def nvim_palette(spec):
     try:
         return flatten(json.loads(result.stdout))
     except (json.JSONDecodeError, ValueError):
-        die(f"could not read {spec['module']}: {result.stderr.strip()[:200]}")
+        die(f"could not evaluate `{spec['expr']}`: {result.stderr.strip()[:200]}")
+
+
+def assemble(raw, roles, name):
+    """Turn a flat table of named colours into the role table the contract wants."""
+    resolved = {}
+    for role, recipe in roles.items():
+        if isinstance(recipe, str):
+            colour = raw.get(recipe)
+            if not isinstance(colour, str) or not colour.startswith("#"):
+                die(f"{name} has no colour named `{recipe}` for `{role}`")
+            resolved[role] = colour
+        else:
+            _, first, second, weight = recipe
+            resolved[role] = mix(raw[first], raw[second], weight)
+    return resolved
 
 
 def wezterm_term(spec):
@@ -156,6 +272,9 @@ def mix(a, b, weight):
 def build(name):
     spec = THEMES[name]
     raw = nvim_palette(spec)
+    raw.update(spec.get("overrides", {}))
+    if "roles" in spec:
+        raw = assemble(raw, spec["roles"], name)
 
     palette = {}
     for role in ROLES:
@@ -174,7 +293,10 @@ def build(name):
         else:
             palette[role] = mix(palette[recipe[1]], palette[recipe[2]], recipe[3])
 
-    palette.update(wezterm_term(spec))
+    # A theme with its own wezterm extra is read from it; one without states the
+    # 16 slots in its spec instead.
+    palette.update({f"term.{i}": v for i, v in enumerate(spec["term"])}
+                   if "term" in spec else wezterm_term(spec))
     # Upstream mixes cases within one palette (kanso has #C5C9C7 next to
     # #c4746e), so normalise -- otherwise generated output is inconsistent and
     # byte-comparison against it is noise.

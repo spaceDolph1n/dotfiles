@@ -9,40 +9,40 @@ local config = wezterm.config_builder()
 -- Colours (Kanso) -- fixed. Colourscheme swapping happens in Neovim, not here.
 --------------------------------------------------------------------------------
 config.colors = {
-	foreground = "#c5c9c7",
-	background = "#090e13",
+	foreground = "#e0def4",
+	background = "#090b10",
 
-	cursor_bg = "#090e13",
-	cursor_fg = "#c5c9c7",
-	cursor_border = "#c5c9c7",
+	cursor_bg = "#090b10",
+	cursor_fg = "#e0def4",
+	cursor_border = "#e0def4",
 
-	selection_fg = "#c5c9c7",
-	selection_bg = "#22262d",
+	selection_fg = "#e0def4",
+	selection_bg = "#26233a",
 
-	scrollbar_thumb = "#22262d",
-	split = "#22262d",
+	scrollbar_thumb = "#26233a",
+	split = "#26233a",
 
 	-- The 16 ANSI slots, and the only definition of them on this machine: tmux
 	-- pane borders, starship, fzf and eza all resolve colour names through here.
 	ansi = {
-		"#090e13",
-		"#c4746e",
-		"#8a9a7b",
-		"#c4b28a",
-		"#8ba4b0",
-		"#a292a3",
-		"#8ea4a2",
-		"#a4a7a4",
+		"#26233a",
+		"#eb6f92",
+		"#31748f",
+		"#f6c177",
+		"#9ccfd8",
+		"#c4a7e7",
+		"#ebbcba",
+		"#e0def4",
 	},
 	brights = {
-		"#a4a7a4",
-		"#e46876",
-		"#87a987",
-		"#e6c384",
-		"#7fb4ca",
-		"#938aa9",
-		"#7aa89f",
-		"#c5c9c7",
+		"#6e6a86",
+		"#eb6f92",
+		"#31748f",
+		"#f6c177",
+		"#9ccfd8",
+		"#c4a7e7",
+		"#ebbcba",
+		"#e0def4",
 	},
 }
 

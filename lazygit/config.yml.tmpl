@@ -9,23 +9,24 @@ git:
       colorArg: always
       command: delta --dark --paging=never --line-numbers --hyperlinks
 gui:
-  # Kanso Zen, same palette as wezterm/nvim/tuicr. The default theme paints the
-  # selected line on ANSI blue (<<syn.fun>> here), which swallows the filename and
-  # its status letters -- zenBg2 is the terminal's own selection background.
+  # The active theme's palette, same as wezterm/nvim/tuicr. The default theme
+  # paints the selected line on ANSI blue (<<syn.fun>> here), which swallows the
+  # filename and its status letters -- the role below is the terminal's own
+  # selection background.
   theme:
-    activeBorderColor: ["<<syn.type>>"]          # aqua
-    inactiveBorderColor: ["<<ui.bg_visual>>"]        # zenBg3
+    activeBorderColor: ["<<syn.type>>"]
+    inactiveBorderColor: ["<<ui.bg_visual>>"]
     searchingActiveBorderColor: ["<<term.11>>"] # bright yellow
     optionsTextColor: ["<<term.12>>"]           # bright blue
-    selectedLineBgColor: ["<<note.title_bg>>"]        # zenBg2
-    inactiveViewSelectedLineBgColor: ["<<note.bg>>"] # zenBg1
+    selectedLineBgColor: ["<<note.title_bg>>"]
+    inactiveViewSelectedLineBgColor: ["<<note.bg>>"]
     # Dark text on a light chip -- the pair the defaults get wrong.
     cherryPickedCommitFgColor: ["<<term.0>>"]
     cherryPickedCommitBgColor: ["<<term.14>>"]  # bright cyan
     markedBaseCommitFgColor: ["<<term.0>>"]
     markedBaseCommitBgColor: ["<<term.11>>"]
     unstagedChangesColor: ["<<term.9>>"]       # bright red
-    defaultFgColor: ["<<term.15>>"]             # fg
+    defaultFgColor: ["<<term.15>>"]
 customCommands:
   - key: "C"
     command: "czg"

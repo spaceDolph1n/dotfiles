@@ -9,23 +9,24 @@ git:
       colorArg: always
       command: delta --dark --paging=never --line-numbers --hyperlinks
 gui:
-  # Kanso Zen, same palette as wezterm/nvim/tuicr. The default theme paints the
-  # selected line on ANSI blue (#8ba4b0 here), which swallows the filename and
-  # its status letters -- zenBg2 is the terminal's own selection background.
+  # The active theme's palette, same as wezterm/nvim/tuicr. The default theme
+  # paints the selected line on ANSI blue (#ebbcba here), which swallows the
+  # filename and its status letters -- the role below is the terminal's own
+  # selection background.
   theme:
-    activeBorderColor: ["#8ea4a2"]          # aqua
-    inactiveBorderColor: ["#393b44"]        # zenBg3
-    searchingActiveBorderColor: ["#e6c384"] # bright yellow
-    optionsTextColor: ["#7fb4ca"]           # bright blue
-    selectedLineBgColor: ["#22262d"]        # zenBg2
-    inactiveViewSelectedLineBgColor: ["#1c1e25"] # zenBg1
+    activeBorderColor: ["#9ccfd8"]
+    inactiveBorderColor: ["#403d52"]
+    searchingActiveBorderColor: ["#f6c177"] # bright yellow
+    optionsTextColor: ["#9ccfd8"]           # bright blue
+    selectedLineBgColor: ["#26233a"]
+    inactiveViewSelectedLineBgColor: ["#1f1d2e"]
     # Dark text on a light chip -- the pair the defaults get wrong.
-    cherryPickedCommitFgColor: ["#090e13"]
-    cherryPickedCommitBgColor: ["#7aa89f"]  # bright cyan
-    markedBaseCommitFgColor: ["#090e13"]
-    markedBaseCommitBgColor: ["#e6c384"]
-    unstagedChangesColor: ["#e46876"]       # bright red
-    defaultFgColor: ["#c5c9c7"]             # fg
+    cherryPickedCommitFgColor: ["#26233a"]
+    cherryPickedCommitBgColor: ["#ebbcba"]  # bright cyan
+    markedBaseCommitFgColor: ["#26233a"]
+    markedBaseCommitBgColor: ["#f6c177"]
+    unstagedChangesColor: ["#eb6f92"]       # bright red
+    defaultFgColor: ["#e0def4"]
 customCommands:
   - key: "C"
     command: "czg"

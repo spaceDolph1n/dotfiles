@@ -17,12 +17,12 @@
   line-numbers = true
   side-by-side = false     # unified reads better at split-pane widths
   hyperlinks = true
-  plus-style = "syntax #2b3328"
-  minus-style = "syntax #43242b"
-  plus-emph-style = "syntax #44533e"
-  minus-emph-style = "syntax #6e2d33"
-  hunk-header-decoration-style = "#22262d"
-  line-numbers-zero-style = "#5c6066"
+  plus-style = "syntax #263238"
+  minus-style = "syntax #361f2a"
+  plus-emph-style = "syntax #4d666d"
+  minus-emph-style = "syntax #723a4d"
+  hunk-header-decoration-style = "#26233a"
+  line-numbers-zero-style = "#6e6a86"
 
 [alias]
   # diffnav is diff-only and full-screen, so it cannot be `core.pager` -- that

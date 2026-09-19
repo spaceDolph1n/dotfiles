@@ -6,7 +6,7 @@
 # `{`/`}` annotated hunk, `c` leave a note, `a` toggle agent notes, `e` open the
 # selected file in $EDITOR, `t` theme picker, `?` everything else.
 
-theme = "kanso"
+theme = "rose-pine"
 
 # `[themes.<id>]` rather than `[custom_theme]`: same keys, but it takes a name,
 # shows up in the `t` picker, and leaves room for a second theme later.
@@ -41,7 +41,7 @@ background = "#090e13" # the darkest surface
 panel = "#090e13"      # the diff surface too, not just the sidebar
 panelAlt = "#22262d"   # two steps up
 border = "#3c4045"     # panel borders
-accent = "#8ea4a2"     # the aqua tmux uses for the active pane border
+accent = "#8ea4a2"     # the colour tmux uses for the active pane border
 accentMuted = "#5c6066" # dimmest text
 text = "#c5c9c7"       # body text
 # A step dimmer than the comment grey, deliberately. hunk spends `muted` on the
@@ -132,7 +132,7 @@ background = "#181616" # the darkest surface
 panel = "#181616"      # the diff surface too, not just the sidebar
 panelAlt = "#393836"   # two steps up
 border = "#565349"     # panel borders
-accent = "#8ea4a2"     # the aqua tmux uses for the active pane border
+accent = "#8ea4a2"     # the colour tmux uses for the active pane border
 accentMuted = "#625e5a" # dimmest text
 text = "#c5c9c5"       # body text
 muted = "#625e5a"
@@ -188,6 +188,76 @@ noteTitleText = "#c5c9c5"
 "entity.name.type" = "#8ea4a2"
 "support.type" = "#8ea4a2"
 "support.class" = "#8ea4a2"
+
+[themes.rose-pine]
+# Same roles again; see the kanso block for the reasoning. The base is Shiki's
+# own rose-pine, which is the palette this theme is derived from -- no
+# substitution needed, unlike kanso borrowing kanagawa-wave.
+base = "rose-pine"
+label = "Rosé Pine"
+
+background = "#090b10" # the darkest surface
+panel = "#090b10"      # the diff surface too, not just the sidebar
+panelAlt = "#26233a"   # two steps up
+border = "#3b3850"     # panel borders
+accent = "#9ccfd8"     # the colour tmux uses for the active pane border
+accentMuted = "#6e6a86" # dimmest text
+text = "#e0def4"       # body text
+muted = "#6e6a86"
+
+addedBg = "#263238"        # added row tint
+removedBg = "#361f2a"      # removed row tint
+movedAddedBg = "#362e32"   # moved-added tint
+movedRemovedBg = "#635254" # moved-removed tint
+contextBg = "#090b10"
+contextContentBg = "#090b10"
+
+addedContentBg = "#4d666d"
+removedContentBg = "#723a4d"
+
+addedSignColor = "#9ccfd8"   # added sign
+removedSignColor = "#eb6f92" # removed sign
+
+lineNumberBg = "#090b10"
+lineNumberFg = "#6e6a86" # dimmest text
+selectedHunk = "#26233a" # two steps up, the cursor_line row
+
+badgeAdded = "#9ccfd8"
+badgeRemoved = "#eb6f92"
+badgeNeutral = "#908caa" # neutral badge
+
+fileNew = "#9ccfd8"
+fileDeleted = "#eb6f92"
+fileRenamed = "#9ccfd8"   # renamed
+fileModified = "#ebbcba"  # modified
+fileUntracked = "#908caa" # untracked
+
+# Pine, not violet: rose-pine spends iris on diagnostics and links, and pine on
+# nothing the diff or git state uses. Same requirement, different hue.
+noteBorder = "#31748f"
+noteBackground = "#1f1d2e"
+noteTitleBackground = "#26233a"
+noteTitleText = "#e0def4"
+
+[themes.rose-pine.syntax_scopes]
+"comment" = "#908caa"
+"punctuation.definition.comment" = "#908caa"
+"string" = "#f6c177"
+"string.quoted" = "#f6c177"
+"string.template" = "#f6c177"
+"string.regexp" = "#ebbcba"
+"constant.numeric" = "#f6c177"
+"constant.language" = "#f6c177"
+"constant.character" = "#f6c177"
+"keyword" = "#31748f"
+"keyword.control" = "#31748f"
+"storage.type" = "#31748f"
+"storage.modifier" = "#31748f"
+"entity.name.function" = "#ebbcba"
+"support.function" = "#ebbcba"
+"entity.name.type" = "#9ccfd8"
+"support.type" = "#9ccfd8"
+"support.class" = "#9ccfd8"
 
 [keybindings]
 "hunk.review.nextAnnotatedFile" = ">"
