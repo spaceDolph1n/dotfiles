@@ -30,7 +30,6 @@ icon = " "
 name = "second brain"
 path = "~/.sb/second-brain"
 startup_command = "nvim"
-alias = "sb"
 icon = " "
 
 # --- Work -------------------------------------------------------------------
