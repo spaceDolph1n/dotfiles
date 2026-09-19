@@ -6,6 +6,7 @@ node = "lts"
 "npm:@firecrawl/anydoc" = "latest"
 "npm:@openai/codex" = "latest"
 "npm:czg" = "latest"
+"npm:defuddle" = "latest"
 python = "3.13"
 rust = "latest"
 
