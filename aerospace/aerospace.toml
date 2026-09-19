@@ -87,6 +87,13 @@ outer.bottom =     20
 # The second entry used to be written `{ monitor = { "LG ULTRAWIDE" = 60 } }`,
 # which is a different (and unsupported) shape from the first -- the per-monitor
 # override silently never applied.
+#
+# The built-in display's 37 is the notch, not a gap. With the menu bar set to
+# auto-hide, macOS hands back a visible frame starting at y=0, so a window sized
+# to it runs under the notch and loses its titlebar centre. 37pt is the menu bar
+# height on a notched 14-inch, which is exactly the strip to keep clear. The
+# externals have no notch and no menu bar to clear, so they keep the 20 the rest
+# of the gaps use.
 outer.top = [ { monitor."LG ULTRAGEAR" = 20 }, { monitor."LG ULTRAWIDE" = 60 }, 20 ]
 outer.right =      20
 
