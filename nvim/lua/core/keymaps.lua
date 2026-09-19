@@ -99,16 +99,32 @@ keymap.set("n", "<leader>yy", yank_path(":.", "relative path"), { desc = "Yank r
 keymap.set("n", "<leader>yY", yank_path(":p", "absolute path"), { desc = "Yank absolute path" })
 keymap.set("n", "<leader>yn", yank_path(":t", "filename"), { desc = "Yank filename" })
 keymap.set("n", "<leader>yd", yank_path(":h", "directory"), { desc = "Yank directory" })
-keymap.set("n", "<leader>yl", function()
+-- `'<` and `'>` are only set once visual mode has been left, so the live
+-- selection is read from `v` (where it started) and `.` (where the cursor is),
+-- which works while still in it.
+local function yank_path_line()
 	local file = vim.fn.expand("%:.")
 	if file == "" then
 		vim.notify("Buffer has no file name", vim.log.levels.WARN, { title = "Yank path" })
 		return
 	end
-	local path = ("%s:%d"):format(file, vim.fn.line("."))
+
+	local first = vim.fn.line(".")
+	local last = first
+	if vim.fn.mode():match("^[vV\22]") then
+		first, last = vim.fn.line("v"), first
+		if first > last then
+			first, last = last, first
+		end
+	end
+
+	local path = first == last and ("%s:%d"):format(file, first)
+		or ("%s:%d:%d"):format(file, first, last)
 	vim.fn.setreg("+", path)
 	vim.notify(path, vim.log.levels.INFO, { title = "Yanked path:line" })
-end, { desc = "Yank path:line" })
+end
+
+keymap.set({ "n", "x" }, "<leader>yl", yank_path_line, { desc = "Yank path:line" })
 
 -- (The "keep last yanked when pasting" mapping for `v p` is already set above;
 --  it used to be defined a second time here.)
