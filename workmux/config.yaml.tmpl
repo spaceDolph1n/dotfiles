@@ -32,6 +32,21 @@ panes:
     split: horizontal
     focus: true
 
+# `C` in gh-dash: a PR in its own worktree, so two reviews never share a branch.
+# nvim left, agent top-right, dev server under it. `dev-pane` installs deps in a
+# fresh worktree and asks before taking the port from another checkout's server.
+layouts:
+  review:
+    panes:
+      - command: "nvim; exec $SHELL"
+        focus: true
+      - command: <agent>
+        split: horizontal
+        percentage: 40
+      - command: "dev-pane; exec $SHELL"
+        split: vertical
+        percentage: 30
+
 # Single-width dots, painted from the status line's palette. None resets the
 # foreground after itself: that made every window carrying a dot render its name
 # in full fg. tmux/theme.conf sets the name colour after the dot instead.

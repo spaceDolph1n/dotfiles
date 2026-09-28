@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+#
+# The dev-server pane of a review window (workmux layout `review`, opened by `C`
+# in gh-dash). Installs dependencies if the worktree has none, then serves it.
+#
+# Only one web dev server can run: every checkout binds 443/80, fixed by
+# ~/.web-dev-profile. So if another worktree already holds the port, this says
+# which one and waits -- Enter stops it and serves this one instead, q leaves it.
+# Knowing which tree the browser is showing is the point: on 2026-09-28 a PR was
+# tested against a branch that had been switched underneath the server.
+#
+# Tests: scripts/dev-pane.test.sh
+
+set -euo pipefail
+
+PORT="${DEV_PANE_PORT:-443}"
+# `kill` is a builtin, so a stub on PATH cannot replace it; the test swaps it here.
+KILL="${DEV_PANE_KILL:-kill}"
+
+listener() { lsof -ti "tcp:$PORT" -sTCP:LISTEN 2>/dev/null | head -1 || true; }
+
+if [[ -f package.json && ! -d node_modules ]]; then
+	npm ci
+fi
+
+pid="$(listener)"
+if [[ -n "$pid" ]]; then
+	served="$(lsof -a -p "$pid" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p')"
+	if [[ "$served" == "$(pwd -P)" ]]; then
+		echo "Dev server already serving this worktree (pid $pid)."
+		exit 0
+	fi
+
+	printf 'Port %s is serving %s (pid %s).\n' "$PORT" "$served" "$pid"
+	read -rp "Enter: stop it and serve this worktree. q: leave it. " answer || answer=q
+	[[ "$answer" == q* ]] && exit 0
+
+	"$KILL" "$pid"
+	for _ in {1..50}; do
+		[[ -z "$(listener)" ]] && break
+		sleep 0.2
+	done
+fi
+
+npm run dev
