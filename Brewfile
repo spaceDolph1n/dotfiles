@@ -67,6 +67,7 @@ brew "hunk"
 brew "yt-dlp"         # pull video transcripts: yt-dlp --skip-download --write-auto-subs
 brew "poppler"        # pdftotext — extract book/PDF text locally for the vault
 brew "pandoc"         # epub/docx -> markdown, same job for non-PDF books
+brew "typst"          # PDF engine for pandoc (--pdf-engine=typst); ad-hoc test PDFs
 
 # ---------------------------------------------------------------------------
 # Terminal / system
