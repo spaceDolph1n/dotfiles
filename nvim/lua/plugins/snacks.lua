@@ -63,7 +63,15 @@ return {
 		-- Draws images and ```mermaid blocks inline in markdown. Needs Ghostty (full
 		-- kitty graphics), tmux allow-passthrough, ImageMagick, and mmdc via mise.
 		-- WezTerm cannot show them inline, which is why the terminal changed.
-		image = { enabled = true },
+		image = {
+			enabled = true,
+			-- A diagram replaces its mermaid source while reading.
+			doc = {
+				conceal = function(_, type)
+					return type == "math" or type == "chart"
+				end,
+			},
+		},
 		-- Replaces vim.ui.input; the DAP conditional-breakpoint prompt uses it.
 		input = { enabled = true },
 		lazygit = { enabled = true },
