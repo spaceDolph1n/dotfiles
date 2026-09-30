@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+#
+# `workmux resurrect` in every repo that has worktrees, from anywhere. Flags pass
+# through, so `--dry-run` works.
+#
+# resurrect is repo-scoped: from ~ it fails on `git worktree list`, which is what
+# made it look like it did nothing after the tmux restart of 2026-09-30.
+#
+# Tests: scripts/workmux-resurrect-all.test.sh
+
+set -euo pipefail
+
+WORKTREE_ROOT="${WORKMUX_WORKTREE_ROOT:-$HOME/.worktrees}"
+
+# One worktree per project folder is enough to find the main repo.
+repos() {
+	local project wt
+	for project in "$WORKTREE_ROOT"/*/; do
+		for wt in "$project"*/; do
+			[[ -d "$wt" ]] || continue
+			dirname "$(git -C "$wt" rev-parse --path-format=absolute --git-common-dir)"
+			break
+		done
+	done | sort -u
+}
+
+failed=0
+while IFS= read -r repo; do
+	printf '== %s\n' "$repo"
+	(cd "$repo" && workmux resurrect "$@") || failed=1
+done < <(repos)
+
+exit "$failed"
