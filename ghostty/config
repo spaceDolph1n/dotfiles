@@ -74,3 +74,8 @@ copy-on-select = clipboard
 
 # WezTerm had Ctrl+' clear the scrollback. Links open with Cmd+click here.
 keybind = ctrl+apostrophe=clear_screen
+
+# Ghostty's defaults turn Option+Left/Right into shell word jumps (esc b / esc f),
+# which swallowed tmux's prefix + M-Left/Right pane resize. WezTerm sent them on.
+keybind = alt+arrow_left=unbind
+keybind = alt+arrow_right=unbind
