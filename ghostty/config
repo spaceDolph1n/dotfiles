@@ -43,9 +43,9 @@ palette = 15=#e0def4
 font-family = JetBrains Mono
 font-size = 12.5
 adjust-cell-height = 5%
-# Ghostty fits Nerd Font icons strictly inside the cell, where WezTerm let them
-# overflow, so icons like tmux's session glyph came out smaller.
-adjust-icon-height = 25%
+# Wide Nerd Font icons (tmux's session glyph) render smaller than in WezTerm:
+# Ghostty fits them inside one cell. adjust-icon-height cannot help, as it only
+# affects height-constrained icons; a square glyph was tried and looked worse.
 
 # No title bar or tabs: tmux draws the tabs.
 macos-titlebar-style = hidden
@@ -53,8 +53,9 @@ background-opacity = 1
 
 # Top is deliberately larger than the sides: it is the gap above the tmux status
 # bar, and tmux can only pad in whole rows, which is too much. These are points,
-# so half WezTerm's pixel values on a Retina display. 4 is the baseline.
-window-padding-x = 4
+# so half WezTerm's pixel values on a Retina display -- except the sides, which
+# read better slightly wider than WezTerm's.
+window-padding-x = 8
 window-padding-y = 12,4
 window-padding-balance = false
 
