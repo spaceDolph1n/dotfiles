@@ -1,3 +1,31 @@
+local mermaid_config = vim.fn.stdpath("cache") .. "/mermaid-theme.json"
+
+-- Mermaid's own themes ignore the palette, so build one from nvim's colours.
+local function mermaid_theme()
+	local function hex(group, attr)
+		local value = vim.api.nvim_get_hl(0, { name = group, link = false })[attr]
+		return value and ("#%06x"):format(value)
+	end
+	local fill = hex("RenderMarkdownCode", "bg") or hex("ColorColumn", "bg")
+	local text, muted = hex("Normal", "fg"), hex("Comment", "fg")
+	return vim.json.encode({
+		theme = "base",
+		look = "classic", -- "neo" adds shadows and gradient borders
+		flowchart = { wrappingWidth = 400 },
+		themeVariables = {
+			fontFamily = "JetBrains Mono, Menlo, monospace",
+			primaryColor = fill,
+			primaryTextColor = text,
+			primaryBorderColor = muted,
+			lineColor = muted,
+			textColor = text,
+			edgeLabelBackground = fill,
+			secondaryColor = fill,
+			tertiaryColor = fill,
+		},
+	})
+end
+
 return {
 	"folke/snacks.nvim",
 	priority = 1000,
@@ -64,8 +92,17 @@ return {
 		image = {
 			enabled = true,
 			doc = {
+				max_width = 60,
+				max_height = 20,
 				conceal = function(_, type)
 					return type == "math" or type == "chart"
+				end,
+			},
+			convert = {
+				mermaid = function()
+					vim.fn.writefile({ mermaid_theme() }, mermaid_config)
+					-- Rendered at 3x and shrunk to fit, so it stays sharp.
+					return { "-i", "{src}", "-o", "{file}", "-b", "transparent", "-c", mermaid_config, "-s", "3" }
 				end,
 			},
 		},
@@ -313,6 +350,18 @@ return {
 		},
 	},
 	init = function()
+		-- snacks caches diagrams by content, so re-render them when the colours change.
+		vim.api.nvim_create_autocmd("ColorScheme", {
+			callback = function()
+				local ok, old = pcall(vim.fn.readfile, mermaid_config)
+				-- Compared decoded: key order in the encoded JSON is not stable.
+				if ok and not vim.deep_equal(vim.json.decode(old[1]), vim.json.decode(mermaid_theme())) then
+					for _, file in ipairs(vim.fn.glob(vim.fn.stdpath("cache") .. "/snacks/image/*chart*", false, true)) do
+						os.remove(file)
+					end
+				end
+			end,
+		})
 		vim.api.nvim_create_autocmd("User", {
 			pattern = "VeryLazy",
 			callback = function()
