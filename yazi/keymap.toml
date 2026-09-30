@@ -1,0 +1,6 @@
+[mgr]
+prepend_keymap = [
+	{ on = [ "g", "." ], run = "cd ~/.config/dotfiles",   desc = "Go to dotfiles" },
+	{ on = [ "g", "b" ], run = "cd ~/.sb/second-brain",   desc = "Go to second brain" },
+	{ on = "?",          run = "help",                    desc = "Open help" },
+]
