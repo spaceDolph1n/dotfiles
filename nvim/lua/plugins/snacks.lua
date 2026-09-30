@@ -1,3 +1,7 @@
+-- Personal repos (the github-personal SSH alias) are private to the inactive gh account.
+local gh = "if git remote get-url origin 2>/dev/null | grep -q github-personal; then "
+	.. "export GH_TOKEN=$(gh auth token -u spaceDolph1n); fi; gh"
+
 local mermaid_config = vim.fn.stdpath("cache") .. "/mermaid-theme.json"
 
 -- Mermaid's own themes ignore the palette, so build one from nvim's colours.
@@ -71,10 +75,10 @@ return {
 					indent = 3,
 					icon = " ",
 					title = "Open PRs",
-					cmd = "gh pr list -L 3",
+					cmd = gh .. " pr list -L 3",
 					key = "p",
 					action = function()
-						vim.fn.jobstart("gh pr list --web", { detach = true })
+						vim.fn.jobstart(gh .. " pr list --web", { detach = true })
 					end,
 					height = 7,
 				},
