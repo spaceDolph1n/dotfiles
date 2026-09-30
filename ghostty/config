@@ -1,15 +1,5 @@
-# Ghostty -- ported from wezterm/wezterm.lua.tmpl, 2026-09-30. Moved for the full
-# kitty graphics protocol (with unicode placeholders), which is what lets
-# snacks.image draw images and mermaid diagrams inline in nvim, even under tmux.
-# WezTerm's support is partial and draws nothing inline.
-#
 # Rendered by scripts/theme into `config`; edit this file, not that one.
-# Validate with: ghostty +validate-config --config-file=<path>
 
-# ------------------------------------------------------------------------------
-# Colours -- the 16 ANSI slots, and the only definition of them on this machine:
-# tmux pane borders, starship, fzf and eza all resolve colour names through here.
-# ------------------------------------------------------------------------------
 foreground = #e0def4
 background = #090b10
 cursor-color = #e0def4
@@ -35,47 +25,26 @@ palette = 13=#c4a7e7
 palette = 14=#ebbcba
 palette = 15=#e0def4
 
-# ------------------------------------------------------------------------------
-# Appearance
-# ------------------------------------------------------------------------------
-# Ghostty bundles Nerd Font symbols and falls back to Apple Color Emoji itself,
-# so the explicit fallback chain WezTerm needed is not repeated here.
 font-family = JetBrains Mono
 font-size = 12.5
 adjust-cell-height = 5%
-# Wide Nerd Font icons (tmux's session glyph) render smaller than in WezTerm:
-# Ghostty fits them inside one cell. adjust-icon-height cannot help, as it only
-# affects height-constrained icons; a square glyph was tried and looked worse.
 
-# No title bar or tabs: tmux draws the tabs.
 macos-titlebar-style = hidden
 background-opacity = 1
 
-# Top is deliberately larger than the sides: it is the gap above the tmux status
-# bar, and tmux can only pad in whole rows, which is too much. These are points,
-# so half WezTerm's pixel values on a Retina display -- except the sides, which
-# read better slightly wider than WezTerm's.
+# Top is the gap above the tmux status bar. Values are points, not pixels.
 window-padding-x = 8
 window-padding-y = 12,4
 window-padding-balance = false
 
 cursor-invert-fg-bg = true
 
-# ------------------------------------------------------------------------------
-# Behaviour
-# ------------------------------------------------------------------------------
-# Left Option is Alt, as in WezTerm; right Option still composes characters.
 macos-option-as-alt = left
 confirm-close-surface = false
 auto-update = off
-
-# Select-to-copy, mirroring the tmux binding so bare shells behave the same.
 copy-on-select = clipboard
 
-# WezTerm had Ctrl+' clear the scrollback. Links open with Cmd+click here.
 keybind = ctrl+apostrophe=clear_screen
-
-# Ghostty's defaults turn Option+Left/Right into shell word jumps (esc b / esc f),
-# which swallowed tmux's prefix + M-Left/Right pane resize. WezTerm sent them on.
+# The defaults make these word jumps, which swallows tmux's prefix + M-Left/Right.
 keybind = alt+arrow_left=unbind
 keybind = alt+arrow_right=unbind

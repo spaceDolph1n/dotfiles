@@ -60,12 +60,9 @@ return {
 		-- Renders the file before plugins finish loading.
 		quickfile = { enabled = true },
 		indent = { enabled = true },
-		-- Draws images and ```mermaid blocks inline in markdown. Needs Ghostty (full
-		-- kitty graphics), tmux allow-passthrough, ImageMagick, and mmdc via mise.
-		-- WezTerm cannot show them inline, which is why the terminal changed.
+		-- Inline images and mermaid; needs Ghostty, tmux passthrough, magick and mmdc.
 		image = {
 			enabled = true,
-			-- A diagram replaces its mermaid source while reading.
 			doc = {
 				conceal = function(_, type)
 					return type == "math" or type == "chart"
@@ -106,9 +103,7 @@ return {
 		} },
 		toggle = { enabled = true },
 		words = { enabled = true },
-		-- A reading column like shoin's: centred, ~72 columns of text, nothing dimmed.
-		-- A toggle, not the markdown default: 41% of the vault's table rows are wider.
-		-- It widens to the note's widest table row, since table cells cannot wrap.
+		-- Reading column; widens to the widest table row, since cells cannot wrap.
 		zen = {
 			toggles = { dim = false },
 			win = {
@@ -119,7 +114,6 @@ return {
 							widest = math.max(widest, vim.fn.strdisplaywidth(line))
 						end
 					end
-					-- 8 for the number and sign columns.
 					return math.min(math.max(80, widest + 8), vim.o.columns)
 				end,
 			},
@@ -326,8 +320,7 @@ return {
 				Snacks.toggle.option("spell", { name = "Spelling" }):map("<leader>us")
 				Snacks.toggle.option("wrap", { name = "Wrap" }):map("<leader>uw")
 				Snacks.toggle.diagnostics():map("<leader>ud")
-				-- The built-in zen and zoom toggles both read the one shared window, so
-				-- each showed as on when the other was. Zoom's is the full-width one.
+				-- The built-in zen/zoom toggles share one window, so each showed the other on.
 				local function zen_toggle(id, name, key, open, zoomed)
 					Snacks.toggle
 						.new({

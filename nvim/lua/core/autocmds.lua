@@ -45,8 +45,7 @@ vim.api.nvim_create_autocmd("FileType", {
 	callback = function()
 		vim.opt_local.conceallevel = 1
 		vim.opt_local.wrap = true
-		-- Wrap at word boundaries, and indent a wrapped list item under its text
-		-- rather than its bullet, number or checkbox.
+		-- Wrap at words; wrapped list items indent under their text.
 		vim.opt_local.linebreak = true
 		vim.opt_local.breakindent = true
 		vim.opt_local.breakindentopt = "list:-1"
