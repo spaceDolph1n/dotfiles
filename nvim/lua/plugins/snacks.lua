@@ -60,9 +60,10 @@ return {
 		-- Renders the file before plugins finish loading.
 		quickfile = { enabled = true },
 		indent = { enabled = true },
-		-- Off: needs the kitty graphics protocol, which the Homebrew WezTerm build
-		-- does not implement, and its converters are not installed either.
-		image = { enabled = false },
+		-- Draws images and ```mermaid blocks inline in markdown. Needs Ghostty (full
+		-- kitty graphics), tmux allow-passthrough, ImageMagick, and mmdc via mise.
+		-- WezTerm cannot show them inline, which is why the terminal changed.
+		image = { enabled = true },
 		-- Replaces vim.ui.input; the DAP conditional-breakpoint prompt uses it.
 		input = { enabled = true },
 		lazygit = { enabled = true },
@@ -97,6 +98,24 @@ return {
 		} },
 		toggle = { enabled = true },
 		words = { enabled = true },
+		-- A reading column like shoin's: centred, ~72 columns of text, nothing dimmed.
+		-- A toggle, not the markdown default: 41% of the vault's table rows are wider.
+		-- It widens to the note's widest table row, since table cells cannot wrap.
+		zen = {
+			toggles = { dim = false },
+			win = {
+				width = function(win)
+					local widest = 0
+					for _, line in ipairs(vim.api.nvim_buf_get_lines(win.buf, 0, -1, false)) do
+						if line:match("^%s*|.*|%s*$") then
+							widest = math.max(widest, vim.fn.strdisplaywidth(line))
+						end
+					end
+					-- 8 for the number and sign columns.
+					return math.min(math.max(80, widest + 8), vim.o.columns)
+				end,
+			},
+		},
 	},
 	keys = {
 		-- UI
@@ -299,7 +318,29 @@ return {
 				Snacks.toggle.option("spell", { name = "Spelling" }):map("<leader>us")
 				Snacks.toggle.option("wrap", { name = "Wrap" }):map("<leader>uw")
 				Snacks.toggle.diagnostics():map("<leader>ud")
-				Snacks.toggle.zoom():map("<leader>uz")
+				-- The built-in zen and zoom toggles both read the one shared window, so
+				-- each showed as on when the other was. Zoom's is the full-width one.
+				local function zen_toggle(id, name, key, open, zoomed)
+					Snacks.toggle
+						.new({
+							id = id,
+							name = name,
+							get = function()
+								local win = Snacks.zen.win
+								return win ~= nil and win:valid() and (win.opts.width == 0) == zoomed
+							end,
+							set = function(state)
+								if state then
+									open()
+								elseif Snacks.zen.win then
+									Snacks.zen.win:close()
+								end
+							end,
+						})
+						:map(key)
+				end
+				zen_toggle("zoom", "Zoom Mode", "<leader>uz", Snacks.zen.zoom, true)
+				zen_toggle("zen", "Zen Mode", "<leader>uZ", Snacks.zen.zen, false)
 				Snacks.toggle.indent():map("<leader>ug")
 				Snacks.toggle.dim():map("<leader>uD")
 			end,
