@@ -1,6 +1,6 @@
 # 🛠️ macOS Dotfiles
 
-Personal dotfiles for a fresh macOS install: shell, Neovim, tmux, WezTerm,
+Personal dotfiles for a fresh macOS install: shell, Neovim, tmux, Ghostty,
 AeroSpace and git, symlinked with GNU Stow.
 
 Setup is ten steps, in dependency order. Everything is safe to re-run.
@@ -64,6 +64,13 @@ CLIs that ship as npm packages go through mise too — **never `npm install -g`*
 ```bash
 mise use -g "npm:czg@latest"             # commit tooling, lazygit's `C` binding
 mise use -g "npm:@openai/codex@latest"   # Codex CLI, used by the codex consult
+```
+
+`mmdc` (mermaid-cli, for diagrams drawn inline in nvim) renders through a headless
+Chrome that mise does not download. Fetch the version its error names, once:
+
+```bash
+npx @puppeteer/browsers install chrome-headless-shell@<version> --path ~/.cache/puppeteer
 ```
 
 > **Which manager?** Decide by what the thing *ships as*, not by preference:
@@ -222,7 +229,8 @@ because `$`, `{}`, `{{}}` and `#{}` are already spoken by starship, gh-dash and 
 
 | Surface | How it switches |
 | --- | --- |
-| **wezterm** | generated; the only ANSI definition on this machine — tmux, starship, fzf and eza all resolve colour names through it |
+| **ghostty** | generated `ghostty/config`; the only ANSI definition on this machine — tmux, starship, fzf and eza all resolve colour names through it. `cmd+shift+,` reloads |
+| **wezterm** | generated; kept while Ghostty settles in |
 | **tmux** | generated `tmux/theme.conf`, sourced after tpm |
 | **workmux** | generated; the agent-status dots |
 | **nvim** | generated `nvim/lua/active-theme.lua`, read by `theme.lua` |
@@ -240,8 +248,9 @@ values reproduce colours that were hand-tuned here first, which is what the test
 watch: it rewrites `config.toml` when you accept "save view changes?" on quit, so answer *no*
 and put the preference in the template instead.
 
-The wezterm block must keep `force_reverse_video_cursor = true`. Without it the cursor uses
-`cursor_bg`/`cursor_fg` literally, which in this palette is dark-on-dark and near invisible.
+The ghostty config must keep `cursor-invert-fg-bg = true`, and wezterm's
+`force_reverse_video_cursor = true`. Without them the cursor uses its colours literally,
+which in this palette is dark-on-dark and near invisible.
 
 The yazi flavours carry no `tmtheme.xml`, so file *previews* keep yazi's default syntax
 highlighting; only the chrome is themed. `theme.toml` holds nothing but `[flavor]` — anything

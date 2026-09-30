@@ -38,7 +38,7 @@ ROLE = re.compile(r"<<([a-z0-9_.:-]+)>>")
 # Files with a live inode-based watcher, written in place rather than renamed.
 WATCHED_IN_PLACE = {"wezterm.lua"}
 
-NEEDS_RESTART = ["nvim", "lazygit", "hunk", "tuicr", "yazi", "starship", "gh-dash"]
+NEEDS_RESTART = ["ghostty (cmd+shift+, reloads)", "nvim", "lazygit", "hunk", "tuicr", "yazi", "starship", "gh-dash"]
 
 
 def die(message):

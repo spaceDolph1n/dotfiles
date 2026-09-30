@@ -4,6 +4,7 @@
 [tools]
 node = "lts"
 "npm:@firecrawl/anydoc" = "latest"
+"npm:@mermaid-js/mermaid-cli" = "latest"
 "npm:@openai/codex" = "latest"
 "npm:czg" = "latest"
 "npm:defuddle" = "latest"

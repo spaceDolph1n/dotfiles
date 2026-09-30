@@ -37,6 +37,8 @@ brew "neovim"
 # Required by nvim-treesitter's `main` branch to build parsers (:TSUpdate).
 # Note: the `tree-sitter` formula is the C library only -- this is the CLI.
 brew "tree-sitter-cli"
+# snacks.image converts every non-PNG image (and mermaid's SVG) through it.
+brew "imagemagick"
 # mise manages Node *and* Python, and supplies per-project env via .mise.toml.
 # It replaced fnm, which replaced nvm.
 brew "mise"
@@ -84,7 +86,8 @@ brew "felixkratz/formulae/borders"  # window borders, started by aerospace
 # ---------------------------------------------------------------------------
 # Applications
 # ---------------------------------------------------------------------------
-cask "wezterm"
+cask "ghostty"        # replaces wezterm: full kitty graphics, so snacks.image draws inline
+cask "wezterm"        # kept until ghostty has settled in
 cask "aerospace"
 cask "betterdisplay"  # per-monitor scaling/brightness, incl. the non-native displays
 cask "1password"
