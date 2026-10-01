@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+#
+# Build workmux from its latest release tag with our patches on top, and install
+# it to ~/.local/bin. Re-run after an upstream release to pick it up; a patch that
+# no longer applies stops the build instead of installing a half-patched binary.
+#
+# Patches: workmux/patches/*.patch, applied in name order.
+
+set -euo pipefail
+
+DOTFILES="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+SRC="${WORKMUX_SRC:-$HOME/.cache/workmux-src}"
+DEST="${WORKMUX_DEST:-$HOME/.local/bin}"
+
+if [[ -d "$SRC/.git" ]]; then
+	git -C "$SRC" fetch -q --tags origin
+else
+	git clone -q https://github.com/raine/workmux.git "$SRC"
+fi
+
+tag="$(git -C "$SRC" tag --sort=-v:refname | head -1)"
+git -C "$SRC" checkout -q --detach "$tag"
+git -C "$SRC" reset -q --hard
+git -C "$SRC" clean -qfd
+
+for patch in "$DOTFILES"/workmux/patches/*.patch; do
+	printf 'apply %s\n' "$(basename "$patch")"
+	git -C "$SRC" apply --3way "$patch"
+done
+
+(cd "$SRC" && mise exec rust -- cargo build --release --quiet)
+mkdir -p "$DEST"
+install -m 755 "$SRC/target/release/workmux" "$DEST/workmux"
+printf 'installed %s (%s + patches)\n' "$DEST/workmux" "$tag"
+
+# The sidebar's tmux hooks call the binary that started it, so restart it on the new one.
+if [[ -n "$(tmux show-option -gqv @workmux_sidebar_daemon_pid 2>/dev/null)" ]]; then
+	"$DEST/workmux" sidebar off && "$DEST/workmux" sidebar on
+fi
