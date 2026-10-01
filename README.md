@@ -274,7 +274,9 @@ workmux runs from source with `workmux/patches/*.patch` on top:
 scripts/workmux-build    # latest release tag + patches → ~/.local/bin/workmux
 ```
 
-Re-run it after an upstream release. A patch that no longer applies stops the build.
+Brew still installs and updates its own copy; `~/.local/bin` comes first on PATH, so
+the patched one wins. Re-run the script after an upstream release to rebuild the newest
+tag. A patch that no longer applies stops the build.
 The sidebar patch makes the row background mark the window you are in, and shows
 the j/k cursor only while the sidebar has focus.
 

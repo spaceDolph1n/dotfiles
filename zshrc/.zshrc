@@ -4,8 +4,8 @@
 export XDG_CONFIG_HOME="$HOME/.config"
 export LANG=en_US.UTF-8
 
-export PATH=/opt/homebrew/bin:$PATH
-export PATH=$PATH:$HOME/.local/bin
+# ~/.local/bin ahead of brew so the patched workmux (scripts/workmux-build) wins.
+export PATH=$HOME/.local/bin:/opt/homebrew/bin:$PATH
 
 export SCRIPTS="$HOME/.config/scripts"
 export PATH="$PATH:$SCRIPTS"

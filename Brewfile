@@ -76,6 +76,8 @@ brew "typst"          # PDF engine for pandoc (--pdf-engine=typst); ad-hoc test 
 brew "tmux"
 # git worktree + tmux window per task, for parallel agents.
 # Global config is stowed from workmux/; per-repo overrides in .workmux.yaml.
+# Shadowed by a patched build in ~/.local/bin while workmux/patches/ is non-empty;
+# see scripts/workmux-build. Drop the patch and that binary to fall back to this one.
 brew "raine/workmux/workmux"
 brew "btop"
 brew "openssh"
