@@ -98,7 +98,6 @@ cask "notion-calendar"
 cask "notion-mail"
 cask "firefox"
 cask "slack"
-cask "obsidian"       # backs the ~/.sb/second-brain obsidian.nvim workspace
 cask "raycast"
 cask "spotify"
 cask "todoist-app"
