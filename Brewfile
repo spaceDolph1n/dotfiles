@@ -86,7 +86,6 @@ brew "felixkratz/formulae/borders"  # window borders, started by aerospace
 # Applications
 # ---------------------------------------------------------------------------
 cask "ghostty"
-cask "wezterm"        # kept until ghostty has settled in
 cask "font-jetbrains-mono"  # for mermaid diagrams; terminals bundle their own
 cask "aerospace"
 cask "betterdisplay"  # per-monitor scaling/brightness, incl. the non-native displays

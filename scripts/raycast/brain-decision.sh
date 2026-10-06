@@ -2,7 +2,7 @@
 # Raycast Script Command -- record a decision.
 #
 # Fill in why/expected here and it is captured complete, with no editor.
-# Leave them blank and the stub opens in WezTerm to finish at the desk.
+# Leave them blank and the stub opens in Ghostty to finish at the desk.
 #
 # @raycast.schemaVersion 1
 # @raycast.title Log a decision

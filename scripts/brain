@@ -61,11 +61,10 @@ open_editor() {
 	local file="$1" line="$2"
 	if [[ -t 0 && -t 1 ]]; then
 		"$EDITOR_CMD" "+$line" "$file"
-	elif command -v wezterm >/dev/null 2>&1; then
-		# Raycast runs scripts without a TTY, so spawn a real terminal.
-		wezterm start --always-new-process -- "$EDITOR_CMD" "+$line" "$file" >/dev/null 2>&1 &
 	else
-		open -a WezTerm >/dev/null 2>&1 || die "no TTY and no wezterm to open $file"
+		# Raycast runs scripts without a TTY, so spawn a real terminal.
+		open -na Ghostty --args -e "$EDITOR_CMD" "+$line" "$file" >/dev/null 2>&1 ||
+			die "no TTY and no Ghostty to open $file"
 	fi
 }
 

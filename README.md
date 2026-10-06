@@ -46,9 +46,6 @@ brew bundle check --file=~/.config/dotfiles/Brewfile --verbose   # what's missin
 brew bundle cleanup --file=~/.config/dotfiles/Brewfile           # what's extra
 ```
 
-> WezTerm may already exist in `/Applications` from a manual download. Adopt it
-> into Homebrew once with `brew install --cask wezterm --force`.
-
 ### 4. Runtimes
 
 Managed by **mise** — Node *and* Python, plus per-project env vars via `mise.toml`.
@@ -230,7 +227,6 @@ because `$`, `{}`, `{{}}` and `#{}` are already spoken by starship, gh-dash and 
 | Surface | How it switches |
 | --- | --- |
 | **ghostty** | generated `ghostty/config`; the only ANSI definition on this machine — tmux, starship, fzf and eza all resolve colour names through it. `cmd+shift+,` reloads |
-| **wezterm** | generated; kept while Ghostty settles in |
 | **tmux** | generated `tmux/theme.conf`, sourced after tpm |
 | **workmux** | generated; the agent-status dots |
 | **nvim** | generated `nvim/lua/active-theme.lua`, read by `theme.lua` |
@@ -248,8 +244,7 @@ values reproduce colours that were hand-tuned here first, which is what the test
 watch: it rewrites `config.toml` when you accept "save view changes?" on quit, so answer *no*
 and put the preference in the template instead.
 
-The ghostty config must keep `cursor-invert-fg-bg = true`, and wezterm's
-`force_reverse_video_cursor = true`. Without them the cursor uses its colours literally,
+The ghostty config must keep `cursor-invert-fg-bg = true`. Without it the cursor uses its colours literally,
 which in this palette is dark-on-dark and near invisible.
 
 The yazi flavours carry no `tmtheme.xml`, so file *previews* keep yazi's default syntax
