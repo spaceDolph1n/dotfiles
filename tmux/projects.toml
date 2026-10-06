@@ -1,0 +1,18 @@
+# Curated projects for `prefix + O` (scripts/tmux-project-window). They sit at the
+# top of the picker under their own name; everything else still reaches it through
+# zoxide and the workmux worktree root, so only add what is worth a fixed name.
+#
+# Every place opens the same way a workmux worktree does: a shell on the left, the
+# agent on the right and focused.
+
+[[project]]
+name = "dotfiles"
+path = "~/.config/dotfiles"
+
+[[project]]
+name = "second brain"
+path = "~/.sb/second-brain"
+
+[[project]]
+name = "web"
+path = "~/Documents/work/web"
