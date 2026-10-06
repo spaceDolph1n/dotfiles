@@ -63,3 +63,6 @@ local.*
 # ~/.config/git/ignore. Named here so the pattern matches the *symlink* workmux
 # creates in each worktree, which the global rule cannot see into.
 /.claude
+
+# Work identity: local only, never in this public repo. git/.gitconfig includes it for ~/Documents/work.
+git/.gitconfig-work
