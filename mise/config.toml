@@ -9,7 +9,6 @@ node = "lts"
 "npm:czg" = "latest"
 "npm:defuddle" = "latest"
 python = "3.13"
-rust = "stable"
 
 [settings]
 # Read `.nvmrc` / `.node-version` the way fnm's `--use-on-cd` did.

@@ -4,7 +4,7 @@
 export XDG_CONFIG_HOME="$HOME/.config"
 export LANG=en_US.UTF-8
 
-# ~/.local/bin ahead of brew so the patched workmux (scripts/workmux-build) wins.
+# ~/.local/bin ahead of brew: user-installed binaries, the claude CLI among them, win.
 export PATH=$HOME/.local/bin:/opt/homebrew/bin:$PATH
 
 export SCRIPTS="$HOME/.config/scripts"

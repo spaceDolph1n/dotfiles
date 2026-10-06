@@ -266,21 +266,7 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 Prefix is `C-a`. After any edit to `tmux.conf`, reload with **`prefix + R`** —
 otherwise new bindings silently do nothing.
 
-### 10. workmux, patched
-
-workmux runs from source with `workmux/patches/*.patch` on top:
-
-```bash
-scripts/workmux-build    # latest release tag + patches → ~/.local/bin/workmux
-```
-
-Brew still installs and updates its own copy; `~/.local/bin` comes first on PATH, so
-the patched one wins. Re-run the script after an upstream release to rebuild the newest
-tag. A patch that no longer applies stops the build.
-The sidebar patch makes the row background mark the window you are in, and shows
-the j/k cursor only while the sidebar has focus.
-
-### 11. Daily auto-commit (optional)
+### 10. Daily auto-commit (optional)
 
 `scripts/daily-snapshot` commits and pushes anything uncommitted in this repo and
 in a notes repo at `~/.sb/second-brain`. The repo list is hardcoded at the top of
@@ -305,7 +291,7 @@ Raycast → Extensions → Script Commands if you use Raycast.
 > unset, git never reads `~/.config/git/.gitconfig`, and commits get authored as
 > `user@hostname`. Do not remove those lines.
 
-### 12. Verify
+### 11. Verify
 
 ```bash
 ls -l ~/.config | grep ' -> '        # symlinks resolve
