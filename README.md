@@ -266,28 +266,13 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 Prefix is `C-a`. After any edit to `tmux.conf`, reload with **`prefix + R`** —
 otherwise new bindings silently do nothing.
 
-### 10. Daily auto-commit (optional)
-
-`scripts/daily-snapshot` commits and pushes anything uncommitted in this repo and
-in a notes repo at `~/.sb/second-brain`. The repo list is hardcoded at the top of
-the script — **edit it before enabling**, or skip this step entirely.
-
-Install the LaunchAgent that runs it daily at 23:00 and at login:
-
-```bash
-ln -sf ~/.config/dotfiles/launchd/com.spacedolph1n.daily-snapshot.plist ~/Library/LaunchAgents/
-launchctl load ~/Library/LaunchAgents/com.spacedolph1n.daily-snapshot.plist
-tail -f /tmp/daily-snapshot.log
-```
-
-It checks `git status` per repo first and exits immediately when everything is
-clean, so a quiet day costs nothing.
+### 10. Raycast scripts (optional)
 
 `scripts/raycast/` holds Raycast Script Commands — register that directory under
 Raycast → Extensions → Script Commands if you use Raycast.
 
 > **Why the scripts set `GIT_CONFIG_GLOBAL` explicitly:** anything launched by
-> launchd, Raycast or Shortcuts does **not** source `.zshrc`, so the variable is
+> Raycast or Shortcuts does **not** source `.zshrc`, so the variable is
 > unset, git never reads `~/.config/git/.gitconfig`, and commits get authored as
 > `user@hostname`. Do not remove those lines.
 
@@ -299,7 +284,6 @@ git config user.email                # correct identity per directory
 nvim --version | head -1             # 0.12+
 nvim +checkhealth                    # treesitter, lsp, conform all green
 tmux new -d && tmux ls && tmux kill-server
-launchctl list | grep daily-snapshot
 ```
 
 ---

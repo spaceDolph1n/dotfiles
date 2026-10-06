@@ -11,8 +11,8 @@ The Obsidian app is gone and its graph view with it. This is the replacement:
 one file, no dependencies, no toolchain -- the alternative was installing Rust
 to build an 80-star TUI with no macOS binary.
 
-Deliberately NOT written into the vault: it is a generated artifact, and
-daily-snapshot would commit it.
+Deliberately NOT written into the vault: it is a generated artifact, and the
+vault is a pushed repo.
 """
 
 import html
