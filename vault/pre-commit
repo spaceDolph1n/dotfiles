@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Refuses local-only paths (work/, learning/, capture files), renames included, because
+# .git/info/exclude does not travel with a clone. Then regenerates and stages index.md.
+set -euo pipefail
+
+blocked=$(git diff --cached --name-only --diff-filter=d |
+	grep -E '^(work|learning)/|^captures(-done)?\.md$' || true)
+if [ -n "$blocked" ]; then
+	printf '\n✋ refusing to commit — these paths are local-only:\n\n' >&2
+	printf '%s\n' "$blocked" | sed 's/^/    /' >&2
+	printf '\nUnstage with:  git restore --staged <path>\n\n' >&2
+	exit 1
+fi
+
+BRAIN_VAULT="${BRAIN_VAULT:-$(git rev-parse --show-toplevel)}" "$HOME/.config/scripts/vault-index" >/dev/null
+git add index.md

@@ -1,0 +1,6 @@
+# Local-only: never committed. Versioned in ~/.config/dotfiles/vault, linked by vault-install-hooks.
+work/
+learning/
+captures.md
+captures-done.md
+.captures.lock

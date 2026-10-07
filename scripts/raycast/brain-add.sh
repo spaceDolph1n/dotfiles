@@ -6,7 +6,7 @@
 # @raycast.mode silent
 # @raycast.packageName Second Brain
 # @raycast.icon 🧠
-# @raycast.argument1 { "type": "text", "placeholder": "thought" }
-# @raycast.description Append a timestamped one-liner to the second brain log.
+# @raycast.argument1 { "type": "text", "placeholder": "capture" }
+# @raycast.description One-line capture into the vault inbox; /triage routes it later.
 
 exec "$HOME/.config/scripts/brain" "$1"

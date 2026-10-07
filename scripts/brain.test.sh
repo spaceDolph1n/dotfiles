@@ -1,135 +1,31 @@
 #!/usr/bin/env bash
-#
-# Tests for `brain`. Run: scripts/brain.test.sh
-#
-# Every case points BRAIN_VAULT at a throwaway vault, so the real second brain
-# is never touched. Each test builds its own vault from scratch -- shared state
-# between shell tests is how they start passing for the wrong reason.
-
+# Tests for `brain`. Every case points BRAIN_VAULT at a throwaway vault.
 set -uo pipefail
-
-BRAIN="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/brain"
-pass=0
+BRAIN="$(cd "$(dirname "$0")" && pwd)/brain"
 fail=0
+check() { if [ "$2" = "$3" ]; then echo "ok   $1"; else echo "FAIL $1 (got '$2', want '$3')"; fail=1; fi; }
+fresh() { BRAIN_VAULT="$(mktemp -d)"; export BRAIN_VAULT; }
 
-# --- harness -----------------------------------------------------------------
+fresh
+"$BRAIN" "check nvim marks" >/dev/null
+check "a capture lands in captures.md" "$(grep -c 'check nvim marks' "$BRAIN_VAULT/captures.md")" 1
+grep -qE '^- [0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2} — check nvim marks$' "$BRAIN_VAULT/captures.md" && f=yes || f=no
+check "the line is dated" "$f" yes
 
-new_vault() {
-	VAULT="$(mktemp -d)"
-	export BRAIN_VAULT="$VAULT"
-	printf '# Log\n' >"$VAULT/log.md"
-	printf '# Decisions\n' >"$VAULT/decisions.md"
-}
+"$BRAIN" two words here >/dev/null
+check "unquoted words are one capture" "$(grep -c 'two words here' "$BRAIN_VAULT/captures.md")" 1
 
-note() { # note <stem> [body]
-	printf '%s\n' "${2:-# ${1}}" >"$BRAIN_VAULT/$1.md"
-}
+printf 'piped line\n' | "$BRAIN" >/dev/null
+check "a line on stdin is captured" "$(grep -c 'piped line' "$BRAIN_VAULT/captures.md")" 1
 
-check() { # check <name> <expected> <actual>
-	if [[ "$2" == "$3" ]]; then
-		printf '  ok   %s\n' "$1"
-		pass=$((pass + 1))
-	else
-		printf '  FAIL %s\n' "$1"
-		printf '       expected: %q\n' "$2"
-		printf '       actual:   %q\n' "$3"
-		fail=$((fail + 1))
-	fi
-}
+before=$(wc -l <"$BRAIN_VAULT/captures.md")
+printf '   \n' | "$BRAIN" >/dev/null 2>&1; code=$?
+check "an empty capture is refused" "$code" 1
+check "and writes nothing" "$(wc -l <"$BRAIN_VAULT/captures.md")" "$before"
 
-check_contains() { # check_contains <name> <needle> <haystack>
-	if [[ "$3" == *"$2"* ]]; then
-		printf '  ok   %s\n' "$1"
-		pass=$((pass + 1))
-	else
-		printf '  FAIL %s\n' "$1"
-		printf '       expected to contain: %q\n' "$2"
-		printf '       actual:              %q\n' "$3"
-		fail=$((fail + 1))
-	fi
-}
+"$BRAIN" -d "old decision" >/dev/null 2>&1; code=$?
+check "the removed -d flag fails loudly" "$code" 1
+[ ! -e "$BRAIN_VAULT/decisions.md" ] && d=no || d=yes
+check "and writes no decisions file" "$d" no
 
-# --- autolink: must not corrupt code spans or identifiers --------------------
-
-printf 'autolink\n'
-
-new_vault
-note code-review
-printf -- '- 2026-08-20 adherence is `pr-review-toolkit:code-review` work\n' >>"$BRAIN_VAULT/log.md"
-"$BRAIN" --relink >/dev/null 2>&1
-check "leaves a stem inside an inline code span alone" \
-	'- 2026-08-20 adherence is `pr-review-toolkit:code-review` work' \
-	"$(sed -n '2p' "$BRAIN_VAULT/log.md")"
-
-new_vault
-note code-review
-printf -- '- 2026-08-20 the code-review notes are worth rereading\n' >>"$BRAIN_VAULT/log.md"
-"$BRAIN" --relink >/dev/null 2>&1
-check_contains "still links a bare prose mention" \
-	'[[code-review]]' \
-	"$(sed -n '2p' "$BRAIN_VAULT/log.md")"
-
-new_vault
-note code-review
-printf -- '- 2026-08-20 see pr-review-toolkit:code-review for that\n' >>"$BRAIN_VAULT/log.md"
-"$BRAIN" --relink >/dev/null 2>&1
-check "leaves a stem inside a colon-separated identifier alone" \
-	'- 2026-08-20 see pr-review-toolkit:code-review for that' \
-	"$(sed -n '2p' "$BRAIN_VAULT/log.md")"
-
-new_vault
-note git-sheet
-printf -- '- 2026-08-20 pinned to git-sheet-v2 last week\n' >>"$BRAIN_VAULT/log.md"
-"$BRAIN" --relink >/dev/null 2>&1
-check "leaves a stem inside a longer hyphenated identifier alone" \
-	'- 2026-08-20 pinned to git-sheet-v2 last week' \
-	"$(sed -n '2p' "$BRAIN_VAULT/log.md")"
-
-new_vault
-note git-sheet
-printf -- '- 2026-08-20 reread the git-sheet.\n' >>"$BRAIN_VAULT/log.md"
-"$BRAIN" --relink >/dev/null 2>&1
-check_contains "still links a stem ending a sentence" \
-	'[[git-sheet]].' \
-	"$(sed -n '2p' "$BRAIN_VAULT/log.md")"
-
-new_vault
-note code-review
-"$BRAIN" 'adherence is `pr-review-toolkit:code-review` work' >/dev/null 2>&1
-check_contains "capture path leaves a code span alone" \
-	'`pr-review-toolkit:code-review`' \
-	"$(cat "$BRAIN_VAULT/log.md")"
-
-# --- backlinks: only a real heading is a heading ------------------------------
-
-printf 'backlinks\n'
-
-new_vault
-note code-review
-prose='# Second brain capture
-
-It re-scans the streams and refreshes `## Backlinks` sections in notes
-that opt in by containing that heading.
-
-## Committing
-
-Nothing to see here.'
-printf '%s\n' "$prose" >"$BRAIN_VAULT/second-brain-capture.md"
-"$BRAIN" --relink >/dev/null 2>&1
-check "leaves a literal '## Backlinks' in prose alone" \
-	"$prose" \
-	"$(cat "$BRAIN_VAULT/second-brain-capture.md")"
-
-new_vault
-note code-review
-printf -- '- 2026-08-20 the code-review notes are worth rereading\n' >>"$BRAIN_VAULT/log.md"
-printf '# Code review\n\nBody.\n\n## Backlinks\n\nstale\n' >"$BRAIN_VAULT/code-review.md"
-"$BRAIN" --relink >/dev/null 2>&1
-check_contains "refreshes a real '## Backlinks' heading" \
-	'- 2026-08-20 the code-review notes are worth rereading' \
-	"$(cat "$BRAIN_VAULT/code-review.md")"
-
-# --- result ------------------------------------------------------------------
-
-printf '\n%d passed, %d failed\n' "$pass" "$fail"
-[[ "$fail" -eq 0 ]]
+exit $fail

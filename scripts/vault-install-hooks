@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Links the vault's pre-commit hook and exclude file to their versioned copies in dotfiles.
+set -euo pipefail
+VAULT="${BRAIN_VAULT:-$HOME/.sb/second-brain}"; SRC="$HOME/.config/dotfiles/vault"
+ln -sfn "$SRC/pre-commit" "$VAULT/.git/hooks/pre-commit"
+ln -sfn "$SRC/exclude" "$VAULT/.git/info/exclude"
+echo "linked pre-commit and exclude into $VAULT/.git"
