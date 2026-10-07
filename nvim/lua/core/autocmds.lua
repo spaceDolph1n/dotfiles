@@ -53,3 +53,15 @@ vim.api.nvim_create_autocmd("FileType", {
 		vim.opt_local.spell = true
 	end,
 })
+
+-- A dead nvim's swap whose recovered text already matches the file: delete it without asking.
+vim.api.nvim_create_autocmd("SwapExists", {
+	group = augroup("stale_swap"),
+	callback = function(ev)
+		local choice = require("core.swap").choice(vim.v.swapname, vim.fn.fnamemodify(ev.file, ":p"))
+		if choice then
+			vim.v.swapchoice = choice
+			vim.notify("Deleted a stale swap: its text matched the file.", vim.log.levels.INFO)
+		end
+	end,
+})
