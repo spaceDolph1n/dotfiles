@@ -1,0 +1,112 @@
+#!/usr/bin/env python3
+"""Join hard-wrapped prose in vault notes: one paragraph, one line.
+  vault-unwrap [--dry-run] <note.md>...   prints each note it changes (or would change)
+A note is written only if the result passes the safety check below; otherwise it is skipped."""
+import re
+import sys
+
+FENCE = re.compile(r"^\s*(>\s*)*(```|~~~)")  # a fence can sit inside a quote or callout
+LIST = re.compile(r"^(\s*)([-*+]|\d+[.)])\s")
+BLOCK = re.compile(r"^\s*([#|<]|\[\^[^\]]+\]:|\$\$|---\s*$|___\s*$)")  # never joined into or onto
+
+
+def hard_break(line):
+    return line.endswith("  ") or line.endswith("\\") or line.rstrip().endswith("<br>")
+
+
+def unwrap(text):
+    lines = text.split("\n")
+    out, i, fence = [], 0, False
+    if lines and lines[0] == "---":  # front matter stays exactly as it is
+        end = next((k for k in range(1, len(lines)) if lines[k] == "---"), None)
+        if end:
+            out, i = lines[: end + 1], end + 1
+    for line in lines[i:]:
+        prev = out[-1] if out else ""
+        if FENCE.match(line):
+            fence = not fence
+            out.append(line)
+            continue
+        if fence or not line.strip() or BLOCK.match(line) or LIST.match(line) or not prev.strip():
+            out.append(line)
+            continue
+        if FENCE.match(prev) or BLOCK.match(prev) or hard_break(prev):
+            out.append(line)
+            continue
+        quote = line.lstrip().startswith(">")
+        prev_quote = prev.lstrip().startswith(">")
+        if quote or prev_quote:
+            # Join quote body lines only: never onto a callout header or an empty `>` line.
+            body = line.lstrip()[1:].strip()
+            if quote and prev_quote and body and prev.lstrip()[1:].strip() \
+                    and not re.match(r"^>\s*\[!", prev.lstrip()) and not body.startswith(("[!", "-", "*", "|")):
+                out[-1] = prev.rstrip() + " " + body
+            else:
+                out.append(line)
+            continue
+        m = LIST.match(prev)
+        indent = len(line) - len(line.lstrip())
+        if line.startswith("    ") and not m and not out_in_list(out):
+            out.append(line)  # indented code block
+            continue
+        if indent and not m and not out_in_list(out):
+            out.append(line)
+            continue
+        out[-1] = prev.rstrip() + " " + line.strip()
+    return "\n".join(out)
+
+
+def out_in_list(out):
+    """Is the last non-blank output line part of a list item (the item or its joined text)?"""
+    for l in reversed(out):
+        if not l.strip():
+            return False
+        return bool(LIST.match(l)) or l.startswith(("  ", "\t"))
+    return False
+
+
+def safe(before, after):
+    """Only whitespace and quote markers may change, and the block structure must match."""
+    def skeleton(t):
+        return re.sub(r"\s+", "", re.sub(r"(?m)^\s*>", "", t))
+
+    def shape(t):
+        lines = t.split("\n")
+        return [sum(1 for l in lines if p.match(l)) for p in (
+            re.compile(r"^#{1,6} "), LIST, FENCE, re.compile(r"^\s*\|"),
+            re.compile(r"^\[\^[^\]]+\]:"), re.compile(r"^\s*>\s*\[!"))]
+    def fenced(t):  # every line inside a code fence, byte for byte
+        inside, keep = False, []
+        for l in t.split("\n"):
+            if FENCE.match(l):
+                inside = not inside
+            elif inside:
+                keep.append(l)
+        return keep
+    return (skeleton(before) == skeleton(after) and shape(before) == shape(after)
+            and fenced(before) == fenced(after))
+
+
+def main(args):
+    dry = "--dry-run" in args
+    paths = [a for a in args if a != "--dry-run"]
+    if not paths:
+        sys.exit(__doc__.strip())
+    bad = 0
+    for path in paths:
+        before = open(path, encoding="utf-8").read()
+        after = unwrap(before)
+        if after == before:
+            continue
+        if not safe(before, after):
+            print(f"SKIPPED (safety check failed): {path}", file=sys.stderr)
+            bad += 1
+            continue
+        print(path)
+        if not dry:
+            open(path, "w", encoding="utf-8").write(after)
+    return 1 if bad else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

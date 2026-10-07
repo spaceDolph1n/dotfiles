@@ -22,12 +22,17 @@ import os
 import re
 import sys
 from collections import defaultdict
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+from vaultlib import parse_frontmatter  # noqa: E402
 
 VAULT = os.environ.get("BRAIN_VAULT", os.path.expanduser("~/.sb/second-brain"))
 IGNORE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vault-lint.ignore")
 
 SKIP_DIRS = {".git", ".obsidian", "files", "node_modules"}
-SOFT_LINES, HARD_LINES = 400, 800
+SOFT_WORDS, HARD_WORDS = 1500, 3000
+BOLD_MAX = 15
+SIZE_EXEMPT = {"ticket", "plan", "journal"}  # read top to bottom as one record; journals split by year
+PROSE_SKIP = re.compile(r"^\s*([#|>]|[-*+] |\d+[.)] |\[\^|<|```|~~~|\$\$|---)")
 
 # [[target]], [[target|alias]], [[target#heading]], ![[embed]]
 LINK_RE = re.compile(r"!?\[\[([^\]]+)\]\]")
@@ -55,34 +60,38 @@ def load_ignore():
     return out
 
 
-def parse_frontmatter(text):
-    """Minimal YAML front-matter reader. Only the shapes this vault actually uses:
-    scalars, and block lists under aliases / tags / sources."""
-    if not text.startswith("---\n"):
-        return None
-    end = text.find("\n---", 3)
-    if end == -1:
-        return None
-    fm, key = {}, None
-    for raw in text[4:end].split("\n"):
-        if not raw.strip():
+def body(text):
+    """The note without its front matter."""
+    if text.startswith("---\n"):
+        end = text.find("\n---", 3)
+        if end != -1:
+            return text[end + 4:]
+    return text
+
+
+def prose_stats(text):
+    """Words, bold spans and hard-wrapped paragraphs, outside code fences."""
+    words = bold = wrapped = 0
+    fence, prev_prose = False, False
+    for line in body(text).split("\n"):
+        if re.match(r"^\s*(```|~~~)", line):
+            fence, prev_prose = not fence, False
             continue
-        if re.match(r"^\s+-\s", raw) and key:
-            # A bare `aliases:` sets "" first; the items that follow turn it
-            # into the list it always was.
-            if not isinstance(fm.get(key), list):
-                fm[key] = []
-            fm[key].append(raw.strip()[1:].strip().strip("\"'"))
+        if fence:
             continue
-        m = re.match(r"^([A-Za-z_][\w-]*):\s*(.*)$", raw)
-        if not m:
-            continue
-        key, val = m.group(1), m.group(2).strip()
-        if val in ("", "[]", "~", "null"):
-            fm[key] = [] if val == "[]" else ""
-        else:
-            fm[key] = val.strip("\"'")
-    return fm
+        words += len(line.split())
+        bold += len(re.findall(r"\*\*[^*\n]+\*\*", line))
+        list_item = re.match(r"^\s*([-*+] |\d+[.)] )", line)
+        is_prose = bool(line.strip()) and not PROSE_SKIP.match(line)
+        continuation = is_prose or (bool(line.strip()) and line.startswith("  ") and not list_item
+                                    and not PROSE_SKIP.match(line))
+        if continuation and prev_prose:
+            wrapped += 1
+        # A prose line or a list item can be followed by its own wrapped continuation,
+        # unless it ends in a markdown hard break (two spaces or a backslash).
+        ends_break = line.endswith("  ") or line.endswith("\\")
+        prev_prose = (is_prose or bool(list_item) or continuation) and not ends_break
+    return words, bold, wrapped
 
 
 def collect(ignore_files):
@@ -109,6 +118,7 @@ def collect(ignore_files):
                 "base": fn[:-3],
                 "fm": parse_frontmatter(text),
                 "lines": text.count("\n") + 1,
+                **dict(zip(("words", "bold", "wrapped"), prose_stats(text))),
                 "links": LINK_RE.findall(text),
             })
     return notes
@@ -133,6 +143,14 @@ def slug(s):
     """Fuzzy key for near-miss detection: alnum only, trailing plural dropped."""
     k = re.sub(r"[^a-z0-9]", "", norm(s))
     return k[:-1] if k.endswith("s") and len(k) > 4 else k
+
+
+def index_stale():
+    """vault-index --check exits 1 when either index is out of date."""
+    import subprocess
+    here = os.path.dirname(os.path.realpath(__file__))
+    r = subprocess.run([os.path.join(here, "vault-index"), "--check"], capture_output=True, text=True)
+    return [l for l in (r.stdout + r.stderr).splitlines() if l.strip()] if r.returncode else []
 
 
 def analyse(wanted_min):
@@ -201,9 +219,16 @@ def analyse(wanted_min):
             f"{n['rel']} ({', '.join(k for k in ('aliases', 'tags') if n['fm'].get(k) == [])})"
             for n in notes
             if n["fm"] and any(n["fm"].get(k) == [] for k in ("aliases", "tags"))),
-        "oversized": [{"note": r, "lines": l} for r, l in
-                      sorted(((n["rel"], n["lines"]) for n in notes if n["lines"] > SOFT_LINES),
+        "oversized": [{"note": r, "words": w} for r, w in
+                      sorted(((n["rel"], n["words"]) for n in notes if n["words"] > SOFT_WORDS
+                              and (n["fm"] or {}).get("type") not in SIZE_EXEMPT),
                              key=lambda x: -x[1])],
+        "wrapped": sorted(f"{n['rel']} ({n['wrapped']} lines)" for n in notes if n["wrapped"]),
+        # Bold marks the one load-bearing claim per section: over 15, or 1 per 100 words, marks nothing.
+        "heavy_bold": [f"{b:>3} bold in {w} words  {r}" for r, b, w in
+                       sorted(((n["rel"], n["bold"], n["words"]) for n in notes
+                               if n["bold"] > max(BOLD_MAX, n["words"] // 100)), key=lambda x: -x[1])],
+        "index_stale": index_stale(),
         "source_wanted": [{"id": s, "cited_by": c} for s, c in source_wanted],
     }
 
@@ -244,8 +269,11 @@ def main():
     section("source-wanted", f"SOURCES CITED {wanted_min}+ TIMES WITH NO NOTE",
             [f"{s['cited_by']}x  {s['id']}" for s in r["source_wanted"]])
     section("empty-fields", "EMPTY aliases:/tags:", r["empty_fields"])
-    section("oversized", f"OVERSIZED — soft {SOFT_LINES}, hard {HARD_LINES}",
-            [f"{o['lines']:>5}  {o['note']}{'  HARD' if o['lines'] > HARD_LINES else ''}"
+    section("index-stale", "INDEX STALE — run vault-index (the pre-commit hook does)", r["index_stale"])
+    section("wrapped", "HARD-WRAPPED PROSE — one paragraph, one line", r["wrapped"])
+    section("heavy-bold", f"HEAVY BOLD — more than {BOLD_MAX} spans, or 1 per 100 words", r["heavy_bold"])
+    section("oversized", f"OVERSIZED — words, soft {SOFT_WORDS}, hard {HARD_WORDS}; ticket and plan exempt",
+            [f"{o['words']:>5}  {o['note']}{'  HARD' if o['words'] > HARD_WORDS else ''}"
              for o in r["oversized"]])
     print()
     return 0

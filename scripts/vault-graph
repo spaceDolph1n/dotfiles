@@ -21,6 +21,8 @@ import os
 import re
 import subprocess
 import sys
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+from vaultlib import parse_frontmatter  # noqa: E402
 
 VAULT = os.environ.get("BRAIN_VAULT", os.path.expanduser("~/.sb/second-brain"))
 SKIP_DIRS = {".git", ".obsidian", "files", "node_modules"}
@@ -40,26 +42,7 @@ def norm(s):
 
 
 def parse_fm(text):
-    if not text.startswith("---\n"):
-        return {}
-    end = text.find("\n---", 3)
-    if end == -1:
-        return {}
-    fm, key = {}, None
-    for raw in text[4:end].split("\n"):
-        if not raw.strip():
-            continue
-        if re.match(r"^\s+-\s", raw) and key:
-            if not isinstance(fm.get(key), list):
-                fm[key] = []
-            fm[key].append(raw.strip()[1:].strip().strip("\"'"))
-            continue
-        m = re.match(r"^([A-Za-z_][\w-]*):\s*(.*)$", raw)
-        if m:
-            key, val = m.group(1), m.group(2).strip()
-            fm[key] = [] if val == "[]" else val.strip("\"'")
-    return fm
-
+    return parse_frontmatter(text) or {}
 
 def build(pushed_only):
     roots = ["00 - zettelkasten", "0 - inbox"] + ([] if pushed_only else ["work"])
