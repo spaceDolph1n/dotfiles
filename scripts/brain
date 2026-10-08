@@ -15,7 +15,7 @@ if [ "$#" -gt 0 ]; then
 	text="$*"
 elif [ -t 0 ] && command -v fzf >/dev/null; then
 	# fzf as a one-line input: Enter captures, Esc or Ctrl-C cancels (so the tmux popup closes).
-	text="$(fzf --print-query --prompt 'capture › ' --no-info --layout=reverse </dev/null | head -1)" || true
+	text="$(fzf --print-query --prompt 'capture › ' --no-info --layout=reverse --border=none --no-separator --no-scrollbar </dev/null | head -1)" || true
 	[ -n "$text" ] || exit 0
 elif [ -t 0 ]; then
 	read -r -p "capture: " text
