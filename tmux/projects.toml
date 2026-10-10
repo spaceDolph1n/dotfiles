@@ -16,3 +16,7 @@ path = "~/.sb/second-brain"
 [[project]]
 name = "web"
 path = "~/Documents/work/web"
+
+[[project]]
+name = "claude"
+path = "~/.claude"
