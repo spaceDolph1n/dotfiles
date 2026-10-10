@@ -153,6 +153,21 @@ def index_stale():
     return [l for l in (r.stdout + r.stderr).splitlines() if l.strip()] if r.returncode else []
 
 
+def stale_companions(ignore_files):
+    """An HTML companion holds a view of its note's data; edited after it, the view is out of date."""
+    stale = []
+    for root, dirs, files in os.walk(VAULT):
+        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+        for fn in files:
+            note = os.path.join(root, fn[:-5] + ".md")
+            if not fn.endswith(".html") or not os.path.exists(note):
+                continue
+            rel = os.path.relpath(os.path.join(root, fn), VAULT)
+            if norm(rel) not in ignore_files and os.path.getmtime(os.path.join(root, fn)) < os.path.getmtime(note):
+                stale.append(rel)
+    return sorted(stale)
+
+
 def analyse(wanted_min):
     ignore = load_ignore()
     notes = collect(ignore["files"])
@@ -229,6 +244,7 @@ def analyse(wanted_min):
                        sorted(((n["rel"], n["bold"], n["words"]) for n in notes
                                if n["bold"] > max(BOLD_MAX, n["words"] // 100)), key=lambda x: -x[1])],
         "index_stale": index_stale(),
+        "stale_companion": stale_companions(ignore["files"]),
         "source_wanted": [{"id": s, "cited_by": c} for s, c in source_wanted],
     }
 
@@ -270,6 +286,8 @@ def main():
             [f"{s['cited_by']}x  {s['id']}" for s in r["source_wanted"]])
     section("empty-fields", "EMPTY aliases:/tags:", r["empty_fields"])
     section("index-stale", "INDEX STALE — run vault-index (the pre-commit hook does)", r["index_stale"])
+    section("stale-companion", "STALE HTML COMPANION — its note changed after it; regenerate the view",
+            r["stale_companion"])
     section("wrapped", "HARD-WRAPPED PROSE — one paragraph, one line", r["wrapped"])
     section("heavy-bold", f"HEAVY BOLD — more than {BOLD_MAX} spans, or 1 per 100 words", r["heavy_bold"])
     section("oversized", f"OVERSIZED — words, soft {SOFT_WORDS}, hard {HARD_WORDS}; ticket and plan exempt",
