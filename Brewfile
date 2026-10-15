@@ -102,7 +102,7 @@ cask "kap"
 cask "keka"
 cask "linear"
 cask "zed"
-cask "zoom"
+cask "google-chrome"
 
 # ---------------------------------------------------------------------------
 # Work laptop only -- detected by ~/Documents/work, so the personal Mac skips it
@@ -119,4 +119,7 @@ end
 # ---------------------------------------------------------------------------
 unless File.directory?(File.expand_path("~/Documents/work"))
   cask "surfshark"
+  cask "brave-browser"
+  cask "steam"
+  cask "whatsapp"
 end
