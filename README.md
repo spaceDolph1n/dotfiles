@@ -20,7 +20,7 @@ xcode-select --install
 
 ```bash
 mkdir -p ~/.config && cd ~/.config
-git clone git@github-personal:spaceDolph1n/dotfiles.git   # or: gh repo clone spaceDolph1n/dotfiles
+git clone git@github.com:spaceDolph1n/dotfiles.git   # or: gh repo clone spaceDolph1n/dotfiles
 cd dotfiles
 
 stow -t ~/.config .   # everything except zshrc lands in ~/.config

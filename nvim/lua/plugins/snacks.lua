@@ -1,5 +1,5 @@
--- Personal repos (the github-personal SSH alias) are private to the inactive gh account.
-local gh = "if git remote get-url origin 2>/dev/null | grep -q github-personal; then "
+-- Personal repos are private to the inactive gh account on the work laptop.
+local gh = "if git remote get-url origin 2>/dev/null | grep -q spaceDolph1n/; then "
 	.. "export GH_TOKEN=$(gh auth token -u spaceDolph1n); fi; gh"
 
 return {
