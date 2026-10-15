@@ -35,15 +35,12 @@ return {
 					elseif closing - 1 > first then
 						local info = node:named_child(1)
 						local has_language = info ~= nil and info:type() == "info_string"
-						local diagram = has_language and vim.treesitter.get_node_text(info, ctx.buf):match("^mermaid")
-						if not diagram then
-							-- Without a language both fences are hidden, so pad the code itself.
-							marks[#marks + 1] = row(has_language and first or first + 1, false, { virt_lines = { pad }, virt_lines_above = true })
-							if has_language then
-								marks[#marks + 1] = row(first, true, { virt_lines = { divider } })
-							end
-							marks[#marks + 1] = row(closing - 1, false, { virt_lines = { pad } })
+						-- Without a language both fences are hidden, so pad the code itself.
+						marks[#marks + 1] = row(has_language and first or first + 1, false, { virt_lines = { pad }, virt_lines_above = true })
+						if has_language then
+							marks[#marks + 1] = row(first, true, { virt_lines = { divider } })
 						end
+						marks[#marks + 1] = row(closing - 1, false, { virt_lines = { pad } })
 					end
 				end
 				return marks
@@ -54,8 +51,6 @@ return {
 				heading = { sign = false, icons = { "" }, position = "inline", backgrounds = {} },
 				bullet = { icons = { "•", "◦" } },
 				code = {
-					-- snacks.image draws these; hiding the fences would hide the diagram too.
-					disable = { "mermaid" },
 					sign = false,
 					border = "hide",
 					left_pad = 2,

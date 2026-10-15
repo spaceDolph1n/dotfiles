@@ -63,13 +63,6 @@ mise use -g "npm:czg@latest"             # commit tooling, lazygit's `C` binding
 mise use -g "npm:@openai/codex@latest"   # Codex CLI, used by the codex consult
 ```
 
-`mmdc` (mermaid-cli, for diagrams drawn inline in nvim) renders through a headless
-Chrome that mise does not download. Fetch the version its error names, once:
-
-```bash
-npx @puppeteer/browsers install chrome-headless-shell@<version> --path ~/.cache/puppeteer
-```
-
 > **Which manager?** Decide by what the thing *ships as*, not by preference:
 > language runtimes and npm-delivered CLIs → **mise** (tracked in `mise/config.toml`);
 > compiled binaries and apps → **brew** (tracked in `Brewfile`). Keep `npm -g`,
