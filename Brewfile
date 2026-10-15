@@ -29,6 +29,7 @@ brew "fzf-tab"        # fzf-powered zsh completion menu
 brew "ripgrep"        # grep replacement; also backs :grep in Neovim
 brew "ast-grep"       # structural search/replace engine for grug-far.nvim
 brew "yazi"           # TUI file manager
+brew "unar"           # extracts rar, 7z and the rest; Keka stays for Finder
 
 # ---------------------------------------------------------------------------
 # Editor & language tooling
