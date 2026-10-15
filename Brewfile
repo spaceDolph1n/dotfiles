@@ -78,8 +78,6 @@ brew "tmux"
 # Global config is stowed from workmux/; per-repo overrides in .workmux.yaml.
 brew "raine/workmux/workmux"
 brew "btop"
-brew "openssh"
-brew "ykman"                        # YubiKey manager (SSH signing key)
 brew "felixkratz/formulae/borders"  # window borders, started by aerospace
 
 # ---------------------------------------------------------------------------
@@ -93,11 +91,32 @@ cask "1password"
 cask "1password-cli"
 cask "homerow"
 cask "jordanbaird-ice" # Ice, menu bar manager
-cask "notion"
 cask "notion-calendar"
 cask "notion-mail"
 cask "firefox"
-cask "slack"
 cask "raycast"
 cask "spotify"
 cask "todoist-app"
+cask "iina"
+cask "kap"
+cask "keka"
+cask "linear"
+cask "zed"
+cask "zoom"
+
+# ---------------------------------------------------------------------------
+# Work laptop only -- detected by ~/Documents/work, so the personal Mac skips it
+# ---------------------------------------------------------------------------
+if File.directory?(File.expand_path("~/Documents/work"))
+  brew "openssh"  # Apple's ssh can't use the YubiKey (sk) signing key
+  brew "ykman"    # YubiKey manager
+  cask "notion"
+  cask "slack"
+end
+
+# ---------------------------------------------------------------------------
+# Personal Mac only
+# ---------------------------------------------------------------------------
+unless File.directory?(File.expand_path("~/Documents/work"))
+  cask "surfshark"
+end
