@@ -95,6 +95,8 @@ Identity is split by directory via `includeIf` in `git/.gitconfig`:
 | `~/Documents/work/` | `.gitconfig-work` |
 | `~/.config/dotfiles/`, `~/.sb/` | `.gitconfig-personal` |
 
+`git/config` is a symlink to `.gitconfig` and must stay: tools like workmux strip `GIT_CONFIG_GLOBAL` before running git, and without the file at git's default path they lose the work include and fetch with the personal key.
+
 ```bash
 ssh-keygen -t ed25519 -C "your_email@example.com"
 pbcopy < ~/.ssh/id_ed25519.pub   # → GitHub → Settings → SSH and GPG keys
