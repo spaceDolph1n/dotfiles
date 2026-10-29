@@ -18,4 +18,11 @@ check "a companion older than its note is stale, and only that one" "$(stale)" "
 "$LINT" --only stale-companion | grep -q 'edited.html' && r=yes || r=no
 check "the text report lists it too" "$r" yes
 
+wrapped() { "$LINT" --json | python3 -c 'import json,sys; print(" ".join(json.load(sys.stdin)["wrapped"]))'; }
+rm -f "$BRAIN_VAULT"/*.md "$BRAIN_VAULT"/*.html
+printf -- '---\nid: decision\ntype: concept\n---\n\n- **Decided:** keep it.\n  **Why:** it works.\n  **Rejected:** dropping it.\n' > "$BRAIN_VAULT/decision.md"
+check "labelled lines under a decision are not hard wraps" "$(wrapped)" ""
+printf -- '---\nid: broken\ntype: concept\n---\n\n- a sentence that was\n  broken in the middle.\n' > "$BRAIN_VAULT/broken.md"
+check "a list item broken mid-sentence still is" "$(wrapped)" "broken.md (1 lines)"
+
 rm -rf "$BRAIN_VAULT"; exit $fail

@@ -85,7 +85,9 @@ def prose_stats(text):
         is_prose = bool(line.strip()) and not PROSE_SKIP.match(line)
         continuation = is_prose or (bool(line.strip()) and line.startswith("  ") and not list_item
                                     and not PROSE_SKIP.match(line))
-        if continuation and prev_prose:
+        # A line opening on a bold label (`**Why:**`) starts a new field, as in /capture's decisions.
+        labelled = re.match(r"^\s*\*\*[^*\n]+:\*\*", line)
+        if continuation and prev_prose and not labelled:
             wrapped += 1
         # A prose line or a list item can be followed by its own wrapped continuation,
         # unless it ends in a markdown hard break (two spaces or a backslash).
