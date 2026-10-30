@@ -78,6 +78,7 @@ brew "tmux"
 # git worktree + tmux window per task, for parallel agents.
 # Global config is stowed from workmux/; per-repo overrides in .workmux.yaml.
 brew "raine/workmux/workmux"
+brew "agent-browser"  # drives Chrome for agents; run `agent-browser install` once for its Chrome
 brew "btop"
 brew "felixkratz/formulae/borders"  # window borders, started by aerospace
 
