@@ -90,7 +90,13 @@ if [[ "$selected" == "$WORKTREE_ROOT"/* ]]; then
 	[[ -n "$parent" ]] && parent_args=(--parent-session "$parent")
 	if ! err=$(workmux open "$name" "${parent_args[@]}" 2>&1 >/dev/null); then
 		tmux display-message "tmux-project-window: ${err:-workmux open $name failed}"
+		exit 0
 	fi
+	# workmux leaves the client on the old window too. Find the worktree's window by
+	# path: names get renamed, and workmux tracks its windows by an id it keeps itself.
+	win=$(tmux list-panes -s -F $'#{window_id}\t#{pane_current_path}' |
+		awk -F'\t' -v p="$selected" '$2 == p { print $1; exit }' || true)
+	[[ -n "$win" ]] && tmux select-window -t "$win"
 	exit 0
 fi
 
@@ -104,3 +110,6 @@ fi
 # tracking through the hook in ~/.claude, so it still shows in the sidebar.
 pane=$(tmux new-window -P -F '#{pane_id}' -c "$selected" -n "$name")
 tmux split-window -h -t "$pane" -c "$selected" "$(agent_command)"
+# new-window should select it already, but from the popup the client stays on
+# the old window (2026-10-30; not reproduced off-screen), so select it by id.
+tmux select-window -t "$pane"
