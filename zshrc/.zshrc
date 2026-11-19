@@ -14,7 +14,10 @@ export PATH="$PATH:$SCRIPTS"
 # works on an Intel Mac or Linux box.
 export EDITOR=nvim
 export VISUAL="$EDITOR"
-export MANPAGER="nvim +Man!"
+# nvim only with a real terminal: without one it never exits, gets orphaned and
+# grew to 45 GB (found 2026-11-19). Agents' shells have no terminal, so they get
+# plain text (col -bx strips the bold that would print as "NNAAMMEE").
+export MANPAGER='sh -c "if [ -t 1 ]; then nvim +Man!; else col -bx; fi"'
 
 export GIT_CONFIG_GLOBAL=~/.config/git/.gitconfig
 export STARSHIP_CONFIG=~/.config/starship/starship.toml
