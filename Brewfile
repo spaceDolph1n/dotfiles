@@ -67,6 +67,7 @@ brew "diffnav"        # delta plus a GitHub-style file tree; gh-dash's diff page
 # sidecar only -- comments that go on a PR are still tuicr's job.
 brew "hunk"
 brew "yt-dlp"         # pull video transcripts: yt-dlp --skip-download --write-auto-subs
+brew "ffmpeg"         # turns browser-QA recordings into the GIFs the work PR template asks for
 brew "poppler"        # pdftotext — extract book/PDF text locally for the vault
 brew "pandoc"         # epub/docx -> markdown, same job for non-PDF books
 brew "typst"          # PDF engine for pandoc (--pdf-engine=typst); ad-hoc test PDFs
