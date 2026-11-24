@@ -35,6 +35,10 @@
 [diff]
   colorMoved = default     # distinguishes moved code from added/removed
 
+# Machine-only settings that must not be public; the file is git-ignored.
+[include]
+  path = ~/.config/git/.gitconfig-local
+
 [includeIf "gitdir:~/.config/dotfiles/"]
   path = ~/.config/git/.gitconfig-personal
 
