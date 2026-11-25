@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# This repo is public. Refuses staged lines that name employer systems (2026-11-24: an
+# employer git rule sat uncommitted in git/.gitconfig until a check at commit time caught it).
+# The words live in .public-denylist, git-ignored, so this file publishes none of them.
+# Machine-only settings go to git-ignored files instead: git/.gitconfig-local, git/.gitconfig-work.
+set -euo pipefail
+
+list="$(git rev-parse --show-toplevel)/.public-denylist"
+if [ ! -s "$list" ]; then
+	printf '\n✋ refusing to commit — %s is missing or empty, so nothing can be checked.\n\n' "$list" >&2
+	exit 1
+fi
+
+hits=$(git diff --cached -U0 --no-color | grep -E '^(\+[^+]|diff --git)' | grep -inF -f "$list" || true)
+if [ -n "$hits" ]; then
+	printf '\n✋ refusing to commit — this public repo would gain lines naming a denylisted word:\n\n' >&2
+	printf '%s\n' "$hits" | cut -c1-160 | sed 's/^/    /' >&2
+	printf '\nMove them to a git-ignored file (git/.gitconfig-local), or unstage: git restore --staged <path>\n\n' >&2
+	exit 1
+fi

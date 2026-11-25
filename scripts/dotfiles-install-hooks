@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Links dotfiles' own pre-commit hook to its versioned copy. Run once per clone; the hook also
+# needs .public-denylist (git-ignored, one word per line) or it refuses every commit.
+set -euo pipefail
+DOTFILES="$HOME/.config/dotfiles"
+ln -sfn "$DOTFILES/githooks/pre-commit" "$DOTFILES/.git/hooks/pre-commit"
+[ -s "$DOTFILES/.public-denylist" ] || echo "warning: $DOTFILES/.public-denylist is missing; add the words to keep out of this public repo"
+echo "linked pre-commit into $DOTFILES/.git"

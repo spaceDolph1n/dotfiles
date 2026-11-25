@@ -68,3 +68,5 @@ local.*
 git/.gitconfig-work
 # Machine-only settings that name employer systems; git/.gitconfig includes it everywhere.
 git/.gitconfig-local
+# Words githooks/pre-commit keeps out of this public repo; listing them here would publish them.
+.public-denylist
